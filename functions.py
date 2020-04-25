@@ -18,6 +18,11 @@ except Exception as e:
 
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
+def VerifyGJP(AccountID: int, GJP: str):
+    """Returns true if GJP is correct."""
+    #NOT DONE YET!!!!!!
+    return True
+
 def FixUserInput(String):
     """Gets rid of potentially problematic user input."""
     String = String.replace("\0", "")
@@ -90,6 +95,8 @@ def GetUserDataFunction(request):
     TargetAccid = request.form["targetAccountID"]
     FromAccid = request.form["accountID"]
     Log(f"Getting account data for {TargetAccid}")
+    if not VerifyGJP(FromAccid, request.form["gjp"]):
+        return "-1"
     #checking for blocks
     mycursor.execute("SELECT id FROM blocks WHERE (person1 = %s AND person2 = %s) OR (person1 = %s AND person2 = %s)", (TargetAccid, FromAccid, FromAccid, TargetAccid))
     Blocks = mycursor.fetchall()
@@ -178,6 +185,8 @@ def InsertAccComment(request):
     Username = request.form["userName"]
     CommentContent = request.form["comment"]
     AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
     USerID = AIDToUID(AccountID)
     Timestamp = round(time.time())
     mycursor.execute("INSERT INTO acccomments (comment, userID, timeStamp, userName) VALUES (%s, %s, %s, %s)", (CommentContent, USerID, Timestamp, Username))

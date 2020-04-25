@@ -5,6 +5,10 @@ from console import *
 
 app = Flask(__name__)
 
+@app.route("/")
+def Home():
+    return "Running GDPyS by RealistikDash!"
+
 @app.route("/database///accounts/loginGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/loginGJAccount.php", methods=["GET", "POST"])
 def LoginHandler():
@@ -55,6 +59,11 @@ def UpdateAccountSettings():
 @app.route("/database///updateGJUserScore21.php", methods=["GET", "POST"])
 def UpdateScore():
     return UpdateUserScore(request)
+
+@app.route("/database///getGJScores20.php", methods=["GET", "POST"])
+@app.route("/database/getGJScores20.php", methods=["GET", "POST"])
+def GetScores():
+    return GetLeaderboards(request)
 
 @app.errorhandler(500)
 def BadCodeError(error):

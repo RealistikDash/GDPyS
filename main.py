@@ -45,4 +45,15 @@ def UploadAccComment():
 def BadCodeError(error):
     return "-1"
 
-app.run("0.0.0.0", port=UserConfig["Port"])
+if __name__ == "__main__":
+    print(rf"""{Fore.BLUE}   _____ _____  _____        _____
+  / ____|  __ \|  __ \      / ____|
+ | |  __| |  | | |__) |   _| (___
+ | | |_ | |  | |  ___/ | | |\___ \
+ | |__| | |__| | |   | |_| |____) |
+  \_____|_____/|_|    \__, |_____/
+                       __/ |
+                      |___/
+ {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
+    """)
+    app.run("0.0.0.0", port=UserConfig["Port"])

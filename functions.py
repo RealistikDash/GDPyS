@@ -242,3 +242,53 @@ def UpdateUserScore(request):
     mydb.commit()
     Success(f"Successfully updated the user profile for {request.form['userName']}!")
     return "1"
+
+def JointStringBuilder(Content: dict):
+    """Builds a joint string out of a dict."""
+    ReturnString = ""
+    #iterating through dict
+    for key in list(Content.keys()):
+        ReturnString += f":{key}:{Content[key]}"
+    return ReturnString[1:]
+
+def GetLeaderboards(request):
+    """Gets the leaderboards."""
+    AccID = request.form["accountID"]
+    LeaderboardType = request.form["type"] #4 leaderboard types, realitive, creator, friends and top
+    Log(f"Serving {LeaderboardType} leaderboards to {AccID}")
+
+    #leaderboard data
+    if LeaderboardType == "top":
+        #probably the simplest one
+        mycursor.execute("SELECT * FROM users WHERE isBanned = '0' AND stars > 0 ORDER BY stars DESC LIMIT 100")
+
+    elif LeaderboardType == "creators":
+        mycursor.execute("SELECT * FROM users WHERE isCreatorBanned = '0' AND isBanned = '0' ORDER BY creatorPoints DESC LIMIT 100")
+
+    TheData = mycursor.fetchall()
+    
+    ReturnStr = ""
+    Iteration = 0
+    for User in TheData:
+        Iteration += 1
+        ReturnStr += JointStringBuilder({
+            "1" : User[3], #username
+            "2" : User[1], #user id
+            "3" : User[4], #stars
+            "4" : User[5], #demons
+            "6" : Iteration, #rank
+            "7" : User[2], #extid
+            "8" : round(User[22]), #cp
+            "9" : User[6], #icon
+            "10" : User[7], #col1
+            "11" : User[8], #col2
+            "13" : User[10], #coins
+            "14" : User[9], #icon type
+            "15" : User[12], #special
+            "16" : User[2], #another extid
+            "17" : User[11], #usercoins
+            "46" : User[25] #diamonds
+        }) + "|"
+    print(ReturnStr)
+    Success("Leaderboards served!")
+    return ReturnStr[:-1]

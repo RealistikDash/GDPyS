@@ -212,3 +212,33 @@ def UpdateAccSettings(request):
     mydb.commit()
     Success(f"Settings updated successfully for {AccountID}!")
     return "1"
+
+def UpdateUserScore(request):
+    """Updates the user page."""
+    #ill do it this way as i can't be asked to write out a billion if statements
+    #getting accid from name
+    Log(f'Updating user settings for {request.form["userName"]}...')
+    mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (request.form["userName"],))
+    AccountID = mycursor.fetchall()
+    if len(AccountID) == 0:
+        return "-1"
+    AccountID = AccountID[0][0]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    ToGet = ["userName", "stars", "demons", "icon", "diamonds", "color1", "color2", "iconType", "special", "accIcon", "accShip", "accBall", "accBird", "accDart", "accRobot", "accGlow", "accSpider", "accExplosion", "gameVersion", "secret", "coins", "userCoins"]
+    DataDict = {}
+    for Thing in ToGet:
+        try:
+            DataDict[Thing] = request.form[Thing]
+        except:
+            DataDict[Thing] = 0
+
+    UserID = AIDToUID(AccountID)
+    #big boy query coming up....
+    mycursor.execute(
+        "UPDATE users SET stars = %s, diamonds = %s, color1 = %s, color2 = %s, iconType = %s, special = %s, accIcon = %s, accShip = %s, accBall = %s, accBird = %s, accDart = %s, accRobot = %s, accGlow = %s, accSpider = %s, accExplosion = %s, gameVersion = %s, secret = %s, coins=%s, userCoins = %s",
+        (DataDict["stars"], DataDict["diamonds"], DataDict["color1"], DataDict["color2"], DataDict["iconType"], DataDict["special"], DataDict["accIcon"], DataDict["accShip"], DataDict["accBall"], DataDict["accBird"], DataDict["accDart"], DataDict["accRobot"], DataDict["accGlow"], DataDict["accSpider"], DataDict["accExplosion"], DataDict["gameVersion"], DataDict["secret"], DataDict["coins"], DataDict["userCoins"])
+        )
+    mydb.commit()
+    Success(f"Successfully updated the user profile for {request.form['userName']}!")
+    return "1"

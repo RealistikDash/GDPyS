@@ -46,6 +46,16 @@ def UploadAccComment():
 def UpdateAccountSettings():
     return UpdateAccSettings(request)
 
+@app.route("/database/updateGJUserScore22.php", methods=["GET", "POST"])
+@app.route("/database///updateGJUserScore22.php", methods=["GET", "POST"])
+#for older ver compatibillity i think
+@app.route("/database/updateGJUserScore20.php", methods=["GET", "POST"])
+@app.route("/database///updateGJUserScore20.php", methods=["GET", "POST"])
+@app.route("/database/updateGJUserScore201php", methods=["GET", "POST"])
+@app.route("/database///updateGJUserScore21.php", methods=["GET", "POST"])
+def UpdateScore():
+    return UpdateUserScore(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

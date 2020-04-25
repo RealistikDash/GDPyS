@@ -1,0 +1,4 @@
+flask
+mysql-connector
+colorama
+timeago 

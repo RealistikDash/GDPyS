@@ -192,3 +192,23 @@ def InsertAccComment(request):
     mycursor.execute("INSERT INTO acccomments (comment, userID, timeStamp, userName) VALUES (%s, %s, %s, %s)", (CommentContent, USerID, Timestamp, Username))
     mydb.commit()
     return "1"
+
+def UpdateAccSettings(request):
+    """Updates the account settings for user."""
+    AccountID = request.form["accountID"]
+    Ms = request.form["mS"]
+    Frs = request.form["frS"]
+    Cs = request.form["cS"]
+    AccountID = request.form["accountID"]
+    YouTube = request.form["yt"]
+    Twitter = request.form["twitter"]
+    Twitch = request.form["twitch"]
+    Log(f"Updating account settings for {AccountID}")
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    
+    #setting the things
+    mycursor.execute("UPDATE accounts SET mS = %s, cS = %s, frS = %s, youtubeurl = %s, twitter = %s, twitch = %s WHERE accountID = %s", (Ms, Cs, Frs, YouTube, Twitter, Twitch, AccountID))
+    mydb.commit()
+    Success(f"Settings updated successfully for {AccountID}!")
+    return "1"

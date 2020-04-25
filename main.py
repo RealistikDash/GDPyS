@@ -41,6 +41,11 @@ def UploadAccComment():
     Result = InsertAccComment(request)
     return Result
 
+@app.route("/database///updateGJAccSettings20.php", methods=["GET", "POST"])
+@app.route("/database/updateGJAccSettings20.php", methods=["GET", "POST"])
+def UpdateAccountSettings():
+    return UpdateAccSettings(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

@@ -13,6 +13,8 @@ DefaultConfig = {
     "SQLUser" : "root",
     "SQLDatabase" : "gdps",
     "SQLPassword" : "",
+    "Chest1Wait" : 60,
+    "Chest2Wait" : 240
 }
 
 class JsonFile:

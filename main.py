@@ -70,6 +70,11 @@ def GetScores():
 def GetMod():
     return IsMod(request)
 
+@app.route("/database///getGJRewards.php", methods=["GET", "POST"])
+@app.route("/database/getGJRewards.php", methods=["GET", "POST"])
+def GetRewards():
+    return Rewards(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

@@ -14,7 +14,8 @@ DefaultConfig = {
     "SQLDatabase" : "gdps",
     "SQLPassword" : "",
     "Chest1Wait" : 60,
-    "Chest2Wait" : 240
+    "Chest2Wait" : 240,
+    "CronThreadDelay" : 3600
 }
 
 class JsonFile:

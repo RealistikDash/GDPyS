@@ -3,6 +3,9 @@ from config import *
 from console import *
 import time
 import timeago
+import base64
+import random
+import hashlib
 
 try:
     mydb = mysql.connector.connect(
@@ -25,7 +28,7 @@ def VerifyGJP(AccountID: int, GJP: str):
 
 def FixUserInput(String):
     """Gets rid of potentially problematic user input."""
-    String = String.replace("\0", "")
+    String = String.replace(r"\0", "")
     String = String.replace("#", "")
     String = String.replace("|", "")
     String = String.replace("#", "")
@@ -90,6 +93,12 @@ def GetRank(AccountID):
     """Gets rank for user."""
     return 0
 
+def Xor(data, key):
+    data = str(data)
+    key = str(key)
+    xored = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in zip(data, cycle(key)))
+    return xored
+
 def GetUserDataFunction(request):
     """Gets the user data."""
     TargetAccid = request.form["targetAccountID"]
@@ -142,9 +151,6 @@ def GetUserDataFunction(request):
     TheStupidString = f"1:{Userdata[3]}:2:{Userdata[1]}:13:{Userdata[10]}:17:{Userdata[11]}:10:{Userdata[7]}:11:{Userdata[8]}:3:{Userdata[4]}:46:{Userdata[25]}:4:{Userdata[5]}:8:{Userdata[22]}:18:{ExtraData[4]}:19:{ExtraData[3]}:50:{ExtraData[5]}:20:{ExtraData[0]}:21:{Userdata[15]}:22:{Userdata[16]}:23:{Userdata[17]}:24:{Userdata[18]}:25:{Userdata[19]}:26:{Userdata[20]}:28:{Userdata[21]}:43:{Userdata[28]}:47:{Userdata[29]}:30:{Rank}:16:{Userdata[2]}:31:{FriendState}:44:{ExtraData[1]}:45:{ExtraData[2]}:29:1:49:{ModBadgeLevel}{Append}"
     Success(f"Got user data for {Userdata[3]} successfully!A")
     return TheStupidString
-
-def Base64Encode(Text):
-    return Text.encode("base64".strip())
 
 def AIDToUID(AccountID: int):
     """Gets user ID from Account ID."""
@@ -297,13 +303,13 @@ def GetLeaderboards(request):
 def GetModBadge(AccountID):
     """Gets mod badge level"""
     #checking if user has role assigned
-    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s", (AccountID,))
+    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s LIMIT 1", (AccountID,))
     Role = mycursor.fetchall()
     if len(Role) == 0:
         return 0 #no role assigned, byebye
     Role = Role[0][0]
     #now we get the role badge
-    mycursor.execute("SELECT modBadgeLevel FROM roles WHERE roleID = %s", (Role,))
+    mycursor.execute("SELECT modBadgeLevel FROM roles WHERE roleID = %s LIMIT 1", (Role,))
     BadgePriv = mycursor.fetchall()
     if len(BadgePriv) == 0:
         return 0 #role not found
@@ -316,13 +322,13 @@ def IsMod(request):
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
         return "-1"
     #checking if user has role assigned
-    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s", (request.form["accountID"],))
+    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s LIMIT 1", (request.form["accountID"],))
     Role = mycursor.fetchall()
     if len(Role) == 0:
         return "-1" #no role assigned, byebye
     Role = Role[0][0]
     #now we get the role badge
-    mycursor.execute("SELECT actionRequestMod FROM roles WHERE roleID = %s", (Role,))
+    mycursor.execute("SELECT actionRequestMod FROM roles WHERE roleID = %s LIMIT 1", (Role,))
     BadgePriv = mycursor.fetchall()
     if len(BadgePriv) == 0:
         return "-1" #role not found
@@ -332,3 +338,71 @@ def IsMod(request):
         return "-1"
     Success(f"User {request.form['accountID']} mod check success!")
     return str(BadgePriv)
+
+def Rewards(request):
+    """Responsible for the chest rewards."""
+    Log(f"Started getting chest data for {request.form['accountID']}")
+    if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
+        return "-1"
+    
+    Timestamp = round(time.time())
+    RewardType = request.form["rewardType"] #0 = get time, 1= small chest, 2 = big chest
+    Chk = request.form["chk"]
+    #chk things ported from cvoltons php thing
+    EncodeChk = Xor(base64.b64decode(Chk[5:]), 59182)
+    UserID = AIDToUID(request.form["accountID"])
+    mycursor.execute("SELECT chest1count, chest1time, chest2count, chest2time FROM users WHERE userID = %s LIMIT 1", (UserID,)) #get chest 1 data
+    ChestData = mycursor.fetchall()[0]
+    Chest1Data = [ChestData[0], ChestData[1]]
+    Chest2Data = [ChestData[2], ChestData[3]]
+    if RewardType == 1:
+        #smol chest
+        if not (Chest1Data[0] - Timestamp) <= 0:
+            return "-1"
+        NewChestCount = Chest1Data[0] + 1
+        NewChestTime = Timestamp + (UserConfig["Chest1Wait"] * 60)
+        mycursor.execute("UPDATE users SET chest1count = %s, chest1time = %s WHERE userID = %s LIMIT 1", (NewChestCount, NewChestTime, UserID))
+
+    if RewardType == 2:
+        #big chest
+        if not (Chest2Data[0] - Timestamp) <= 0:
+            return "-1"
+        NewChestCount = Chest2Data[0] + 1
+        NewChestTime = Timestamp + (UserConfig["Chest2Wait"] * 60)
+        mycursor.execute("UPDATE users SET chest2count = %s, chest2time = %s WHERE userID = %s LIMIT 1", (NewChestCount, NewChestTime, UserID))
+
+    #generating chest stuff, work in progress
+    Chest1orbs = random.randint(100, 1000)
+    Chest1Diamonds = random.randint(0, 2)
+    Chest1Shards = random.randint(0, 1)
+    Chest1Keys = random.randint(0, 1)
+    Chest1Str = f"{Chest1orbs},{Chest1Diamonds},{Chest1Shards},{Chest1Keys}"
+
+    Chest2orbs = random.randint(100, 1000)
+    Chest2Diamonds = random.randint(0, 2)
+    Chest2Shards = random.randint(0, 1)
+    Chest2Keys = random.randint(0, 1)
+    Chest2Str = f"{Chest2orbs},{Chest2Diamonds},{Chest2Shards},{Chest2Keys}"
+
+    Chest1Lest = Timestamp - Chest1Data[1]
+    Chest2Lest = Timestamp - Chest2Data[1]
+
+    #building return string
+    #cant use joint string builder here due to a different nature of this return :/
+    ReturnStr = f"1:{UserID}:{EncodeChk}:{request.form['udid']}:{request.form['accountID']}:{Chest1Lest}:{Chest1Str}:{Chest1Data[0]}:{Chest2Lest}:{Chest2Str}:{Chest2Data[0]}:{RewardType}"
+    #the weird way gd encrypts this
+    EncodedReturn = Xor(ReturnStr, 59182)
+    EncodedReturn = base64.b64encode(EncodedReturn.encode("ascii")).decode("ascii")
+    EncodedReturn = EncodedReturn.replace("/", "_")
+    EncodedReturn = EncodedReturn.replace("+", "-")
+    ShaReturn = Sha1It(EncodedReturn, "pC26fpYaQCtg")
+    Success("Boom chest data done.")
+    print(f"bruhh{EncodedReturn}|{ShaReturn}")
+    return f"bruhh{EncodedReturn}|{ShaReturn}"
+
+def Sha1It(Text: str, Key: str):
+    """Hashes text in SHA1."""
+    m = hashlib.sha1()
+    m.update(Text.encode())
+    Hashed = m.hexdigest()
+    return Hashed

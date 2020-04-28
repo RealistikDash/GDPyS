@@ -186,7 +186,7 @@ def GetAccComments(request):
     
     CommentStr = ""
     for comment in UserComments:
-        CommentStr += f"2~{comment[0]}~3~{comment[1]}~4~{comment[2]}~5~0~7~{comment[3]}~9~{TimeAgoFromNow(comment[5])}~6~{comment[4]}|"
+        CommentStr += f"2~{comment[0]}~3~{comment[1]}~4~{comment[2]}~5~0~7~{comment[3]}~9~{TimeAgoFromNow(comment[5])[:-4]}~6~{comment[4]}|"
 
     CommentStr = CommentStr[:-1]
 

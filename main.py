@@ -65,6 +65,11 @@ def UpdateScore():
 def GetScores():
     return GetLeaderboards(request)
 
+@app.route("/database///requestUserAccess.php", methods=["GET", "POST"])
+@app.route("/database/requestUserAccess.php", methods=["GET", "POST"])
+def GetMod():
+    return IsMod(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

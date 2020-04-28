@@ -292,3 +292,26 @@ def GetLeaderboards(request):
     print(ReturnStr)
     Success("Leaderboards served!")
     return ReturnStr[:-1]
+
+def IsMod(request):
+    """Returns whether the user is a mod (has badge)."""
+    Log(f"User {request.form['accountID']} is checking mod status.")
+    if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
+        return "-1"
+    #checking if user has role assigned
+    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s", (request.form["accountID"],))
+    Role = mycursor.fetchall()
+    if len(Role) == 0:
+        return "-1" #no role assigned, byebye
+    Role = Role[0][0]
+    #now we get the role badge
+    mycursor.execute("SELECT actionRequestMod FROM roles WHERE roleID = %s", (Role,))
+    BadgePriv = mycursor.fetchall()
+    if len(BadgePriv) == 0:
+        return "-1" #role not found
+    BadgePriv = BadgePriv[0][0]
+    if BadgePriv == 0:
+        Success(f"User {request.form['accountID']} mod check fail!")
+        return "-1"
+    Success(f"User {request.form['accountID']} mod check success!")
+    return str(BadgePriv)

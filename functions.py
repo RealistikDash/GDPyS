@@ -6,6 +6,7 @@ import timeago
 import base64
 import random
 import hashlib
+from itertools import cycle
 
 try:
     mydb = mysql.connector.connect(

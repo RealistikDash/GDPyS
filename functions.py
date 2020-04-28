@@ -136,9 +136,10 @@ def GetUserDataFunction(request):
     mycursor.execute("SELECT youtubeurl, twitter, twitch, frS, mS, cS FROM accounts WHERE accountID = %s LIMIT 1", (TargetAccid,))
     ExtraData = mycursor.fetchall()[0]
     Rank = GetRank(TargetAccid)
+    ModBadgeLevel = GetModBadge(TargetAccid)
     #AAAAAAAA WHY DIDNT ROBTOP USE JSON
     #refrence taken from php gdps (thanks cvolton)
-    TheStupidString = f"1:{Userdata[3]}:2:{Userdata[1]}:13:{Userdata[10]}:17:{Userdata[11]}:10:{Userdata[7]}:11:{Userdata[8]}:3:{Userdata[4]}:46:{Userdata[25]}:4:{Userdata[5]}:8:{Userdata[22]}:18:{ExtraData[4]}:19:{ExtraData[3]}:50:{ExtraData[5]}:20:{ExtraData[0]}:21:{Userdata[15]}:22:{Userdata[16]}:23:{Userdata[17]}:24:{Userdata[18]}:25:{Userdata[19]}:26:{Userdata[20]}:28:{Userdata[21]}:43:{Userdata[28]}:47:{Userdata[29]}:30:{Rank}:16:{Userdata[2]}:31:{FriendState}:44:{ExtraData[1]}:45:{ExtraData[2]}:29:1:49:0{Append}"
+    TheStupidString = f"1:{Userdata[3]}:2:{Userdata[1]}:13:{Userdata[10]}:17:{Userdata[11]}:10:{Userdata[7]}:11:{Userdata[8]}:3:{Userdata[4]}:46:{Userdata[25]}:4:{Userdata[5]}:8:{Userdata[22]}:18:{ExtraData[4]}:19:{ExtraData[3]}:50:{ExtraData[5]}:20:{ExtraData[0]}:21:{Userdata[15]}:22:{Userdata[16]}:23:{Userdata[17]}:24:{Userdata[18]}:25:{Userdata[19]}:26:{Userdata[20]}:28:{Userdata[21]}:43:{Userdata[28]}:47:{Userdata[29]}:30:{Rank}:16:{Userdata[2]}:31:{FriendState}:44:{ExtraData[1]}:45:{ExtraData[2]}:29:1:49:{ModBadgeLevel}{Append}"
     Success(f"Got user data for {Userdata[3]} successfully!A")
     return TheStupidString
 
@@ -293,6 +294,22 @@ def GetLeaderboards(request):
     Success("Leaderboards served!")
     return ReturnStr[:-1]
 
+def GetModBadge(AccountID):
+    """Gets mod badge level"""
+    #checking if user has role assigned
+    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s", (AccountID,))
+    Role = mycursor.fetchall()
+    if len(Role) == 0:
+        return 0 #no role assigned, byebye
+    Role = Role[0][0]
+    #now we get the role badge
+    mycursor.execute("SELECT modBadgeLevel FROM roles WHERE roleID = %s", (Role,))
+    BadgePriv = mycursor.fetchall()
+    if len(BadgePriv) == 0:
+        return 0 #role not found
+    BadgePriv = BadgePriv[0][0]
+    return BadgePriv
+
 def IsMod(request):
     """Returns whether the user is a mod (has badge)."""
     Log(f"User {request.form['accountID']} is checking mod status.")
@@ -311,7 +328,7 @@ def IsMod(request):
         return "-1" #role not found
     BadgePriv = BadgePriv[0][0]
     if BadgePriv == 0:
-        Success(f"User {request.form['accountID']} mod check fail!")
+        Success(f"User {request.form['accountID']} mod check fail! (modbadge level {BadgePriv})")
         return "-1"
     Success(f"User {request.form['accountID']} mod check success!")
     return str(BadgePriv)

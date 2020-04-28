@@ -22,6 +22,8 @@ except Exception as e:
 
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
+Ranks = {}
+
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
     #NOT DONE YET!!!!!!
@@ -92,7 +94,11 @@ def RegisterFunction(request):
 
 def GetRank(AccountID):
     """Gets rank for user."""
-    return 0
+    try:
+        Rank = Ranks[str(AccountID)]
+    except:
+        Rank = 0
+    return Rank
 
 def Xor(data, key):
     data = str(data)
@@ -414,3 +420,21 @@ def Sha1It(Text: str, Key: str):
     m.update(Text.encode())
     Hashed = m.hexdigest()
     return Hashed
+
+def CacheRanks():
+    print("Caching ranks... ", end="")
+    mycursor.execute("SELECT extID FROM users ORDER BY stars")
+    Leaderboards = mycursor.fetchall()
+    Ranks.clear()
+
+    UserRank = 0
+
+    for User in Leaderboards:
+        UserRank += 1
+        Ranks[str(User[0])] = UserRank
+    print("Done!")
+
+def CronThread():
+    print("Cron thread ran!")
+    time.sleep(UserConfig["CronThreadDelay"])
+    CacheRanks()

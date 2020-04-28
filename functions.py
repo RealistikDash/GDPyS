@@ -184,9 +184,13 @@ def GetAccComments(request):
     for comment in UserComments:
         CommentStr += f"2~{comment[0]}~3~{comment[1]}~4~{comment[2]}~5~0~7~{comment[3]}~9~{TimeAgoFromNow(comment[5])}~6~{comment[4]}|"
 
+    CommentStr = CommentStr[:-1]
+
+    CommentStr = f"#{CommentStr}:{Offset}:10"
+
     Success(f"Successfully got account comments for {TargetAccid}!")
 
-    return CommentStr[:-1]
+    return CommentStr
 
 def InsertAccComment(request):
     """Adds an account comment."""
@@ -297,7 +301,6 @@ def GetLeaderboards(request):
             "17" : User[11], #usercoins
             "46" : User[25] #diamonds
         }) + "|"
-    print(ReturnStr)
     Success("Leaderboards served!")
     return ReturnStr[:-1]
 

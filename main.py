@@ -36,8 +36,7 @@ def GetUserData():
 @app.route("/database/getGJAccountComments20.php", methods=["GET", "POST"])
 def AccountComments():
     Comments = GetAccComments(request)
-    print(Comments)
-    return Comments # fix later
+    return Comments
 
 @app.route("/database///uploadGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJAccComment20.php", methods=["GET", "POST"])

@@ -180,13 +180,17 @@ def GetAccComments(request):
     if len(UserComments) == 0: #if no usercomments
         return "#0:0:0"
     
+    #get comment count
+    mycursor.execute("SELECT count(*) FROM acccomments WHERE userID = %s", (UserID,))
+    CommentCount = mycursor.fetchall()[0][0]
+    
     CommentStr = ""
     for comment in UserComments:
         CommentStr += f"2~{comment[0]}~3~{comment[1]}~4~{comment[2]}~5~0~7~{comment[3]}~9~{TimeAgoFromNow(comment[5])}~6~{comment[4]}|"
 
     CommentStr = CommentStr[:-1]
 
-    CommentStr = f"#{CommentStr}:{Offset}:10"
+    CommentStr = f"{CommentStr}#{CommentCount}:{Offset}:10"
 
     Success(f"Successfully got account comments for {TargetAccid}!")
 

@@ -75,6 +75,16 @@ def GetMod():
 def GetRewards():
     return Rewards(request)
 
+@app.route("/database///getAccountURL.php", methods=["GET", "POST"])
+@app.route("/database/getAccountURL.php", methods=["GET", "POST"])
+def GetAccUrl():
+    return GetAccountUrl(request)
+
+@app.route("//database/accounts/backupGJAccountNew.php", methods=["GET", "POST"])
+@app.route("/database/accounts/backupGJAccountNew.php", methods=["GET", "POST"])
+def SaveRoune():
+    return SaveUserData(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

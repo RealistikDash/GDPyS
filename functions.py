@@ -7,6 +7,8 @@ import base64
 import random
 import hashlib
 from itertools import cycle
+import requests
+import zlib
 
 try:
     mydb = mysql.connector.connect(
@@ -39,6 +41,14 @@ def FixUserInput(String):
     String = String.replace("--", "")
     return String
 
+def GetServerIP():
+    """Gets the server IP."""
+    if UserConfig["LocalServer"]:
+        CurrentIP = "127.0.0.1"
+    else:
+        Request = requests.get("https://ip.zxq.co/") #gets our ip
+        CurrentIP = Request.json()["ip"]
+    return CurrentIP
 
 def LoginCheck(Udid, Username, Password, request):
     """Checks login and password"""
@@ -65,12 +75,19 @@ def LoginCheck(Udid, Username, Password, request):
     UserID = UserID[0][0]
 
     #insert password check here
+    if not CheckPassword(AccountID, Password):
+        return "-1"
     Success(f"Authentication for {Username} was successfull!")
     return f"{AccountID},{UserID}"
 
 def HashPassword(PlainPassword: str):
     """Creates a hashed password to be used in database."""
     return PlainPassword #for now no hashing
+
+def CheckPassword(AccountID: int, Password: str):
+    """Checks if the password passed matches the one in the database."""
+    #placeholder function
+    return True
 
 def RegisterFunction(request):
     """Registers a user."""
@@ -435,6 +452,66 @@ def CacheRanks():
     print("Done!")
 
 def CronThread():
-    print("Cron thread ran!")
+    Log("Cron thread ran!")
     time.sleep(UserConfig["CronThreadDelay"])
     CacheRanks()
+
+def GetAccountUrl(request):
+    """Returns something for the account url?"""
+    TheIP = GetServerIP()
+    return f"http://{TheIP}/"
+
+def SaveUserData(request):
+    """Saves the data of the user."""
+    #ok so this is pretty much a direct port of cvoltons backupGJAccount to make sure the saves form the php server work with GDPyS
+    Username = request.form["userName"] #whY is name capitalised smh
+    Password = request.form["password"] #here word isnt capitalised smhmh
+    Log(f"Beginning to save data for {Username}")
+
+    SaveData = request.form["saveData"]
+
+    #getting account id from username
+    mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (Username,))
+    AccountID = mycursor.fetchall()
+    if len(AccountID) == 0:
+        Log("User not found!")
+        return "-1"
+    AccountID = AccountID[0][0]
+    if not CheckPassword(AccountID, Password):
+        Fail("Password didn't match!")
+        return "-1"
+    
+    #this is where we do the save ting, decrypting things
+    SaveDataAttr = SaveData.split(";")
+    SaveData = SaveDataAttr[0]
+    SaveData = SaveData.replace("-", "+")
+    SaveData = SaveData.replace("_", "/")
+    SaveData = base64.b64decode(SaveData)
+    SaveData = zlib.decompress(SaveData)
+
+    #getting some variables from the save data
+    OrbCount = SaveData.split("</s><k>14</k><s>")[1]
+    OrbCount = OrbCount.split("</s>")[0]
+    LevelCount = SaveData.split("<k>GS_value</k>")[1]
+    LevelCount = LevelCount.split("</s><k>4</k><s>")[1]
+    LevelCount = LevelCount.split("</s>")[0]
+    mycursor.execute("UPDATE users SET orbs = %s, completedLvls = %s WHERE extID = %s", (OrbCount, LevelCount, AccountID))
+    mydb.commit()
+
+    #replacing  the user's password
+    SaveData = SaveData.replace(f"<k>GJA_002</k><s>{Password}</s>", "<k>GJA_002</k><s>password go bye bye</s>")
+
+    #guess what now we are encrypting it back
+    SaveData = zlib.compress(SaveData)
+    SaveData = base64.b64encode(SaveData).decode("ascii")
+    SaveData = SaveData.replace("+", "-")
+    SaveData = SaveData.replace("/", "_")
+    SaveData = f"{SaveData};{SaveDataAttr[1]}"
+
+    #writing the save data to file
+    with open(f"Data/Saves/{AccountID}", "w+") as File:
+        File.write(SaveData)
+        File.close()
+
+    Success(f"User data for {Username} saved!")
+    return "1"

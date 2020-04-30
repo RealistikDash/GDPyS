@@ -15,7 +15,8 @@ DefaultConfig = {
     "SQLPassword" : "",
     "Chest1Wait" : 60,
     "Chest2Wait" : 240,
-    "CronThreadDelay" : 3600
+    "CronThreadDelay" : 3600,
+    "LocalServer" : False
 }
 
 class JsonFile:
@@ -43,5 +44,22 @@ if UserConfig == {}:
     print(Fore.WHITE+" Config created! It is named config.json. Edit it accordingly and start the server again!")
     exit()
 else:
-    #insert config check here
-    print(Fore.GREEN+" Configuration loaded successfully! Loading..." + Fore.RESET)
+    #config check and updater
+    AllGood = True
+    NeedSet = []
+    for key in list(DefaultConfig.keys()):
+        if key not in list(UserConfig.keys()):
+            AllGood = False
+            NeedSet.append(key)
+
+    if AllGood:
+        print(Fore.GREEN+" Configuration loaded successfully! Loading..." + Fore.RESET)
+    else:
+        #fixes config
+        print(Fore.BLUE+" Updating config..." + Fore.RESET)
+        for Key in NeedSet:
+            UserConfig[Key] = DefaultConfig[Key]
+            print(Fore.BLUE+f" Option {Key} added to config. Set default to '{DefaultConfig[Key]}'." + Fore.RESET)
+        print(Fore.GREEN+" Config updated! Please edit the new values to your liking." + Fore.RESET)
+        JsonFile.SaveDict(UserConfig, "config.json")
+        exit()

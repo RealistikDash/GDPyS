@@ -508,7 +508,7 @@ def SaveUserData(request):
     SaveData = f"{SaveData};{SaveDataAttr[1]}"
 
     #writing the save data to file
-    with open(f"Data/Saves/{AccountID}", "w+") as File:
+    with open(f"./Data/Saves/{AccountID}", "w+") as File:
         File.write(SaveData)
         File.close()
 

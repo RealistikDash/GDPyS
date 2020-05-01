@@ -639,7 +639,7 @@ def UploadLevel(request):
         )
         mydb.commit()
         # TODO: Later add a case for updating the level like bruh
-        LevelId = mycursor.lastrowid()[0][0]
+        LevelId = mycursor.lastrowid
 
         with open(f"./Data/Levels/{LevelId}", "w+") as File:
             File.write(DataDict["levelString"])

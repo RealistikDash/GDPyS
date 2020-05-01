@@ -550,4 +550,5 @@ def LoadUserData(request):
         Log("No save data found! Using the one saved in database!")
         SaveData = DBSaveData
     
+    Success(f"Successfully returned load data to {Username}!")
     return f"{SaveData};21;30;a;a"

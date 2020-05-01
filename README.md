@@ -1,5 +1,5 @@
 # GDPyS
-GDPyS is a Python based Geometry Dash server, which can be used for making Privarte Servers.
+GDPyS is a Python based Geometry Dash server, which can be used for making Private Servers.
 
 # What works?
 GDPyS is still in **very** early development. This means that most things aren't completed and some things may not work as intended. So here is what is currently done:

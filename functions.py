@@ -458,7 +458,7 @@ def CronThread():
 
 def GetAccountUrl(request):
     """Returns something for the account url?"""
-    return f"{request.base_url}"
+    return request.url_root
 
 def SaveUserData(request):
     """Saves the data of the user."""

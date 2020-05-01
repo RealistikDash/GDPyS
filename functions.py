@@ -577,7 +577,7 @@ def LikeFunction(request):
 
     #ok so i usually dont do formats in sql queries because sql injection, but here we can trust variables
     mycursor.execute(f"SELECT likes FROM {Table} WHERE {Column} = %s LIMIT 1", (ItemID,))
-    Likes = mycursor.execute()
+    Likes = mycursor.fetchall()
     if len(Likes) == 0:
         return "-1"
     Likes = Likes[0][0]

@@ -85,6 +85,16 @@ def GetAccUrl():
 def SaveRoune():
     return SaveUserData(request)
 
+#this is a bit of routes dont you think?
+@app.route("//database/accounts/syncGJAccountNew.php", methods=["GET", "POST"])
+@app.route("/database/accounts/syncGJAccountNew.php", methods=["GET", "POST"])
+@app.route("//database/accounts/syncGJAccount20.php", methods=["GET", "POST"])
+@app.route("/database/accounts/syncGJAccount20.php", methods=["GET", "POST"])
+@app.route("//database/accounts/syncGJAccount.php", methods=["GET", "POST"])
+@app.route("/database/accounts/syncGJAccount.php", methods=["GET", "POST"])
+def LoadRoute():
+    return LoadUserData(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

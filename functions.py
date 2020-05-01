@@ -9,6 +9,7 @@ import hashlib
 from itertools import cycle
 import requests
 import zlib
+import os
 
 try:
     mydb = mysql.connector.connect(
@@ -514,3 +515,39 @@ def SaveUserData(request):
 
     Success(f"User data for {Username} saved!")
     return "1"
+
+def LoadUserData(request):
+    """Returns the user data to be loaded."""
+    Username = request.form["userName"]
+    Password = request.form["password"]
+
+    Log(f"Starting loading user data for {Username}!")
+
+    #getting account id from username
+    mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (Username,))
+    AccountID = mycursor.fetchall()
+    if len(AccountID) == 0:
+        Log("User not found!")
+        return "-1"
+    AccountID = AccountID[0][0]
+    if not CheckPassword(AccountID, Password):
+        Fail("Password didn't match!")
+        return "-1"
+
+    #getting the save data
+    mycursor.execute("SELECT saveData FROM accounts WHERE accountID = %s", (AccountID,))
+    try:
+        DBSaveData = mycursor.fetchall()[0][0]
+    except:
+        Log("No user data found in db!")
+        DBSaveData = "" #why did i do this in this way? idk.
+
+    if os.path.exists(f"./Data/Saves/{AccountID}"):
+        File = open(f"./Data/Saves/{AccountID}", "r")
+        SaveData = File.read()
+        File.close()
+    else:
+        Log("No save data found! Using the one saved in database!")
+        SaveData = DBSaveData
+    
+    return f"{SaveData};21;30;a;a"

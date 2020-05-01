@@ -459,7 +459,7 @@ def CronThread():
 def GetAccountUrl(request):
     """Returns something for the account url?"""
     TheIP = GetServerIP()
-    return f"http://{TheIP}/"
+    return f"http://{TheIP}{request.path}"
 
 def SaveUserData(request):
     """Saves the data of the user."""

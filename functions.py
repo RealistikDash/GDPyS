@@ -629,11 +629,6 @@ def UploadLevel(request):
     #database stuff
     if DataDict["levelString"] != "" and DataDict["levelName"] != "":
         UploadDate = round(time.time())
-
-        with open(f"./Data/Levels/{LevelId}", "w+") as File:
-            File.write(DataDict["levelString"])
-            File.close()
-
         mycursor.execute(
             """INSERT INTO levels (levelName, gameVersion, binaryVersion, userName, levelDesc, levelVersion, levelLength, audioTrack, auto, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, levelString, levelInfo, secret, uploadDate, userID, extID, updateDate, unlisted, hostname, isLDM) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
             (DataDict["levelName"], GameVersion, DataDict["binaryVersion"], DataDict["userName"], DataDict["levelDesc"], DataDict["levelVersion"], DataDict["levelLenghs"], DataDict["audioTrack"], DataDict["auto"], DataDict["password"], DataDict["original"], DataDict["twoPlayer"], DataDict["songID"], DataDict["objects"], DataDict["coins"], DataDict["requestedStars"], DataDict["extraString"], DataDict["levelString"], DataDict["levelInfo"], DataDict["secret"], UploadDate, DataDict["userID"], DataDict["extID"], UploadDate, DataDict["unlisted"], request.remote_addr)
@@ -641,5 +636,9 @@ def UploadLevel(request):
         mydb.commit()
         # TODO: Later add a case for updating the level like bruh
         LevelId = mycursor.lastrowid()[0][0]
+
+        with open(f"./Data/Levels/{LevelId}", "w+") as File:
+            File.write(DataDict["levelString"])
+            File.close()
         
         return LevelId

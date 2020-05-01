@@ -628,7 +628,7 @@ def UploadLevel(request):
 
     #getting UserID
     mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
-    UserID = mycursor.execute()[0][0]
+    UserID = mycursor.fetchall()[0][0]
 
     #database stuff
     if DataDict["levelString"] != "" and DataDict["levelName"] != "":

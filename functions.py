@@ -443,6 +443,7 @@ def CacheRanks():
     print("Caching ranks... ", end="")
     mycursor.execute("SELECT extID FROM users ORDER BY stars")
     Leaderboards = mycursor.fetchall()
+    Leaderboards.reverse()
     Ranks.clear()
 
     UserRank = 0
@@ -559,7 +560,7 @@ def LikeFunction(request):
     # Type 2 | Commetns
     # Type 3 | Account Comments
 
-    Type = request.form["type"]
+    Type = int(request.form["type"])
     Like = request.form["like"]
     ItemID = request.form["itemID"]
 

@@ -561,7 +561,7 @@ def LikeFunction(request):
     # Type 3 | Account Comments
 
     Type = int(request.form["type"])
-    Like = request.form["like"]
+    Like = int(request.form["like"])
     ItemID = request.form["itemID"]
 
     if Type == 1:

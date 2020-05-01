@@ -645,4 +645,7 @@ def UploadLevel(request):
             File.write(DataDict["levelString"])
             File.close()
         
-        return LevelId
+        Success(f"{Username} has uploaded level {DataDict['levelName']}!")
+        return str(LevelId)
+    else:
+        return "-1"

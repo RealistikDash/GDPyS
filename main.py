@@ -95,6 +95,11 @@ def SaveRoune():
 def LoadRoute():
     return LoadUserData(request)
 
+@app.route("//database/likeGJItem211.php", methods=["GET", "POST"])
+@app.route("/database/likeGJItem211.php", methods=["GET", "POST"])
+def LikeRoute():
+    return LikeFunction(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

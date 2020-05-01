@@ -552,3 +552,40 @@ def LoadUserData(request):
     
     Success(f"Successfully returned load data to {Username}!")
     return f"{SaveData};21;30;a;a"
+
+def LikeFunction(request):
+    """Likes a comment/level/accomments."""
+    # Type 1 | Levels
+    # Type 2 | Commetns
+    # Type 3 | Account Comments
+
+    Type = request.form["type"]
+    Like = request.form["like"]
+    ItemID = request.form["itemID"]
+
+    if Type == 1:
+        #level
+        Table = "levels"
+        Column = "levelID"
+    if Type == 2:
+        Table = "comments"
+        Column = "commentID"
+    if Type == 3:
+        Table = "acccomments"
+        Column = "commentID"
+
+    #ok so i usually dont do formats in sql queries because sql injection, but here we can trust variables
+    mycursor.execute(f"SELECT likes FROM {Table} WHERE {Column} = %s LIMIT 1", (ItemID,))
+    Likes = mycursor.execute()
+    if len(Likes) == 0:
+        return "-1"
+    Likes = Likes[0][0]
+
+    if Like == 1:
+        Likes += 1
+    else:
+        Likes -= 1
+    
+    mycursor.execute(f"UPDATE {Table} SET likes = %s WHERE {Column} = %s", (Likes, ItemID))
+    mydb.commit()
+    return "1"

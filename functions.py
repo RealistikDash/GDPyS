@@ -590,3 +590,55 @@ def LikeFunction(request):
     mycursor.execute(f"UPDATE {Table} SET likes = %s WHERE {Column} = %s", (Likes, ItemID))
     mydb.commit()
     return "1"
+
+def UploadLevel(request):
+    """Handles the level uploading part."""
+    Username = request.form["userName"]
+    GJP = request.form["gjp"]
+    GameVersion = request.form["gameVersion"]
+    Log(f"{Username} is trying to upload a level!")
+
+    #i should make this a function... also on some versions the account id is not passed so to be safe i did this
+    mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (Username,))
+    AccountID = mycursor.fetchall()
+    if len(AccountID) == 0:
+        Log("User not found!")
+        return "-1"
+    AccountID = AccountID[0][0]
+
+    if not VerifyGJP(AccountID, GJP):
+        return "-1"
+
+    ToGet = ["levelID", "levelName", "levelDesc", "levelVersion", "levelLength", "audioTrack", "auto", "password", "original", "twoPlayer", "songID", "objects", "coins", "requestedStars", "extraString", "levelString", "levelInfo", "secret", "ldm", "udid"]
+    DataDict = {}
+    for Thing in ToGet:
+        try:
+            if Thing == "levelDesc" and GameVersion < 20:
+                #encode it for the old folks (still debating whether to maintain compatibillity with the older versions or not)
+                DataDict[Thing] = base64.b64encode(request.form[Thing]).decode("ascii")
+            DataDict[Thing] = request.form[Thing]
+        except:
+            #special cases because YEAH
+            if Thing == "extraString":
+                DataDict[Thing] = "29_29_29_40_29_29_29_29_29_29_29_29_29_29_29_29"
+            elif Thing == "password":
+                DataDict[Thing] = 1
+            else:
+                DataDict[Thing] = 0
+
+    #database stuff
+    if DataDict["levelString"] != "" and DataDict["levelName"] != "":
+        UploadDate = round(time.time())
+        mycursor.execute(
+            """INSERT INTO levels (levelName, gameVersion, binaryVersion, userName, levelDesc, levelVersion, levelLength, audioTrack, auto, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, levelString, levelInfo, secret, uploadDate, userID, extID, updateDate, unlisted, hostname, isLDM) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            (DataDict["levelName"], DataDict["gameVersion"], DataDict["binaryVersion"], DataDict["userName"], DataDict["levelDesc"], DataDict["levelVersion"], DataDict["levelLenghs"], DataDict["audioTrack"], DataDict["auto"], DataDict["password"], DataDict["original"], DataDict["twoPlayer"], DataDict["songID"], DataDict["objects"], DataDict["coins"], DataDict["requestedStars"], DataDict["extraString"], DataDict["levelString"], DataDict["levelInfo"], DataDict["secret"], UploadDate, DataDict["userID"], DataDict["extID"], UploadDate, DataDict["unlisted"], request.remote_addr)
+        )
+        mydb.commit()
+        # TODO: Later add a case for updating the level like bruh
+        LevelId = mycursor.lastrowid()[0][0]
+
+        with open(f"./Data/Levels/{LevelId}", "w+") as File:
+            File.write(DataDict["levelString"])
+            File.close()
+        
+        return LevelId

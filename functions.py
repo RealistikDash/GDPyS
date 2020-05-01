@@ -486,7 +486,7 @@ def SaveUserData(request):
     SaveData = SaveData.replace("-", "+")
     SaveData = SaveData.replace("_", "/")
     SaveData = base64.b64decode(SaveData)
-    SaveData = zlib.decompress(SaveData, zlib.MAX_WBITS|32).decode()
+    SaveData = zlib.decompress(SaveData, zlib.MAX_WBITS|32)
 
     #getting some variables from the save data
     OrbCount = SaveData.split("</s><k>14</k><s>")[1]
@@ -501,7 +501,7 @@ def SaveUserData(request):
     SaveData = SaveData.replace(f"<k>GJA_002</k><s>{Password}</s>", "<k>GJA_002</k><s>password go bye bye</s>")
 
     #guess what now we are encrypting it back
-    SaveData = zlib.compress(SaveData)
+    SaveData = zlib.compress(SaveData.encode())
     SaveData = base64.b64encode(SaveData).decode("ascii")
     SaveData = SaveData.replace("+", "-")
     SaveData = SaveData.replace("/", "_")

@@ -486,7 +486,7 @@ def SaveUserData(request):
     SaveData = SaveData.replace("-", "+")
     SaveData = SaveData.replace("_", "/")
     SaveData = base64.b64decode(SaveData)
-    SaveData = zlib.decompress(SaveData)
+    SaveData = zlib.decompress(SaveData, zlib.MAX_WBITS|32)
 
     #getting some variables from the save data
     OrbCount = SaveData.split("</s><k>14</k><s>")[1]

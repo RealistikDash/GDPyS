@@ -631,7 +631,7 @@ def UploadLevel(request):
         UploadDate = round(time.time())
         mycursor.execute(
             """INSERT INTO levels (levelName, gameVersion, binaryVersion, userName, levelDesc, levelVersion, levelLength, audioTrack, auto, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, levelString, levelInfo, secret, uploadDate, userID, extID, updateDate, unlisted, hostname, isLDM) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (DataDict["levelName"], GameVersion, DataDict["binaryVersion"], DataDict["userName"], DataDict["levelDesc"], DataDict["levelVersion"], DataDict["levelLenghs"], DataDict["audioTrack"], DataDict["auto"], DataDict["password"], DataDict["original"], DataDict["twoPlayer"], DataDict["songID"], DataDict["objects"], DataDict["coins"], DataDict["requestedStars"], DataDict["extraString"], DataDict["levelString"], DataDict["levelInfo"], DataDict["secret"], UploadDate, DataDict["userID"], DataDict["extID"], UploadDate, DataDict["unlisted"], request.remote_addr)
+            (DataDict["levelName"], GameVersion, DataDict["binaryVersion"], Username, DataDict["levelDesc"], DataDict["levelVersion"], DataDict["levelLenghs"], DataDict["audioTrack"], DataDict["auto"], DataDict["password"], DataDict["original"], DataDict["twoPlayer"], DataDict["songID"], DataDict["objects"], DataDict["coins"], DataDict["requestedStars"], DataDict["extraString"], DataDict["levelString"], DataDict["levelInfo"], DataDict["secret"], UploadDate, DataDict["userID"], DataDict["extID"], UploadDate, DataDict["unlisted"], request.remote_addr)
         )
         mydb.commit()
         # TODO: Later add a case for updating the level like bruh

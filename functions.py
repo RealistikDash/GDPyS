@@ -807,3 +807,4 @@ def GetLevels(request):
     LevelMultiStr = LevelMultiStr[:-1]
 
     TheFinalStr = f"{ReturnStr}#{UserStr}#{LevelCount}:{Offset}:10#{GenMulti(LevelMultiStr)}"
+    return TheFinalStr

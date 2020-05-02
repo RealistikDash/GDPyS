@@ -105,6 +105,11 @@ def LikeRoute():
 def LevelUploadRoute():
     return UploadLevel(request)
 
+@app.route("//database/getGJLevels21.php", methods=["GET", "POST"])
+@app.route("/database/getGJLevels21.php", methods=["GET", "POST"])
+def GetLevelsRoute():
+    return GetLevels(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

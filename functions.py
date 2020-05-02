@@ -427,12 +427,12 @@ def Rewards(request):
     EncodedReturn = base64.b64encode(EncodedReturn.encode("ascii")).decode("ascii")
     EncodedReturn = EncodedReturn.replace("/", "_")
     EncodedReturn = EncodedReturn.replace("+", "-")
-    ShaReturn = Sha1It(EncodedReturn, "pC26fpYaQCtg")
+    ShaReturn = Sha1It(EncodedReturn + "pC26fpYaQCtg")
     Success("Boom chest data done.")
     print(f"bruhh{EncodedReturn}|{ShaReturn}")
     return f"bruhh{EncodedReturn}|{ShaReturn}"
 
-def Sha1It(Text: str, Key: str):
+def Sha1It(Text: str):
     """Hashes text in SHA1."""
     m = hashlib.sha1()
     m.update(Text.encode())
@@ -649,3 +649,157 @@ def UploadLevel(request):
         return str(LevelId)
     else:
         return "-1"
+
+def CheckForm(form, TheThing):
+    """Checks if something in a form is set."""
+    #I KNOW I CAN JUST CHECK IF THE THING IS IN THE KEYS BUT IM TOO LAZY TO DO THIS RN
+    try:
+        form[TheThing] = ""
+        return True
+    except:
+        return False
+
+def UserString(UserID: int):
+    """Returns a user string."""
+    mycursor.execute("SELECT userName, extID FROM users WHERE userID = %s", (UserID,))
+    Data = mycursor.fetchall()
+    if len(Data) == 0:
+        return ""
+    Data = Data[0]
+
+    try:
+        Data[1] = int(Data[1])
+    except:
+        Data[1] = 0
+    
+    return f"{UserID}:{Data[0]}:{Data[1]}"
+
+def GenMulti(LevelMultiString):
+    """
+    Ported from GMDPrivateServer by Cvolton
+    /incl/lib/generateHash.php
+    Let me sleep
+    """
+    Levels = LevelMultiString.split(",")
+    Hash = ""
+    for Level in Levels:
+        mycursor.execute("SELECT levelID, starStars, starCoins FROM levels WHERE levelID = %s", (Level,))
+        Data = mycursor.fetchall()
+        if len(Data) > 0:
+            Data = Data[0]
+
+            Hash += f"{str(Data[0])[0]}{len(str(Data[0]))-1}{Data[1]}{Data[2]}"
+    
+    return Sha1It(Hash + "xI25fpAapCQg")
+
+
+def GetLevels(request):
+    """As the function states, this gets (get ready for it) levels!"""
+    #BRUH I HATE THIS SO MUCH SO SO SO MUCH
+    #this is a partial port of cvoltons sorry i cant do this
+    Form = request.form #so i dont have to write request.form
+
+    if CheckForm(Form, "Type"):
+        Type = int(Form["type"])
+    else:
+        Type = 0
+
+    #pages
+    if CheckForm(Form, "page"):
+        Offset = int(Form["page"]) * 10
+    else:
+        Offset = 0
+
+    Order = "uploadDate"
+    SQLParams = []
+    #SO MANY IF STATEMENTS I HATE THIS
+    if CheckForm(Form, "featured") and Form["featured"]:
+        SQLParams.append("starFeatured = 1")
+    if CheckForm(Form, "original") and Form["original"]:
+        SQLParams.append("original = 0")
+    if CheckForm(Form, "coins") and Form["coins"]:
+        SQLParams.append("starCoins = 1 AND NOT coins = 0")
+    if CheckForm(Form, "epic") and Form["epic"]:
+        SQLParams.append("starEpic = 1")
+    if CheckForm(Form, "twoPlayer") and Form["twoPlayer"]:
+        SQLParams.append("twoPlayer = 1")
+    if CheckForm(Form, "star"):
+        SQLParams.append("NOT starStars = 0")
+    if CheckForm(Form, "noStar"):
+        SQLParams.append("starStars = 0")
+    # commented due to possible sql injection
+    #if CheckForm(Form, "len"):
+    #    SQLParams.append(f"levelLenght IN ({Form['len']})")
+
+    if Type == 0:
+        Order = "likes"
+    if Type == 1:
+        Order = "downloads"
+    if Type == 2:
+        Order = "likes"
+    if Type == 3:
+        SQLParams.append(f"uploadDate > {round(time.time()) - 604800}")
+        Order = "likes"
+    if Type == 16:
+        SQLParams.append("NOT starEpic = 0")
+        Order = "rateDate DESC, uploadDate"
+
+    #converting dict to sql
+    Conditions = ""
+    for Condition in SQLParams:
+        Conditions += f"{Condition} AND"
+    Conditions = Conditions[:-4]
+
+    Query = f"SELECT * FROM levels WHERE {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
+    CountQuery = f"SELECT count(*) FROM levels WHERE {Conditions}"
+
+    mycursor.execute(CountQuery)
+    LevelCount = mycursor.fetchall()[0][0]
+
+    mycursor.execute(Query)
+    Levels = mycursor.fetchall()
+
+    ReturnStr = ""
+    UserStr = ""
+    LevelMultiStr = ""
+
+    for Level in Levels:
+        ReturnStr += JointStringBuilder({
+            "1" : Level[3],
+            "2": Level[4],
+            "3" : Level[5],
+            "5" : Level[6],
+            "6" : Level[-8],
+            "8" : "10",
+            "9" : Level[21],
+            "10" : Level[22],
+            "12" : Level[8],
+            "13" : Level[0],
+            "14" : Level[23],
+            "17" : Level[24],
+            "43" : Level[34],
+            "25" : Level[25],
+            "18" : Level[26],
+            "19" : Level[31],
+            "42" : Level[33],
+            "45" : Level[14],
+            "15" : Level[7],
+            "30" : Level[11],
+            "31" : "0",
+            "37" : Level[15],
+            "38" : Level[30],
+            "39" : Level[16],
+            "46" : "1",
+            "47" : "2",
+            "40" : Level[-1],
+            "35" : Level[13]
+        }) + "|"
+
+        UserStr += UserString(Level[-8]) + "|"
+        LevelMultiStr += str(Level[3]) + "|"
+    
+    ReturnStr = ReturnStr[:-1]
+    UserStr = UserStr[:-1]
+    LevelMultiStr = LevelMultiStr[:-1]
+
+    TheFinalStr = f"{ReturnStr}#{UserStr}#{LevelCount}:{Offset}:10#{GenMulti(LevelMultiStr)}"

@@ -755,7 +755,7 @@ def GetLevels(request):
         Conditions = ""
 
     Query = f"SELECT * FROM levels {Conditions}ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
-    CountQuery = f"SELECT count(*) FROM levels WHERE {Conditions}"
+    CountQuery = f"SELECT count(*) FROM levels {Conditions}"
 
     mycursor.execute(CountQuery)
     LevelCount = mycursor.fetchall()[0][0]

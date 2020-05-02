@@ -681,15 +681,20 @@ def GenMulti(LevelMultiString):
     Let me sleep
     """
     Levels = LevelMultiString.split(",")
+    print(Levels)
     Hash = ""
     for Level in Levels:
         mycursor.execute("SELECT levelID, starStars, starCoins FROM levels WHERE levelID = %s", (Level,))
         Data = mycursor.fetchall()
+        print(f"Ran query with result {str(Data)}")
         if len(Data) > 0:
+            print("Got past len check")
             Data = Data[0]
 
             Hash += f"{str(Data[0])[0]}{len(str(Data[0]))-1}{Data[1]}{Data[2]}"
+            print(f"Hash is now {Hash}")
     
+    print(f"Returning hashed {Hash + 'xI25fpAapCQg'}")
     return Sha1It(Hash + "xI25fpAapCQg")
 
 

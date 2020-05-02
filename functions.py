@@ -680,7 +680,7 @@ def GenMulti(LevelMultiString):
     /incl/lib/generateHash.php
     Let me sleep
     """
-    Levels = LevelMultiString.split(",")
+    Levels = LevelMultiString.split("|")
     Hash = ""
     for Level in Levels:
         mycursor.execute("SELECT levelID, starStars, starCoins FROM levels WHERE levelID = %s", (Level,))

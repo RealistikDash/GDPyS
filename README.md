@@ -25,5 +25,8 @@ The requirements for GDPyS are different to existing alternatives. They include:
 - Nginx/Apache (required to proxypass)
 - 17 character domain (eg devvgdpys.ussr.pl)
 
+# Credits
+- Some of this code is a direct port of [Cvolton's GMDPrivate Server](https://github.com/Cvolton/GMDprivateServer) into Python.
+
 # License
 GDPyS is licensed under the [GNU General Public License v3.0](https://github.com/RealistikDash/GDPyS/blob/master/LICENSE)

@@ -665,7 +665,7 @@ def UserString(UserID: int):
     Data = mycursor.fetchall()
     if len(Data) == 0:
         return ""
-    Data = Data[0]
+    Data = list(Data[0])
 
     try:
         Data[1] = int(Data[1])

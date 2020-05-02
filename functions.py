@@ -434,10 +434,7 @@ def Rewards(request):
 
 def Sha1It(Text: str):
     """Hashes text in SHA1."""
-    m = hashlib.sha1()
-    m.update(Text.encode())
-    Hashed = m.hexdigest()
-    return Hashed
+    return hashlib.sha1(Text.encode).hexdigest()
 
 def CacheRanks():
     print("Caching ranks... ", end="")

@@ -745,12 +745,16 @@ def GetLevels(request):
         Order = "rateDate DESC, uploadDate"
 
     #converting dict to sql
-    Conditions = ""
-    for Condition in SQLParams:
-        Conditions += f"{Condition} AND"
-    Conditions = Conditions[:-4]
+    if len(SQLParams) != 0:
+        Conditions = "WHERE "
+        for Condition in SQLParams:
+            Conditions += f"{Condition} AND"
+        Conditions = Conditions[:-4]
+        Conditions += " "
+    else:
+        Conditions = ""
 
-    Query = f"SELECT * FROM levels WHERE {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
+    Query = f"SELECT * FROM levels {Conditions}ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
     CountQuery = f"SELECT count(*) FROM levels WHERE {Conditions}"
 
     mycursor.execute(CountQuery)

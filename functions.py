@@ -10,6 +10,7 @@ from itertools import cycle
 import requests
 import zlib
 import os
+import urllib.parse
 
 try:
     mydb = mysql.connector.connect(
@@ -689,6 +690,28 @@ def GenMulti(LevelMultiString):
     
     return Sha1It(Hash + "xI25fpAapCQg")
 
+def GenSongString(SongID: int):
+    """Generates a song string."""
+    mycursor.execute("SELECT ID, name, authorID, authorName, size, isDisabled, download FROM songs WHERE ID = %s", (SongID,))
+    SongData = mycursor.fetchall()
+    if len(SongData) == 0:
+        return ""
+    SongData = SongData[0]
+    if SongData[5]:
+        #if DISABLED
+        return ""
+    
+    SongURL = SongData[6]
+
+    if ":" in SongURL:
+        SongURL = urllib.parse.quote(SongURL)
+
+    #clean up output
+    SongName = SongData[1].replace("#", "")
+    AuthorName = SongData[3].replace("#", "")
+    
+    return f"1~|~{SongData[0]}~|~2~|~{SongName}~|~3~|~{SongData[2]}~|~4~|~{AuthorName}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"
+
 
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""
@@ -763,6 +786,7 @@ def GetLevels(request):
     ReturnStr = ""
     UserStr = ""
     LevelMultiStr = ""
+    SongString = ""
 
     for Level in Levels:
         ReturnStr += JointStringBuilder({
@@ -798,10 +822,14 @@ def GetLevels(request):
 
         UserStr += UserString(Level[-8]) + "|"
         LevelMultiStr += str(Level[3]) + "|"
+
+        if Level[13] != 0:
+            SongString += GenSongString(Level[13]) + "~:~"
     
     ReturnStr = ReturnStr[:-1]
     UserStr = UserStr[:-1]
     LevelMultiStr = LevelMultiStr[:-1]
+    SongString = SongString[:-3]
 
-    TheFinalStr = f"{ReturnStr}#{UserStr}#{LevelCount}:{Offset}:10#{GenMulti(LevelMultiStr)}"
+    TheFinalStr = f"{ReturnStr}#{UserStr}#{SongString}#{LevelCount}:{Offset}:10#{GenMulti(LevelMultiStr)}"
     return TheFinalStr

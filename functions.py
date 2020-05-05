@@ -715,6 +715,7 @@ def GenSongString(SongID: int):
 
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""
+    Log("Beginning to fetch levels!")
     #BRUH I HATE THIS SO MUCH SO SO SO MUCH
     #this is a partial port of cvoltons sorry i cant do this
     Form = request.form #so i dont have to write request.form
@@ -832,4 +833,5 @@ def GetLevels(request):
     SongString = SongString[:-3]
 
     TheFinalStr = f"{ReturnStr}#{UserStr}#{SongString}#{LevelCount}:{Offset}:10#{GenMulti(LevelMultiStr)}"
+    Success("Level list served!")
     return TheFinalStr

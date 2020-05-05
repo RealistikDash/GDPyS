@@ -188,7 +188,7 @@ def AIDToUID(AccountID: int):
 
 def TimeAgoFromNow(Timestamp):
     """Returns a string of how long ago from now was a timestamp."""
-    Time = datetime.fromtimestamp(Timestamp)
+    Time = datetime.fromtimestamp(int(Timestamp))
     Now = datetime.now()
     return timeago.format(Time, Now)
 

@@ -889,7 +889,7 @@ def DLLevel(request):
         "3" : Level[5],
         "4" : LevelFiles,
         "5" : Level[6],
-        "6" : Level[3],
+        "6" : Level[35],
         "8" : "10",
         "9" : Level[21],
         "10" : Downloads,
@@ -922,6 +922,7 @@ def DLLevel(request):
     })
 
     ReturnStr += f"#{SoloGen(LevelFiles)}#"
-    ReturnStr += SoloGen2(f"{Level[3]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0")
+    CoolString = f"{Level[3]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0"
+    ReturnStr += SoloGen2(CoolString) + "#" + CoolString
     Success(f"Served level {LevelID}!")
     return ReturnStr

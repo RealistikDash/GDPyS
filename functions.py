@@ -686,7 +686,7 @@ def GenMulti(LevelMultiString):
         if len(Data) > 0:
             Data = Data[0]
 
-            Hash += f"{str(Data[0])[0]}{len(str(Data[0]))-1}{Data[1]}{Data[2]}"
+            Hash += f"{str(Data[0])[0]}{str(Data[0])[len(str(Data[0]))-1]}{Data[1]}{Data[2]}"
     
     return Sha1It(Hash + "xI25fpAapCQg")
 

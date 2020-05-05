@@ -110,6 +110,11 @@ def LevelUploadRoute():
 def GetLevelsRoute():
     return GetLevels(request)
 
+@app.route("//database/downloadGJLevel22.php", methods=["GET", "POST"])
+@app.route("/database/downloadGJLevel22.php", methods=["GET", "POST"])
+def DLLevelRoute():
+    return DLLevel(request)
+
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"

@@ -835,3 +835,92 @@ def GetLevels(request):
     TheFinalStr = f"{ReturnStr}#{UserStr}#{SongString}#{LevelCount}:{Offset}:10#{GenMulti(LevelMultiStr)}"
     Success("Level list served!")
     return TheFinalStr
+
+def SoloGen(LevelString: str):
+    """Port of genSolo from Cvolton's GMDPrivateServer."""
+    Return = ""
+    StrLen = round(len(LevelString) / 40)
+    for i in range(40):
+        Return += LevelString[i * StrLen]
+    return Sha1It(Return + "xI25fpAapCQg")
+
+def SoloGen2(LevelString: str):
+    """Port of genSolo2 from Cvolton's GMDPrivateServer."""
+    return Sha1It(LevelString + "xI25fpAapCQg")
+
+def DLLevel(request):
+    """Returns a stored level."""
+
+    LevelID = int(request.form["levelID"])
+    Log(f"Getting level {LevelID}!")
+    #include dailies around here
+
+    #getting the level
+    mycursor.execute("SELECT * FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
+    Level = mycursor.fetchall()
+    if len(Level) == 0:
+        return "-1"
+
+    Level = Level[0]
+
+    #bump the downloads
+    Downloads = Level[22] + 1
+    mycursor.execute("UPDATE levels SET downloads = %s WHERE levelID = %s", (Downloads, LevelID))
+    mydb.commit()
+
+    UpdateAgo = TimeAgoFromNow(Level[28])[:-4]
+    UploadAgo = TimeAgoFromNow(Level[27])[:-4]
+
+    Password = base64.b64encode(Xor(Level[10], 26364)).decode("ascii")
+
+    if os.path.exists(f"Data/Levels/{LevelID}"):
+        LevelFiles = open(f"Data/Levels/{LevelID}", "r")
+    else:
+        LevelFiles = Level[18]
+    
+    if LevelFiles[0:3] == "kS1":
+        LevelFiles = base64.b64encode(zlib.compress(LevelFiles)).decode("ascii")
+        LevelFiles = LevelFiles.replace("/", "_")
+        LevelFiles = LevelFiles.replace("+", "-")
+    
+    ReturnStr = JointStringBuilder({
+        "1" : LevelID,
+        "2" : Level[4],
+        "3" : Level[5],
+        "4" : LevelFiles,
+        "5" : Level[6],
+        "6" : Level[3],
+        "8" : "10",
+        "9" : Level[21],
+        "10" : Downloads,
+        "11" : "1",
+        "12" : Level[8],
+        "13" : Level[0],
+        "14" : Level[23],
+        "15" : Level[7],
+        "17" : Level[24],
+        "18" : Level[26],
+        "19" : Level[31],
+        "25" : Level[25],
+        "27" : Password,
+        "28" : UploadAgo,
+        "29" : UpdateAgo,
+        "30" : Level[11],
+        "31" : "1",
+        "42" : Level[33],
+        "43" : Level[34],
+        "45" : Level[14],
+        "35" : Level[13],
+        "36" : Level[17],
+        "37" : Level[15],
+        "38" : Level[30],
+        "39" : Level[16],
+        "46" : "1",
+        "47" : "2",
+        "48" : "1",
+        "40" : Level[50]
+    })
+
+    ReturnStr += f"#{SoloGen(LevelFiles)}#"
+    ReturnStr += UserString(Level[3]) + "#" + SoloGen2(f"{Level[3]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0")
+    return ReturnStr

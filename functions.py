@@ -918,7 +918,7 @@ def DLLevel(request):
         "46" : "1",
         "47" : "2",
         "48" : "1",
-        "40" : Level[50]
+        "40" : Level[42]
     })
 
     ReturnStr += f"#{SoloGen(LevelFiles)}#"

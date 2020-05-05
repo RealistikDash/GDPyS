@@ -11,12 +11,13 @@ DefaultConfig = {
     #SQL Info
     "SQLHost" : "localhost",
     "SQLUser" : "root",
-    "SQLDatabase" : "gdps",
+    "SQLDatabase" : "GDPyS",
     "SQLPassword" : "",
     "Chest1Wait" : 60,
     "Chest2Wait" : 240,
     "CronThreadDelay" : 3600,
-    "LocalServer" : False
+    "LocalServer" : False,
+    "LegacyPasswords" : False #cvolton gmdprivateserver passwords if true, bcrypt if false
 }
 
 class JsonFile:

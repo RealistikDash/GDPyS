@@ -874,7 +874,7 @@ def DLLevel(request):
     Password = base64.b64encode(Xor(Level[10], 26364).encode("ascii")).decode("ascii")
 
     if os.path.exists(f"Data/Levels/{LevelID}"):
-        LevelFiles = open(f"Data/Levels/{LevelID}", "r")
+        LevelFiles = open(f"Data/Levels/{LevelID}", "r").readlines()
     else:
         LevelFiles = Level[18]
     
@@ -923,4 +923,5 @@ def DLLevel(request):
 
     ReturnStr += f"#{SoloGen(LevelFiles)}#"
     ReturnStr += UserString(Level[3]) + "#" + SoloGen2(f"{Level[3]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0")
+    Success(f"Served level {LevelID}!")
     return ReturnStr

@@ -115,6 +115,11 @@ def GetLevelsRoute():
 def DLLevelRoute():
     return DLLevel(request)
 
+@app.route("//database/getGJSongInfo.php", methods=["GET", "POST"])
+@app.route("/database/getGJSongInfo.php", methods=["GET", "POST"])
+def SongRoute():
+    return GetSong(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

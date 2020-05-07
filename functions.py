@@ -852,7 +852,7 @@ def GetLevels(request):
 def SoloGen(LevelString: str):
     """Port of genSolo from Cvolton's GMDPrivateServer."""
     Return = ""
-    StrLen = round(len(LevelString) / 40)
+    StrLen = len(LevelString) // 40
     for i in range(40):
         Return += LevelString[i * StrLen]
     return Sha1It(Return + "xI25fpAapCQg")

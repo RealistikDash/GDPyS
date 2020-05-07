@@ -4,7 +4,7 @@ GDPyS is a Python based Geometry Dash server, which can be used for making Priva
 # What works?
 GDPyS is still in **very** early development. This means that most things aren't completed and some things may not work as intended. So here is what is currently done:
 - Registering
-- Logging in (no password check yet)
+- Logging in
 - Loading user data
 - Updating user data
 - Loading account comments

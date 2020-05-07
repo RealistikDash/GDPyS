@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from functions import *
 from config import *
 from console import *
@@ -114,6 +114,10 @@ def GetLevelsRoute():
 @app.route("/database/downloadGJLevel22.php", methods=["GET", "POST"])
 def DLLevelRoute():
     return DLLevel(request)
+
+@app.route("/database")
+def DatabaseRoute():
+    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 @app.errorhandler(500)
 def BadCodeError(error):

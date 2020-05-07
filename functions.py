@@ -963,3 +963,30 @@ def CreateBcrypt(Password: str):
     """Creates hashed password."""
     BHashed = bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt(10))
     return BHashed.decode()
+
+def GetSong(request):
+    """A mix of getting the song info and adding it if it doesnt exist."""
+    SongID = request.form["songID"]
+
+    mycursor.execute("SELECT ID, name, authorID, authorName, size, isDisabled, download FROM songs WHERE ID = %s LIMIT 1", (SongID,))
+    SongData = mycursor.fetchall()
+    if len(SongData) == 0:
+        if SongID > 5000000:
+            return "-1" #dont ask gd for custom songs
+
+        BoomlingsSongInfo = request.post("http://www.boomlings.com/database/getGJSongInfo.php", data={
+            "secret" : "Wmfd2893gb7",
+            "songID" : SongID
+        })
+        Response = BoomlingsSongInfo.text
+        return Response
+
+
+    SongData = SongData[0]
+
+    if SongData[5]:
+        return "-2"
+    
+    SongURL = urllib.parse.quote(SongData[6])
+
+    return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"

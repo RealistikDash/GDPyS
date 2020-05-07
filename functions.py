@@ -974,7 +974,7 @@ def GetSong(request):
         if SongID > 5000000:
             return "-1" #dont ask gd for custom songs
 
-        BoomlingsSongInfo = request.post("http://www.boomlings.com/database/getGJSongInfo.php", data={
+        BoomlingsSongInfo = requests.post("http://www.boomlings.com/database/getGJSongInfo.php", data={
             "secret" : "Wmfd2893gb7",
             "songID" : SongID
         })

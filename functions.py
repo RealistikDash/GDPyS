@@ -966,7 +966,7 @@ def CreateBcrypt(Password: str):
 
 def GetSong(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
-    SongID = request.form["songID"]
+    SongID = int(request.form["songID"])
 
     mycursor.execute("SELECT ID, name, authorID, authorName, size, isDisabled, download FROM songs WHERE ID = %s LIMIT 1", (SongID,))
     SongData = mycursor.fetchall()

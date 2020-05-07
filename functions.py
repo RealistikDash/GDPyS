@@ -967,21 +967,23 @@ def CreateBcrypt(Password: str):
 def GetSong(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
     SongID = int(request.form["songID"])
+    Log(f"Getting song {SongID}.")
 
     mycursor.execute("SELECT ID, name, authorID, authorName, size, isDisabled, download FROM songs WHERE ID = %s LIMIT 1", (SongID,))
     SongData = mycursor.fetchall()
     if len(SongData) == 0:
         if SongID > 5000000:
             return "-1" #dont ask gd for custom songs
-
+        Log("Song not in database... Calling boomlings.")
         BoomlingsSongInfo = requests.post("http://www.boomlings.com/database/getGJSongInfo.php", data={
             "secret" : "Wmfd2893gb7",
             "songID" : SongID
         })
         Response = BoomlingsSongInfo.text
+        Success("Served song from boomlings!")
         return Response
 
-
+    Log("Song found in database! Serving...")
     SongData = SongData[0]
 
     if SongData[5]:
@@ -989,4 +991,5 @@ def GetSong(request):
     
     SongURL = urllib.parse.quote(SongData[6])
 
+    Success("Song served!")
     return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"

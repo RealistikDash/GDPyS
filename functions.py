@@ -949,9 +949,9 @@ def CheckBcryptPw(dbpassword, painpassword):
     password checking...
     """
 
-    result = hashlib.md5(painpassword.encode()).hexdigest().encode('utf-8')
+    painpassword = painpassword.encode('utf-8')
     dbpassword = dbpassword.encode('utf-8')
-    check = bcrypt.checkpw(result, dbpassword)
+    check = bcrypt.checkpw(painpassword, dbpassword)
 
     return check
 

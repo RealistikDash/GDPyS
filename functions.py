@@ -11,6 +11,7 @@ import requests
 import zlib
 import os
 import urllib.parse
+import bcrypt
 
 try:
     mydb = mysql.connector.connect(
@@ -84,11 +85,21 @@ def LoginCheck(Udid, Username, Password, request):
 
 def HashPassword(PlainPassword: str):
     """Creates a hashed password to be used in database."""
-    return PlainPassword #for now no hashing
+    if not UserConfig["LegacyPasswords"]:
+        return CreateBcrypt(PlainPassword)
+    return PlainPassword #havent done legacy passwords
 
 def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
-    #placeholder function
+    #getting password from db
+    mycursor.execute("SELECT password FROM accounts WHERE accountID = %s", (AccountID,))
+    DBPassword = mycursor.fetchall()
+    #if said user dont exist
+    if len(DBPassword) == 0:
+        return False
+    DBPassword = DBPassword[0][0]
+    if not UserConfig["LegacyPasswords"]:
+        return CheckBcryptPw(DBPassword, Password)
     return True
 
 def RegisterFunction(request):
@@ -930,3 +941,21 @@ def DLLevel(request):
     ReturnStr += SoloGen2(CoolString) + "#" + CoolString
     Success(f"Served level {LevelID}!")
     return ReturnStr
+
+def CheckBcryptPw(dbpassword, painpassword):
+    """
+    Checks Bcrypt passwords. Taken from RealistikPanel (made by me)
+    By: kotypey
+    password checking...
+    """
+
+    result = hashlib.md5(painpassword.encode()).hexdigest().encode('utf-8')
+    dbpassword = dbpassword.encode('utf-8')
+    check = bcrypt.checkpw(result, dbpassword)
+
+    return check
+
+def CreateBcrypt(Password: str):
+    """Creates hashed password."""
+    BHashed = bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt(10))
+    return BHashed.decode()

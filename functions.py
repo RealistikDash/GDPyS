@@ -951,7 +951,11 @@ def CheckBcryptPw(dbpassword, painpassword):
 
     painpassword = painpassword.encode('utf-8')
     dbpassword = dbpassword.encode('utf-8')
-    check = bcrypt.checkpw(painpassword, dbpassword)
+    try:
+        check = bcrypt.checkpw(painpassword, dbpassword)
+    except:
+        Fail("Invalid password type (not Bcrypt)")
+        return False
 
     return check
 

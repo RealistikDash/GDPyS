@@ -12,6 +12,7 @@ import zlib
 import os
 import urllib.parse
 import bcrypt
+from threading import Thread
 
 try:
     mydb = mysql.connector.connect(
@@ -980,6 +981,7 @@ def GetSong(request):
             "songID" : SongID
         })
         Response = BoomlingsSongInfo.text
+        Thread(target=AddSongToDB, args=(Response,)).start() #add to thread not to slow down
         Success("Served song from boomlings!")
         return Response
 
@@ -1008,3 +1010,19 @@ def GetComments(request):
             Data[Key[0]] = Key[1]
 
     Offset = Data["page"] * Data["count"]
+
+def AddSongToDB(Response: str):
+    """Adds song to database."""
+    if Response == "-1" or Response == "":
+        return
+    Log("Adding song from Boomlings to database.")
+    List = Response.split("|")
+    SongID = List[1][1:-1]
+    SongName = List[3][1:-1]
+    AuthorID = List[5][1:-1]
+    AuthorName = List[7][1:-1]
+    SongSize = List[9][1:-1]
+    SongURL = urllib.parse.quote(List[13][1:-1])
+
+    mycursor.execute("INSERT INTO songs (ID, name, authorID, authorName, size, download) VALUES (%s, %s, %s, %s, %s, %s)", (SongID, SongName, AuthorID, AuthorName, SongSize, SongURL))
+    mydb.commit()

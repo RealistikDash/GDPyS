@@ -886,8 +886,9 @@ def DLLevel(request):
     UploadAgo = TimeAgoFromNow(Level[27])[:-4]
 
     Password = Level[10]
+    PasswordXor = 0
     if Level[10] != 0:
-        Password = base64.b64encode(Xor(Level[10], 26364).encode("ascii")).decode("ascii")
+        PasswordXor = base64.b64encode(Xor(Level[10], 26364).encode("ascii")).decode("ascii")
 
     if os.path.exists(f"Data/Levels/{LevelID}"):
         LevelFiles = open(f"Data/Levels/{LevelID}", "r").readlines()[0]
@@ -918,7 +919,7 @@ def DLLevel(request):
         "18" : Level[26],
         "19" : Level[31],
         "25" : Level[25],
-        "27" : Password,
+        "27" : PasswordXor,
         "28" : UploadAgo,
         "29" : UpdateAgo,
         "30" : Level[11],

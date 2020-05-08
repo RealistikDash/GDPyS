@@ -993,3 +993,18 @@ def GetSong(request):
 
     Success("Song served!")
     return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"
+
+def GetComments(request):
+    """Gets comments for a level."""
+    Data = {}
+    #ok this is prob stupid but yolo
+    #btw to explain how this works, first value is key, second value is the default one if not set
+    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0]]
+
+    for Key in ToGet:
+        try:
+            Data[Key[0]] = int(request.form[Key[0]])
+        except:
+            Data[Key[0]] = Key[1]
+
+    Offset = Data["page"] * Data["count"]

@@ -1013,7 +1013,7 @@ def GetComments(request):
 
 def AddSongToDB(Response: str):
     """Adds song to database."""
-    if Response == "-1" or Response == "":
+    if Response == "-1" or Response == "" or Response == "-2":
         return
     Log("Adding song from Boomlings to database.")
     List = Response.split("|")

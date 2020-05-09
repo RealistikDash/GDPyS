@@ -1002,7 +1002,7 @@ def GetComments(request):
     Data = {}
     #ok this is prob stupid but yolo
     #btw to explain how this works, first value is key, second value is the default one if not set
-    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0]]
+    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0], ["userID", 0]]
 
     for Key in ToGet:
         try:
@@ -1011,6 +1011,44 @@ def GetComments(request):
             Data[Key[0]] = Key[1]
 
     Offset = Data["page"] * Data["count"]
+    Column = "likes"
+    if Data["mode"] == 0:
+        Column = "commentID"
+    
+    if Data["levelID"] == 0 or Data["levelID"] == "":
+        #all comments
+        DisplayID = True
+        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE userID = %s ORDER BY {Column} DESC LIMIT {Data['count']} OFFSET {Offset}", (Data["userID"],))
+        Comments = mycursor.fetchall()
+        mycursor.execute("SELECT count(*) FROM comments WHERE userID = %s", (Data["userID"],))
+        CommentCount = mycursor.fetchall()[0][0]
+    else:
+        DisplayID = False
+        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE levelID = %s ORDER BY {Column} DESC LIMIT {Data['count']} OFFSET {Offset}", (Data["levelID"],))
+        Comments = mycursor.fetchall()
+        mycursor.execute("SELECT count(*) FROM comments WHERE levelID = %s", (Data["levelID"],))
+        CommentCount = mycursor.fetchall()[0][0]
+    
+    if len(Comments) == 0:
+        return "-2"
+
+    ReturnString = ""
+    UserString = ""
+    for Comment in Comments:
+        if DisplayID:
+            ReturnString += f"1~{Comment[0]}~"
+        UploadAgo = TimeAgoFromNow(Comment[2])[:-4]
+        mycursor.execute("SELECT userID, userName, icon, color1, color2, iconType, special, extID FROM users WHERE userID = %s LIMIT 1", (Data["userID"],))
+        UserData = mycursor.fetchall()[0]
+        try:
+            AccountID = int(UserData[-1])
+        except:
+            AccountID = 0
+        RoleData = GetRoleForUser(AccountID)
+        ReturnString += f"2~{Comment[3]}~3~{Comment[4]}~5~0~7~{Comments[6]}~9~{UploadAgo}~6~{Comment[1]}~10~{Comment[7]}~11~{RoleData['Badge']}~12~{RoleData['Colour']}:1~{UserData[1]}~7~1~9~{UserData[2]}~10~{UserData[3]}~11~{UserData[4]}~14~{UserData[5]}~15~{UserData[6]}~16~{UserData[7]}|"
+    
+    return f"{ReturnString[:-1]}#{CommentCount}:{Data['page']}:{Data['count']}"
+
 
 def AddSongToDB(Response: str):
     """Adds song to database."""
@@ -1027,3 +1065,33 @@ def AddSongToDB(Response: str):
 
     mycursor.execute("INSERT INTO songs (ID, name, authorID, authorName, size, download) VALUES (%s, %s, %s, %s, %s, %s)", (SongID, SongName, AuthorID, AuthorName, SongSize, SongURL))
     mydb.commit()
+
+def GetRoleForUser(AccountID):
+    """Gets role data for account id."""
+    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s LIMIT 1", (AccountID,))
+    RoleID = mycursor.fetchall()
+    if len(RoleID) == 0:
+        return {
+            "RoleID" : 0,
+            "RoleName" : "User",
+            "Badge" : 0,
+            "Colour" : "256,256,256"
+        }
+    RoleID = RoleID[0][0]
+    mycursor.execute("SELECT roleID, roleName, modBadgeLevel, commentColor FROM roles WHERE roleID = %s", (RoleID,))
+    RoleData = mycursor.fetchall()
+    if len(RoleData) == 0:
+        Log(f"Account ID {AccountID} has invalid role assigned!")
+        return {
+            "RoleID" : 0,
+            "RoleName" : "User",
+            "Badge" : 0,
+            "Colour" : "256,256,256"
+        }
+    RoleData = RoleData[0]
+    return {
+        "RoleID" : RoleData[0],
+        "RoleName" : RoleData[1],
+        "Badge" : RoleData[2],
+        "Colour" : RoleData[3]
+    }

@@ -120,6 +120,11 @@ def DLLevelRoute():
 def SongRoute():
     return GetSong(request)
 
+@app.route("//database/getGJComments21.php", methods=["GET", "POST"])
+@app.route("/database/getGJComments21.php", methods=["GET", "POST"])
+def CommentGetRoute():
+    return GetComments(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

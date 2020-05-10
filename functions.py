@@ -995,7 +995,7 @@ def GetSong(request):
     SongURL = urllib.parse.quote(SongData[6])
 
     Success("Song served!")
-    return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"
+    return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~"
 
 def GetComments(request):
     """Gets comments for a level."""

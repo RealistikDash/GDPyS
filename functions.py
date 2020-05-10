@@ -992,7 +992,7 @@ def GetSong(request):
     if SongData[5]:
         return "-2"
     
-    SongURL = urllib.parse.quote(SongData[6])
+    SongURL = SongData[6]
 
     Success("Song served!")
     return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~"
@@ -1061,7 +1061,7 @@ def AddSongToDB(Response: str):
     AuthorID = List[5][1:-1]
     AuthorName = List[7][1:-1]
     SongSize = List[9][1:-1]
-    SongURL = urllib.parse.quote(List[13][1:-1])
+    SongURL = List[13][1:-1]
 
     mycursor.execute("INSERT INTO songs (ID, name, authorID, authorName, size, download) VALUES (%s, %s, %s, %s, %s, %s)", (SongID, SongName, AuthorID, AuthorName, SongSize, SongURL))
     mydb.commit()

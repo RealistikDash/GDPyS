@@ -747,6 +747,7 @@ def GetLevels(request):
 
     Order = "uploadDate"
     SQLParams = []
+    SQLFormats = [] #to prevent sql injection yeah
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:
         SQLParams.append("starFeatured = 1")
@@ -762,9 +763,8 @@ def GetLevels(request):
         SQLParams.append("NOT starStars = 0")
     if CheckForm(Form, "noStar"):
         SQLParams.append("starStars = 0")
-    # commented due to possible sql injection
-    #if CheckForm(Form, "len"):
-    #    SQLParams.append(f"levelLenght IN ({Form['len']})")
+    if CheckForm(Form, "len"):
+        SQLParams.append(f"levelLenght IN ({Form['len']})")
 
     if Type == 0:
         Order = "likes"
@@ -775,6 +775,15 @@ def GetLevels(request):
     if Type == 3:
         SQLParams.append(f"uploadDate > {round(time.time()) - 604800}")
         Order = "likes"
+    if Type == 5:
+        SQLParams.append("userID = %s")
+        SQLFormats.append(Form["str"])
+    if Type == 6:
+        SQLParams.append("starFeatured = 1 OR starFeatured = 2")
+        Order = "uploadDate, rateDate DESC"
+    if Type == 7:
+        SQLParams.append("Magic = 1")
+
     if Type == 16:
         SQLParams.append("NOT starEpic = 0")
         Order = "rateDate DESC, uploadDate"
@@ -792,10 +801,10 @@ def GetLevels(request):
     Query = f"SELECT * FROM levels {Conditions}ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
     CountQuery = f"SELECT count(*) FROM levels {Conditions}"
 
-    mycursor.execute(CountQuery)
+    mycursor.execute(CountQuery, tuple(SQLFormats))
     LevelCount = mycursor.fetchall()[0][0]
 
-    mycursor.execute(Query)
+    mycursor.execute(Query, tuple(SQLFormats))
     Levels = mycursor.fetchall()
 
     ReturnStr = ""

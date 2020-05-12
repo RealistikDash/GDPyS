@@ -32,7 +32,10 @@ Ranks = {}
 
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
-    #NOT DONE YET!!!!!!
+    #ok here is the plan of action
+    #upon register, create a gjp from the password, bcrypt it and then store in db
+    #here, we will bcrypt this gjp and check it with the one that is in the db
+    #i got recommentded encrypting more than decrypting it
     return True
 
 def FixUserInput(String):

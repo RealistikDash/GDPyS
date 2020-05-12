@@ -26,7 +26,7 @@ The requirements for GDPyS are different to existing alternatives. They include:
 - A Linux VPS (required to run Python apps, any free hosting won't do)
 - Python 3.5+ (tested with 3.6.9 and 3.7.5)
 - Nginx/Apache (required to proxypass)
-- 17 character domain (eg devvgdpys.ussr.pl)
+- Roughly 17 character domain such as devvgdpys.ussr.pl (more or less, few tweaks when editing the exe and routes could allow for more or less)
 
 # Credits
 - Some of this code is a direct port of [Cvolton's GMDPrivate Server](https://github.com/Cvolton/GMDprivateServer) into Python.

@@ -1117,10 +1117,10 @@ def DeleteAccComment(request):
 
     #getting the user id for later query so that a person cant delete anyone else's comments
     mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
-    UserID = mycursor.fetchcolumn()
+    UserID = mycursor.fetchone()
     if UserID is None:
         return "-1"
-
+    UserID = UserID[0]
     mycursor.execute("DELETE FROM acccomments WHERE userID = %s AND commentID = %s LIMIT 1", (UserID, CommentID,))
     mydb.commit()
     return "1"

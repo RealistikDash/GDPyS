@@ -1107,3 +1107,20 @@ def GetRoleForUser(AccountID):
         "Badge" : RoleData[2],
         "Colour" : RoleData[3]
     }
+
+def DeleteAccComment(request):
+    """Handler for deleting a comment"""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    CommentID = request.form["commentID"]
+
+    #getting the user id for later query so that a person cant delete anyone else's comments
+    mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
+    UserID = mycursor.fetchcolumn()
+    if UserID is None:
+        return "-1"
+
+    mycursor.execute("DELETE FROM acccomments WHERE userID = %s AND commentID = %s LIMIT 1", (UserID, CommentID,))
+    mydb.commit()
+    return "1"

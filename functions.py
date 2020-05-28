@@ -29,6 +29,7 @@ except Exception as e:
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
 Ranks = {}
+PrivilegeCache = {} # Privileges will be cached here
 
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
@@ -1148,3 +1149,29 @@ def DeleteAccComment(request):
 
 def PostComment(request):
     """Posts a level comment."""
+
+def HasPrivilege(AccountID: int, Privilege):
+    """Checks if the given account has privilege."""
+    #checking if the privilege has been cached
+    if str(AccountID) in list(PrivilegeCache.keys()):
+        #checking if the thing is not expired
+        #and yes ik i could have done it in the same statement
+        if PrivilegeCache[str(AccountID)]["Expiry"] > time.time():
+            return bool(PrivilegeCache[str(AccountID)]["Privileges"] & Privilege)
+    
+    #username either not cached or expired
+    #getting privs from db
+    mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    DBPriv = mycursor.fetchone()
+    if DBPriv == None:
+        return False
+    DBPriv = DBPriv[0]
+
+    #ok first we add them to the cache
+    PrivilegeCache[str(AccountID)] = {
+        "Privileges" : DBPriv,
+        "Expiry" : round(time.time())
+    }
+
+    #and now alas we check if they have it
+    return bool(DBPriv & Privilege)

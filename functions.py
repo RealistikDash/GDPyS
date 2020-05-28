@@ -1124,3 +1124,6 @@ def DeleteAccComment(request):
     mycursor.execute("DELETE FROM acccomments WHERE userID = %s AND commentID = %s LIMIT 1", (UserID, CommentID,))
     mydb.commit()
     return "1"
+
+def PostComment(request):
+    """Posts a level comment."""

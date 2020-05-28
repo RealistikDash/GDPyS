@@ -729,6 +729,14 @@ def GenSongString(SongID: int):
     
     return f"1~|~{SongData[0]}~|~2~|~{SongName}~|~3~|~{SongData[2]}~|~4~|~{AuthorName}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"
 
+def IsInt(TheThing):
+    """Checks if the thing passed is a valid integer."""
+    try:
+        int(TheThing)
+        return True
+    except:
+        return False
+
 
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""
@@ -769,8 +777,21 @@ def GetLevels(request):
     if CheckForm(Form, "len"):
         SQLParams.append(f"levelLenght IN ({Form['len']})")
 
-    if Type == 0:
+    if Type == 0 or Type == 15:
         Order = "likes"
+        SearchStr = request.form.get("str", "")
+        if SearchStr != "":
+            #looking for level id
+            if IsInt(SearchStr):
+                SQLParams.append("levelID = %s")
+                SQLFormats.append(SearchStr)
+            #nope its a name
+            else:
+                #add % around search to find levels with that thing in the name
+                #and btw this may be replaced with elasticsearch as i look further into it
+                ThingSearchStr = f"%{SearchStr}%"
+                SQLParams.append("levelName LIKE %s")
+                SQLFormats.append(ThingSearchStr)
     if Type == 1:
         Order = "downloads"
     if Type == 2:
@@ -821,7 +842,7 @@ def GetLevels(request):
             "2": Level[4],
             "3" : Level[5],
             "5" : Level[6],
-            "6" : Level[-8],
+            "6" : Level[-10], # TODO Replace this with a proper index
             "8" : "10",
             "9" : Level[21],
             "10" : Level[22],

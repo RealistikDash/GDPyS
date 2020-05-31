@@ -13,6 +13,7 @@ import os
 import urllib.parse
 import bcrypt
 from threading import Thread
+from PrivEnums import *
 
 try:
     mydb = mysql.connector.connect(
@@ -82,8 +83,11 @@ def LoginCheck(Udid, Username, Password, request):
 
     UserID = UserID[0][0]
 
-    #insert password check here
     if not CheckPassword(AccountID, Password):
+        return "-1"
+
+    #lastly we check if they are allowed to log in
+    if not HasPrivilege(AccountID, UserLogIn):
         return "-1"
     Success(f"Authentication for {Username} was successfull!")
     return f"{AccountID},{UserID}"
@@ -244,6 +248,9 @@ def InsertAccComment(request):
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
         return "-1"
+    #checking if they are allowed
+    if not HasPrivilege(AccountID, UserPostAccComment):
+        return "-1"
     USerID = AIDToUID(AccountID)
     Timestamp = round(time.time())
     mycursor.execute("INSERT INTO acccomments (comment, userID, timeStamp, userName) VALUES (%s, %s, %s, %s)", (CommentContent, USerID, Timestamp, Username))
@@ -351,42 +358,20 @@ def GetLeaderboards(request):
 
 def GetModBadge(AccountID):
     """Gets mod badge level"""
-    #checking if user has role assigned
-    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s LIMIT 1", (AccountID,))
-    Role = mycursor.fetchall()
-    if len(Role) == 0:
-        return 0 #no role assigned, byebye
-    Role = Role[0][0]
-    #now we get the role badge
-    mycursor.execute("SELECT modBadgeLevel FROM roles WHERE roleID = %s LIMIT 1", (Role,))
-    BadgePriv = mycursor.fetchall()
-    if len(BadgePriv) == 0:
-        return 0 #role not found
-    BadgePriv = BadgePriv[0][0]
-    return BadgePriv
+    HasElderMod = HasPrivilege(AccountID, ModElderBadge)
+    if HasElderMod:
+        return 2
+    HasMod = HasPrivilege(AccountID, ModRegularBadge)
+    if HasMod:
+        return 1
+    return 0
 
 def IsMod(request):
     """Returns whether the user is a mod (has badge)."""
     Log(f"User {request.form['accountID']} is checking mod status.")
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
         return "-1"
-    #checking if user has role assigned
-    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s LIMIT 1", (request.form["accountID"],))
-    Role = mycursor.fetchall()
-    if len(Role) == 0:
-        return "-1" #no role assigned, byebye
-    Role = Role[0][0]
-    #now we get the role badge
-    mycursor.execute("SELECT actionRequestMod FROM roles WHERE roleID = %s LIMIT 1", (Role,))
-    BadgePriv = mycursor.fetchall()
-    if len(BadgePriv) == 0:
-        return "-1" #role not found
-    BadgePriv = BadgePriv[0][0]
-    if BadgePriv == 0:
-        Success(f"User {request.form['accountID']} mod check fail! (modbadge level {BadgePriv})")
-        return "-1"
-    Success(f"User {request.form['accountID']} mod check success!")
-    return str(BadgePriv)
+    return HasPrivilege(request.form["accountID"], ModReqMod)
 
 def Rewards(request):
     """Responsible for the chest rewards."""
@@ -623,6 +608,8 @@ def UploadLevel(request):
     AccountID = AccountID[0][0]
 
     if not VerifyGJP(AccountID, GJP):
+        return "-1"
+    if not HasPrivilege(AccountID, UserUploadLevel):
         return "-1"
 
     ToGet = ["levelID", "levelName", "levelDesc", "levelVersion", "levelLength", "audioTrack", "auto", "password", "original", "twoPlayer", "songID", "objects", "coins", "requestedStars", "extraString", "levelString", "levelInfo", "secret", "ldm", "udid", "binaryVersion", "unlisted"]

@@ -1157,7 +1157,7 @@ def HasPrivilege(AccountID: int, Privilege):
     #ok first we add them to the cache
     PrivilegeCache[str(AccountID)] = {
         "Privileges" : DBPriv,
-        "Expiry" : round(time.time())
+        "Expiry" : round(time.time()) + 600
     }
 
     #and now alas we check if they have it

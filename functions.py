@@ -1099,7 +1099,7 @@ def GetRoleForUser(AccountID):
         "Colour" : "256,256,256"
     }
     mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
-    UserPriv = mycursor.one()
+    UserPriv = mycursor.fetchone()
     if UserPriv == None:
         return Default
 

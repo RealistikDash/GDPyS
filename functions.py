@@ -1024,7 +1024,7 @@ def GetComments(request):
     #ok this is prob stupid but yolo
     #btw to explain how this works, first value is key, second value is the default one if not set
     # NOTE: This was before i found out about request.form.get
-    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0], ["userID", 0]]
+    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0]]
 
     for Key in ToGet:
         try:
@@ -1040,9 +1040,9 @@ def GetComments(request):
     if Data["levelID"] == 0 or Data["levelID"] == "":
         #all comments
         DisplayID = True
-        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE userID = %s ORDER BY {Column} DESC LIMIT {Data['count']} OFFSET {Offset}", (Data["userID"],))
+        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE userID = %s ORDER BY {Column} DESC LIMIT {Data['count']} OFFSET {Offset}", (Data["levelID"],))
         Comments = mycursor.fetchall()
-        mycursor.execute("SELECT count(*) FROM comments WHERE userID = %s", (Data["userID"],))
+        mycursor.execute("SELECT count(*) FROM comments WHERE userID = %s", (Data["levelID"],))
         CommentCount = mycursor.fetchall()[0][0]
     else:
         DisplayID = False
@@ -1060,10 +1060,10 @@ def GetComments(request):
         if DisplayID:
             ReturnString += f"1~{Comment[0]}~"
         UploadAgo = TimeAgoFromNow(Comment[2])[:-4]
-        mycursor.execute("SELECT userID, userName, icon, color1, color2, iconType, special, extID FROM users WHERE userID = %s LIMIT 1", (Data["userID"],))
+        mycursor.execute("SELECT userID, userName, icon, color1, color2, iconType, special, extID FROM users WHERE userID = %s LIMIT 1", (Comment[4],))
         UserData = mycursor.fetchone()
         if UserData == None:
-            Fail(f"Failed to find data for user with the UserID of {Data['userID']}! This will lead to a lot of bad things.")
+            Fail(f"Failed to find data for user with the UserID of {Data['levelID']}! This will lead to a lot of bad things.")
         try:
             AccountID = int(UserData[-1])
         except:

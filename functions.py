@@ -1136,6 +1136,21 @@ def DeleteAccComment(request):
 
 def PostComment(request):
     """Posts a level comment."""
+    Username = request.form["userName"] #why is this passed? idk... ill still use it
+    Log(f"{Username} tries to post a comment...")
+    AccountID = request.form.get("accountID") # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    Percent = int(request.form.get("percent", 0))
+    UserID = AIDToUID(AccountID)
+    LevelID = request.form["levelID"]
+    Comment = request.form["comment"]
+    Timestamp = round(time.time())
+    #we finally add the comment
+    mycursor.execute("INSERT INTO comments (levelID, userID, comment, timeStamp, percent, userName) VALUES (%s, %s, %s, %s, %s, %s)", (LevelID, UserID, Comment, Timestamp, Percent, Username))
+    mydb.commit()
+    Success("Comment posted!")
+    return "1"
 
 def HasPrivilege(AccountID: int, Privilege):
     """Checks if the given account has privilege."""

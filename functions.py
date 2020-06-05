@@ -1092,32 +1092,34 @@ def AddSongToDB(Response: str):
 
 def GetRoleForUser(AccountID):
     """Gets role data for account id."""
-    mycursor.execute("SELECT roleID FROM roleassign WHERE accountID = %s LIMIT 1", (AccountID,))
-    RoleID = mycursor.fetchall()
-    if len(RoleID) == 0:
-        return {
-            "RoleID" : 0,
-            "RoleName" : "User",
-            "Badge" : 0,
-            "Colour" : "256,256,256"
-        }
-    RoleID = RoleID[0][0]
-    mycursor.execute("SELECT roleID, roleName, modBadgeLevel, commentColor FROM roles WHERE roleID = %s", (RoleID,))
-    RoleData = mycursor.fetchall()
-    if len(RoleData) == 0:
-        Log(f"Account ID {AccountID} has invalid role assigned!")
-        return {
-            "RoleID" : 0,
-            "RoleName" : "User",
-            "Badge" : 0,
-            "Colour" : "256,256,256"
-        }
-    RoleData = RoleData[0]
+    Default = {
+        "RoleID" : 0,
+        "RoleName" : "User",
+        "Badge" : 0,
+        "Colour" : "256,256,256"
+    }
+    mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    UserPriv = mycursor.one()
+    if UserPriv == None:
+        return Default
+
+    mycursor.execute("SELECT ID, Name, Colour FROM PrivilegeGroups WHERE Privileges = %s LIMIT 1", (UserPriv,))
+    PrivRole = mycursor.fetchone()
+    if PrivRole == None:
+        return Default
+
+    #working out the badge
+    Badge = 0
+    if bool(UserPriv & ModElderBadge):
+        Badge = 2
+    elif bool(UserPriv & ModRegularBadge):
+        Badge = 1
+    
     return {
-        "RoleID" : RoleData[0],
-        "RoleName" : RoleData[1],
-        "Badge" : RoleData[2],
-        "Colour" : RoleData[3]
+        "RoleID" : PrivRole[0],
+        "RoleName" : PrivRole[1],
+        "Badge" : Badge,
+        "Colour" : PrivRole[2]
     }
 
 def DeleteAccComment(request):

@@ -1023,6 +1023,7 @@ def GetComments(request):
     Data = {}
     #ok this is prob stupid but yolo
     #btw to explain how this works, first value is key, second value is the default one if not set
+    # NOTE: This was before i found out about request.form.get
     ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0], ["userID", 0]]
 
     for Key in ToGet:
@@ -1060,7 +1061,9 @@ def GetComments(request):
             ReturnString += f"1~{Comment[0]}~"
         UploadAgo = TimeAgoFromNow(Comment[2])[:-4]
         mycursor.execute("SELECT userID, userName, icon, color1, color2, iconType, special, extID FROM users WHERE userID = %s LIMIT 1", (Data["userID"],))
-        UserData = mycursor.fetchall()[0]
+        UserData = mycursor.fetchone()
+        if UserData == None:
+            Fail(f"Failed to find data for user with the UserID of {Data['userID']}! This will lead to a lot of bad things.")
         try:
             AccountID = int(UserData[-1])
         except:

@@ -1103,6 +1103,8 @@ def GetRoleForUser(AccountID):
     if UserPriv == None:
         return Default
 
+    UserPriv = UserPriv[0]
+
     mycursor.execute("SELECT ID, Name, Colour FROM PrivilegeGroups WHERE Privileges = %s LIMIT 1", (UserPriv,))
     PrivRole = mycursor.fetchone()
     if PrivRole == None:

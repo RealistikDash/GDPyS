@@ -130,6 +130,11 @@ def CommentGetRoute():
 def DeleteAccCommentRoute():
     return DeleteAccComment(request)
 
+@app.route("//database/uploadGJComment.php", methods=["GET", "POST"])
+@app.route("/database/uploadGJComment.php", methods=["GET", "POST"])
+def PostComment():
+    return DeleteAccComment(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

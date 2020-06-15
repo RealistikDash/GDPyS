@@ -17,7 +17,8 @@ DefaultConfig = {
     "Chest2Wait" : 240,
     "CronThreadDelay" : 3600,
     "LocalServer" : False,
-    "LegacyPasswords" : False #cvolton gmdprivateserver passwords if true, bcrypt if false
+    "LegacyPasswords" : False, #cvolton gmdprivateserver passwords if true, bcrypt if false
+    "Anticheat" : True
 }
 
 class JsonFile:

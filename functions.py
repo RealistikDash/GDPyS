@@ -14,6 +14,7 @@ import urllib.parse
 import bcrypt
 from threading import Thread
 from PrivEnums import *
+import string
 
 try:
     mydb = mysql.connector.connect(
@@ -1184,3 +1185,43 @@ def HasPrivilege(AccountID: int, Privilege):
 
     #and now alas we check if they have it
     return bool(DBPriv & Privilege)
+
+def RandomString(Lenght=8):
+    Chars = string.ascii_lowercase
+    return ''.join(random.choice(Chars) for i in range(Lenght))
+
+class GDPySBot:
+    """This is the bot class for GDPyS. It is responsible for everything GDPyS related ranging from connecting and creating the bot to sending messages."""
+    def __init__(self):
+        """Sets up the GDPyS bot class for connection etc."""
+        self.Connected = False
+        self.BotID = 0
+
+    def _CheckBot(self):
+        """Checks if the bot account exists."""
+        mycursor.execute("SELECT COUNT(*) FROM accounts WHERE IsBot = 1")
+        BotCount = mycursor.fetchone()
+        if BotCount == None:
+            return False
+        return True
+
+    def _FetchID(self):
+        """Gets the bots accountID."""
+        mycursor.execute("SELECT accountID FROM accounts WHERE IsBot = 1 LIMIT 1")
+        return mycursor.fetchone()[0]
+
+    def _RegitsterBot(self, BotName="GDPySBot"):
+        """Creates the bot account."""
+        Timestamp = round(time.time())
+        Password = HashPassword(RandomString(16)) #no one ever ever ever should access the bot account. if they do, you messed up big time
+        mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, 'rel@es.to', '', '', %s, '')", (BotName, Password, Timestamp))
+        Success("Created bot user!")
+    
+    def Connect(self):
+        """Sets up the bot to be able to be used."""
+        if not self._CheckBot():
+            Log("Bot not found! Creating new account for it!")
+            self._RegitsterBot()
+        
+        self.BotID = self._FetchID()
+        self.Connected = True

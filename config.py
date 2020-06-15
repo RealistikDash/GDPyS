@@ -18,7 +18,9 @@ DefaultConfig = {
     "CronThreadDelay" : 3600,
     "LocalServer" : False,
     "LegacyPasswords" : False, #cvolton gmdprivateserver passwords if true, bcrypt if false
-    "Anticheat" : True
+    "CheatlessAC" : True, #global switch
+    "CheatlessScoreCheck" : True,
+    "CheatlessCronChecks" : True
 }
 
 class JsonFile:

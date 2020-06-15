@@ -23,6 +23,10 @@ GDPyS is still in **very** early development. This means that most things aren't
 # Why GDPyS?
 GDPyS is made with convenience and performance in mind. It provides performance benefits over existing alternatives while convenient features (such as error logs for easier debugging and automatic cron). Additionally, it is designed to be directly swappable with Cvolton's GMDPrivateServer, meaning you will able to reuse your existing database, save and level files.
 
+# Cheatless
+
+Cheatless is the GDPyS AntiCheat! It performs various tasks such as score analysis to keep obvious cheaters off your server. It is currently in heavy development but once finished, it will provide protection against cheaters. Each part of it can be enabled and disabled at will via the GDPyS config.
+
 # Requirements
 The requirements for GDPyS are different to existing alternatives. They include:
 - A Linux VPS (required to run Python apps, any free hosting won't do)

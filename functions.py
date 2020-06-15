@@ -299,6 +299,10 @@ def UpdateUserScore(request):
             DataDict[Thing] = 0
 
     UserID = AIDToUID(AccountID)
+    #hold on a minute, lets run the Cheatless check!
+    if int(DataDict["stars"]) > UserConfig["CheatlessMaxStars"]:
+        CheatlessBan(AccountID, "star count over max allowed stars")
+
     #big boy query coming up....
     mycursor.execute(
         "UPDATE users SET stars = %s, diamonds = %s, color1 = %s, color2 = %s, iconType = %s, special = %s, accIcon = %s, accShip = %s, accBall = %s, accBird = %s, accDart = %s, accRobot = %s, accGlow = %s, accSpider = %s, accExplosion = %s, gameVersion = %s, secret = %s, coins=%s, userCoins = %s WHERE userID = %s LIMIT 1",
@@ -1227,3 +1231,42 @@ class GDPySBot:
         
         self.BotID = self._FetchID()
         self.Connected = True
+
+def CheatlessScoreCheck(Score: dict):
+    """Runs a score validity verification."""
+    #ok here i will assume that the owner or mod of the gdps doesnt act stupid and rate free extremes.
+    #this is an example score dict
+    {
+        "AccountID" : 1,
+        "LevelID" : 222,
+        "Percentage" : 100,
+        "Attempts" : 10,
+        "Coins" : 0
+    }
+    if UserConfig["CheatlessAC"] and UserConfig["CheatlessScoreCheck"]:
+        #for now we will only check completed scores
+        if Score["Percentage"] == 100:
+            CLCheck(f"Running score check on a score on the level {Score['LevelID']}")
+            #ok lads first we get the level data
+            mycursor.execute("SELECT levelName, starStars, starDemonDiff, starCoins, coins FROM levels WHERE levelID = %s LIMIT 1", (Score['LevelID'],))
+            LevelData = mycursor.fetchone()
+
+            #first check! invalid score
+            if LevelData == None:
+                CheatlessBan(Score["AccountID"], "invalid level score submission")
+                return
+            
+            #next we do coin check
+            if LevelData[3] == 1 and Score["Coins"] > LevelData[4]:
+                CheatlessBan(Score["AccountID"], "unachievable coin count")
+                return
+
+            #now we check if they beat the extreme in like 5 attempts. this will rely on the mods not being stupid and rating
+            if LevelData[1] == 10 and LevelData[2] == 6 and Score["Attempts"] < UserConfig["CheatlessExtremeDemonMinAttempts"]:
+                CheatlessBan(Score["AccountID"], "too quick demon completion")
+                return
+
+def CheatlessBan(AccountID: int, Offence: str):
+    """Initiates and official CheatlessAC ban!"""
+    CLBan(f"User {AccountID} has been banned by CheatlessAC for {Offence}.")
+    pass # TODO: when GDPyS bot is done

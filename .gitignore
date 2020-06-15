@@ -132,3 +132,4 @@ dmypy.json
 config.json
 Data/
 test.py
+.vscode/

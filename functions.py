@@ -1215,7 +1215,9 @@ class GDPySBot:
         Timestamp = round(time.time())
         Password = HashPassword(RandomString(16)) #no one ever ever ever should access the bot account. if they do, you messed up big time
         mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, 'rel@es.to', '', '', %s, '')", (BotName, Password, Timestamp))
-        Success("Created bot user!")
+        mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, '1.1.1.1')", (self._FetchID(), BotName,))
+        mydb.commit()
+        Success(f"Created bot user ({BotName})!")
     
     def Connect(self):
         """Sets up the bot to be able to be used."""

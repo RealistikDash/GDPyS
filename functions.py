@@ -1478,7 +1478,7 @@ def UserSearchHandler(request):
     """Handles user searches."""
 
     Search = f"%{request.form['str']}%" #surrounding with % for the like search
-    Offset = int(request.form.get("page")) * 10
+    Offset = int(request.form.get("page", 0)) * 10
     #we get the user data now
     mycursor.execute("""SELECT
                         userName,
@@ -1503,6 +1503,11 @@ def UserSearchHandler(request):
     Users = mycursor.fetchall()
     ReturnString = ""
 
+    UserCount = len(Users)
+
+    if UserCount == 0:
+        return "-1"
+
     #now we create on of those joint strings yeah
     for User in Users:
         ReturnString += JointStringBuilder({
@@ -1520,4 +1525,4 @@ def UserSearchHandler(request):
             "4" : User[12],
             "8" : round(User[11])
         }) + "|"
-    return ReturnString[:-1]
+    return ReturnString[:-1] + f"#{UserCount}:{Offset}:10"

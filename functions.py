@@ -744,16 +744,10 @@ def GetLevels(request):
     #this is a partial port of cvoltons sorry i cant do this
     Form = request.form #so i dont have to write request.form
 
-    if CheckForm(Form, "Type"):
-        Type = int(Form["type"])
-    else:
-        Type = 0
+    Type = int(request.form.get("type", 0))
 
     #pages
-    if CheckForm(Form, "page"):
-        Offset = int(Form["page"]) * 10
-    else:
-        Offset = 0
+    Offset = request.form.get("page", "0")
 
     Order = "uploadDate"
     SQLParams = []
@@ -775,6 +769,8 @@ def GetLevels(request):
         SQLParams.append("starStars = 0")
     if CheckForm(Form, "len"):
         SQLParams.append(f"levelLenght IN ({Form['len']})")
+
+    print(Type)
 
     if Type == 0 or Type == 15:
         Order = "likes"

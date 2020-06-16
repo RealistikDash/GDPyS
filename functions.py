@@ -1387,7 +1387,8 @@ def LevelSuggest(request):
                 RateData["StarStars"],
                 RateData["StarDemonDiff"],
                 FeatureStatus,
-                RateData["StarAuto"]
+                RateData["StarAuto"],
+                LevelID
             ))
         mydb.commit()
         return "1"

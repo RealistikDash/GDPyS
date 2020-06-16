@@ -1476,6 +1476,7 @@ def MessagePost(request):
 
 def UserSearchHandler(request):
     """Handles user searches."""
+
     Search = f"%{request.form['str']}%" #surrounding with % for the like search
     Offset = int(request.form.get("page")) * 10
     #we get the user data now
@@ -1504,7 +1505,7 @@ def UserSearchHandler(request):
 
     #now we create on of those joint strings yeah
     for User in Users:
-        ReturnString = JointStringBuilder({
+        ReturnString += JointStringBuilder({
             "1" : User[0],
             "2" : User[1],
             "13" : User[2],
@@ -1520,4 +1521,3 @@ def UserSearchHandler(request):
             "8" : round(User[11])
         }) + "|"
     return ReturnString[:-1]
-    

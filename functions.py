@@ -1403,3 +1403,69 @@ def DebugManualAddSong(Source, SongID):
         "songID" : SongID
     })
     AddSongToDB(SongInfo.text)
+
+def DebugReupload(Source, LevelID):
+    """[DEBUG] Reuploads level from source to GDPyS server."""
+    Level = requests.post(Source, data = {
+        "secret" : "Wmfd2893gb7",
+        "gameVersion" : 22,
+        "levelID" : LevelID,
+        "binaryVersion" : 33,
+        "gdw" : 0,
+        "inc" : 1,
+        "extras" : 0
+    })
+
+    Result = Level.text
+    
+    if Result == "" or Result == "-1" or Result == "No no no":
+        Fail(f"Server error with response {Result}!")
+        return
+    
+    # TODO FINISH THIS
+
+def MessagePost(request):
+    """Posts a message to user."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+
+    Target = request.form["toAccountID"]
+    #checks if not blocked
+    mycursor.execute("SELECT COUNT(*) FROM blocks WHERE person1 = %s AND person2 = %s LIMIT 1", (Target, AccountID))
+    ReturnThing = mycursor.fetchone()
+    if ReturnThing > 0:
+        return "-1" #they are blocked!
+    
+    mycursor.execute("SELECT mS, userName FROM accounts WHERE accountID = %s", (Target,)) #ill also squeeze the username in here
+    ReturnThing = mycursor.fetchone()
+    if ReturnThing[0] == 0:
+        #ok lets check if they are friends
+        # TODO Friend check
+        return "-1" #dont accept messages!
+    
+    Secret = request.form["secret"]
+    Subject = request.form["subject"]
+    Body = request.form["body"]
+    Timestamp = round(time.time())
+    Username = ReturnThing[1]
+    UserID = AIDToUID(AccountID)
+
+    #add to db!
+    mycursor.execute("""INSERT INTO messages 
+                            (accID, toAccountID, userName, userID, secret, subject, body, uploadDate)
+                            VALUES
+                            (%s, %s, %s, %s, %s, %s, %s, %s)
+                            """,
+                            (
+                                AccountID,
+                                Target,
+                                Username,
+                                UserID,
+                                Secret,
+                                Subject,
+                                Body,
+                                Timestamp
+                            ))
+    mydb.commit()
+    return "1"

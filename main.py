@@ -140,6 +140,11 @@ def PostCommentRoute():
 def LevelSuggestRoute():
     return LevelSuggest(request)
 
+@app.route("//database/uploadGJMessage20.php", methods=["GET", "POST"])
+@app.route("/database/uploadGJMessage20.php", methods=["GET", "POST"])
+def PostMessageRoute():
+    return MessagePost(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

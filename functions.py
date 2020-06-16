@@ -1434,7 +1434,7 @@ def MessagePost(request):
     #checks if not blocked
     mycursor.execute("SELECT COUNT(*) FROM blocks WHERE person1 = %s AND person2 = %s LIMIT 1", (Target, AccountID))
     ReturnThing = mycursor.fetchone()
-    if ReturnThing > 0:
+    if ReturnThing[0] > 0:
         return "-1" #they are blocked!
     
     mycursor.execute("SELECT mS, userName FROM accounts WHERE accountID = %s", (Target,)) #ill also squeeze the username in here

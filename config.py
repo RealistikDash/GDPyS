@@ -19,8 +19,10 @@ DefaultConfig = {
     "LocalServer" : False,
     "LegacyPasswords" : False, #cvolton gmdprivateserver passwords if true, bcrypt if false
     "CheatlessAC" : True, #global switch
+    "CheatlessExtremeDemonMinAttempts" : 100, #if a user submits an extreme demon score under this att count, they will be banned
     "CheatlessScoreCheck" : True,
-    "CheatlessCronChecks" : True
+    "CheatlessCronChecks" : True,
+    "CheatlessMaxStars" : 5000
 }
 
 class JsonFile:

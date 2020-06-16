@@ -1276,3 +1276,119 @@ def CheatlessBan(AccountID: int, Offence: str):
     """Initiates and official CheatlessAC ban!"""
     CLBan(f"User {AccountID} has been banned by CheatlessAC for {Offence}.")
     pass # TODO: when GDPyS bot is done
+
+def LevelSuggest(request):
+    """Suggests/rates a level and handles the route."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    
+    #grab vars from post req
+    LevelID = request.form["levelID"]
+    Stars = int(request.form["stars"])
+    FeatureStatus = request.form["feature"]
+
+    #no switch statements in python so i attempted to do this
+    RateData = [
+        { # NA
+            "StarDemon" : 0,
+            "StarDifficulty" : 0,
+            "StarStars" : 0,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0,
+        },
+        { # Auto
+            "StarDemon" : 0,
+            "StarDifficulty" : 0,
+            "StarStars" : 1,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 1
+        },
+        { # Easy
+            "StarDemon" : 0,
+            "StarDifficulty" : 10,
+            "StarStars" : 2,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Normal
+            "StarDemon" : 0,
+            "StarDifficulty" : 20,
+            "StarStars" : 3,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Hard 1
+            "StarDemon" : 0,
+            "StarDifficulty" : 30,
+            "StarStars" : 4,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Hard 2
+            "StarDemon" : 0,
+            "StarDifficulty" : 30,
+            "StarStars" : 5,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Harder 1
+            "StarDemon" : 0,
+            "StarDifficulty" : 40,
+            "StarStars" : 6,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Harder 2
+            "StarDemon" : 0,
+            "StarDifficulty" : 40,
+            "StarStars" : 7,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Insane 1
+            "StarDemon" : 0,
+            "StarDifficulty" : 50,
+            "StarStars" : 8,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Insane 2
+            "StarDemon" : 0,
+            "StarDifficulty" : 50,
+            "StarStars" : 9,
+            "StarDemonDiff" : 0,
+            "StarAuto" : 0
+        },
+        { # Demon
+            "StarDemon" : 1,
+            "StarDifficulty" : 0,
+            "StarStars" : 10,
+            "StarDemonDiff" : 4,
+            "StarAuto" : 0
+        }
+    ][Stars]
+
+    #we check whether they can suggest, rate or none
+    if HasPrivilege(AccountID, ModRateLevel):
+        #ok so first we will get the data for the thing
+        mycursor.execute("""UPDATE levels SET 
+                                starDemon = %s, 
+                                starDifficulty = %s, 
+                                starCoins = 1, 
+                                starStars = %s, 
+                                starDemonDiff = %s,
+                                starFeatured = %s,
+                                starAuto = %s
+                            WHERE levelID = %s LIMIT 1
+            """, (
+                RateData["StarDemon"],
+                RateData["StarDifficulty"],
+                RateData["StarStars"],
+                RateData["StarDemonDiff"],
+                FeatureStatus,
+                RateData["StarAuto"]
+            ))
+        mydb.commit()
+        return "1"
+    return "-1"

@@ -135,6 +135,11 @@ def DeleteAccCommentRoute():
 def PostCommentRoute():
     return PostComment(request)
 
+@app.route("//database/suggestGJStars20.php", methods=["GET", "POST"])
+@app.route("/database/suggestGJStars20.php", methods=["GET", "POST"])
+def LevelSuggestRoute():
+    return LevelSuggest(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

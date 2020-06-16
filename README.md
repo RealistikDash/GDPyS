@@ -29,9 +29,10 @@ Cheatless is the GDPyS AntiCheat! It performs various tasks such as score analys
 
 # Requirements
 The requirements for GDPyS are different to existing alternatives. They include:
-- A Linux VPS (required to run Python apps, any free hosting won't do)
+- Anything that can run Python such as a Linux VPS (required to run Python apps, any free hosting won't do)
 - Python 3.5+ (tested with 3.6.9 and 3.7.5)
 - Nginx/Apache (required to proxypass)
+- MySQL Server
 - Roughly 17 character domain such as devvgdpys.ussr.pl (more or less, few tweaks when editing the exe and routes could allow for more or less)
 
 # Credits

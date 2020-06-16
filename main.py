@@ -145,6 +145,11 @@ def LevelSuggestRoute():
 def PostMessageRoute():
     return MessagePost(request)
 
+@app.route("//database/getGJUsers20.php", methods=["GET", "POST"])
+@app.route("/database/getGJUsers20.php", methods=["GET", "POST"])
+def UserSearchRoute():
+    return UserSearchHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

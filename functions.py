@@ -1473,3 +1473,51 @@ def MessagePost(request):
     mydb.commit()
     Success("Message sent!")
     return "1"
+
+def UserSearchHandler(request):
+    """Handles user searches."""
+    Search = f"%{request.form['str']}%" #surrounding with % for the like search
+    Offset = int(request.form.get("page")) * 10
+    #we get the user data now
+    mycursor.execute("""SELECT
+                        userName,
+                        userID,
+                        coins,
+                        userCoins,
+                        icon,
+                        color1,
+                        color2,
+                        iconType,
+                        special,
+                        extID,
+                        stars,
+                        creatorPoints,
+                        demons
+                    FROM
+                        users
+                    WHERE
+                        userName LIKE %s
+                    LIMIT 10 OFFSET %s""", (Search, Offset))
+
+    Users = mycursor.fetchall()
+    ReturnString = ""
+
+    #now we create on of those joint strings yeah
+    for User in Users:
+        ReturnString = JointStringBuilder({
+            "1" : User[0],
+            "2" : User[1],
+            "13" : User[2],
+            "17" : User[3],
+            "9" : User[4],
+            "10" : User[5],
+            "11" : User[6],
+            "14" : User[7],
+            "15" : User[8],
+            "16" : User[9],
+            "3" : User[10],
+            "4" : User[12],
+            "8" : round(User[11])
+        }) + "|"
+    return ReturnString[:-1]
+    

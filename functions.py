@@ -1456,7 +1456,7 @@ def MessagePost(request):
 
     #add to db!
     mycursor.execute("""INSERT INTO messages 
-                            (accID, toAccountID, userName, userID, secret, subject, body, uploadDate)
+                            (accID, toAccountID, userName, userID, secret, subject, body, timestamp)
                             VALUES
                             (%s, %s, %s, %s, %s, %s, %s, %s)
                             """,

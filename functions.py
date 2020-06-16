@@ -770,8 +770,6 @@ def GetLevels(request):
     if CheckForm(Form, "len"):
         SQLParams.append(f"levelLenght IN ({Form['len']})")
 
-    print(Type)
-
     if Type == 0 or Type == 15:
         Order = "likes"
         SearchStr = request.form.get("str", "")
@@ -794,6 +792,7 @@ def GetLevels(request):
     if Type == 3:
         SQLParams.append(f"uploadDate > {round(time.time()) - 604800}")
         Order = "likes"
+    #no type 4 as it is already the default one
     if Type == 5:
         SQLParams.append("userID = %s")
         SQLFormats.append(Form["str"])
@@ -802,7 +801,14 @@ def GetLevels(request):
         Order = "uploadDate, rateDate DESC"
     if Type == 7:
         SQLParams.append("Magic = 1")
-
+    if Type == 11:
+        SQLParams.append("Awarded = 1")
+    if Type == 12:
+        # TODO: Followed
+        pass
+    if Type == 13:
+        #TODO: Friends
+        pass
     if Type == 16:
         SQLParams.append("NOT starEpic = 0")
         Order = "rateDate DESC, uploadDate"

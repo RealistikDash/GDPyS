@@ -376,7 +376,13 @@ def IsMod(request):
     Log(f"User {request.form['accountID']} is checking mod status.")
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
         return "-1"
-    return HasPrivilege(request.form["accountID"], ModReqMod)
+    if HasPrivilege(request.form["accountID"], ModReqMod):
+        if HasPrivilege(request.form["accountID"], ModElderBadge)
+            return "2"
+        else:
+            return "1"
+    else:
+        return "-1"
 
 def Rewards(request):
     """Responsible for the chest rewards."""

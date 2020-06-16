@@ -13,3 +13,4 @@ ClaimDailyChest = 2 << 8
 CommandSetAcc = 2 << 9
 CommandRename = 2 << 10
 ModReqMod = 2 << 11
+ModSuggestLevel = 2 << 12

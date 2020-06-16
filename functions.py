@@ -377,7 +377,7 @@ def IsMod(request):
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
         return "-1"
     if HasPrivilege(request.form["accountID"], ModReqMod):
-        if HasPrivilege(request.form["accountID"], ModElderBadge)
+        if HasPrivilege(request.form["accountID"], ModElderBadge):
             return "2"
         else:
             return "1"

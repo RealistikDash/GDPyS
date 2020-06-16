@@ -1395,3 +1395,11 @@ def LevelSuggest(request):
         mydb.commit()
         return "1"
     return "-1"
+
+def DebugManualAddSong(Source, SongID):
+    """[DEBUG] Manually add a custom song from a custom source."""
+    SongInfo = requests.post(Source, data={
+        "secret" : "Wmfd2893gb7",
+        "songID" : SongID
+    })
+    AddSongToDB(SongInfo.text)

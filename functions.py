@@ -1426,6 +1426,7 @@ def DebugReupload(Source, LevelID):
 
 def MessagePost(request):
     """Posts a message to user."""
+    Log("Message send attempt!")
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
         return "-1"
@@ -1435,6 +1436,7 @@ def MessagePost(request):
     mycursor.execute("SELECT COUNT(*) FROM blocks WHERE person1 = %s AND person2 = %s LIMIT 1", (Target, AccountID))
     ReturnThing = mycursor.fetchone()
     if ReturnThing[0] > 0:
+        Fail("They were blocked...")
         return "-1" #they are blocked!
     
     mycursor.execute("SELECT mS, userName FROM accounts WHERE accountID = %s", (Target,)) #ill also squeeze the username in here
@@ -1442,6 +1444,7 @@ def MessagePost(request):
     if ReturnThing[0] == 0:
         #ok lets check if they are friends
         # TODO Friend check
+        Fail("Friend only messages!")
         return "-1" #dont accept messages!
     
     Secret = request.form["secret"]
@@ -1468,4 +1471,5 @@ def MessagePost(request):
                                 Timestamp
                             ))
     mydb.commit()
+    Success("Message sent!")
     return "1"

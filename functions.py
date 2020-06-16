@@ -1441,7 +1441,7 @@ def MessagePost(request):
     
     mycursor.execute("SELECT mS, userName FROM accounts WHERE accountID = %s", (Target,)) #ill also squeeze the username in here
     ReturnThing = mycursor.fetchone()
-    if ReturnThing[0] == 0:
+    if ReturnThing[0] == 1:
         #ok lets check if they are friends
         # TODO Friend check
         Fail("Friend only messages!")

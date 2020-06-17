@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 05, 2020 at 03:42 PM
+-- Generation Time: Jun 17, 2020 at 12:20 PM
 -- Server version: 5.7.28-0ubuntu0.18.04.4
 -- PHP Version: 7.1.33-9+ubuntu18.04.1+deb.sury.org+1
 
@@ -68,7 +68,8 @@ CREATE TABLE `accounts` (
   `discordID` bigint(20) NOT NULL DEFAULT '0',
   `discordLinkReq` bigint(20) NOT NULL DEFAULT '0',
   `BcryptGJP` varchar(65) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `Privileges` int(6) NOT NULL DEFAULT '30'
+  `Privileges` int(6) NOT NULL DEFAULT '30',
+  `IsBot` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -795,7 +796,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `actions`
 --
 ALTER TABLE `actions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `bannedips`
 --
@@ -810,7 +811,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `cpshares`
 --
@@ -860,7 +861,7 @@ ALTER TABLE `mappacks`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `modactions`
 --
@@ -910,7 +911,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `songs`
 --
 ALTER TABLE `songs`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123124;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=931350;
 --
 -- AUTO_INCREMENT for table `suggest`
 --

@@ -451,7 +451,7 @@ def Sha1It(Text: str):
 
 def CacheRanks():
     print("Caching ranks... ", end="")
-    mycursor.execute("SELECT extID FROM users ORDER BY stars")
+    mycursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
     Leaderboards = mycursor.fetchall()
     Leaderboards.reverse()
     Ranks.clear()
@@ -1208,6 +1208,7 @@ class GDPySBot:
         """Sets up the GDPyS bot class for connection etc."""
         self.Connected = False
         self.BotID = 0
+        self.BotUserId = 0
 
     def _CheckBot(self):
         """Checks if the bot account exists."""
@@ -1221,6 +1222,11 @@ class GDPySBot:
         """Gets the bots accountID."""
         mycursor.execute("SELECT accountID FROM accounts WHERE IsBot = 1 LIMIT 1")
         return mycursor.fetchone()[0]
+    
+    def _SetUserId(self):
+        """Sets the user id for bot."""
+        mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (self.BotID,))
+        self.BotUserId = mycursor.fetchone()[0]
 
     def _RegitsterBot(self, BotName="GDPySBot"):
         """Creates the bot account."""
@@ -1239,6 +1245,28 @@ class GDPySBot:
         
         self.BotID = self._FetchID()
         self.Connected = True
+        self._SetUserId()
+    
+    def GetID(self):
+        """Returns the bot's account ID."""
+        return self.BotID
+    
+    def SendMessage(self, Target: int, Body: str, Subject: str):
+        """Sends a message from the bot."""
+        #first we base64 encode the body and subject
+        Subject = base64.b64encode(Subject).decode("ascii")
+        Body = base64.b64encode(Body).decode("ascii")
+        Timestamp = round(time.time())
+
+        #and we create the message
+        mycursor.execute("INSERT INTO messages (accID, toAccountID, userName, userID, subject, body, timestamp) VALUES (%s, %s, 'GDPyS Bot', %s, %s, %s, %s)",
+            (self.BotID, Target, self.BotUserId, Subject, Body, Timestamp)
+        )
+        mydb.commit()
+
+#for now ill place the bot defenition her
+Bot = GDPySBot()
+Bot.Connect()
 
 def CheatlessScoreCheck(Score: dict):
     """Runs a score validity verification."""
@@ -1277,7 +1305,9 @@ def CheatlessScoreCheck(Score: dict):
 def CheatlessBan(AccountID: int, Offence: str):
     """Initiates and official CheatlessAC ban!"""
     CLBan(f"User {AccountID} has been banned by CheatlessAC for {Offence}.")
-    pass # TODO: when GDPyS bot is done
+    Bot.SendMessage(AccountID, Subject="[CheatlessAC] You have been banned!", Body=f"You have been by the Cheatless AntiCheat! The reason for your ban is {Offence}. Please contact the staff team for more info and stop cheating.")
+    mycursor.execute("UPDATE users SET isBanned = 1 WHERE extID = %s LIMIT 1", (AccountID,))
+    mydb.commit()
 
 def LevelSuggest(request):
     """Suggests/rates a level and handles the route."""

@@ -28,7 +28,7 @@ except Exception as e:
     print(f"{Fore.RED} Failed connecting to MySQL! Aborting!\n Error: {e}{Fore.RESET}")
     exit()
 
-mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
+mycursor = mydb.cursor(buffered=True) #creates a thing to allow us to run mysql commands
 
 Ranks = {}
 PrivilegeCache = {} # Privileges will be cached here

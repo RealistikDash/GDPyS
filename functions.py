@@ -1213,7 +1213,7 @@ class GDPySBot:
     def _CheckBot(self):
         """Checks if the bot account exists."""
         mycursor.execute("SELECT COUNT(*) FROM accounts WHERE IsBot = 1")
-        BotCount = mycursor.fetchone()
+        BotCount = mycursor.fetchone()[0]
         if BotCount == 0:
             return False
         return True

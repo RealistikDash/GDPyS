@@ -1214,7 +1214,7 @@ class GDPySBot:
         """Checks if the bot account exists."""
         mycursor.execute("SELECT COUNT(*) FROM accounts WHERE IsBot = 1")
         BotCount = mycursor.fetchone()
-        if BotCount == None:
+        if BotCount == 0:
             return False
         return True
 

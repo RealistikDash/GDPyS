@@ -6,6 +6,7 @@ import threading
 
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
+app.config['JSON_SORT_KEYS'] = False
 
 @app.route("/")
 def Home():
@@ -173,7 +174,7 @@ def APIBadCodeError(error):
     })
 
 @APIBlueprint.errorhandler(404)
-def APIBadCodeError(error):
+def APINotFoundError(error):
     return jsonify({
         "status" : 404,
         "message" : "What you're looking for is not here."

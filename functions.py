@@ -1602,7 +1602,7 @@ def APIGetLevel(LevelID):
         "audiotrack" : LevelData[7], #in-game songs
         "uploaded" : LevelData[14],
         "coins" : LevelData[9],
-        "lenght" : LevelData[6],
+        "length" : LevelData[6],
         "creator" : {
             "username" : LevelData[0],
             "userid" : LevelData[3],

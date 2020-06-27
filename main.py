@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, Blueprint, jsonify
 from functions import *
 from config import *
 from console import *
 import threading
 
 app = Flask(__name__)
+APIBlueprint = Blueprint("api", __name__)
+
+app.register_blueprint(APIBlueprint, url_prefix='/api')
 
 @app.route("/")
 def Home():
@@ -149,6 +152,11 @@ def PostMessageRoute():
 @app.route("/database/getGJUsers20.php", methods=["GET", "POST"])
 def UserSearchRoute():
     return UserSearchHandler(request)
+
+##API ROUTES##
+@APIBlueprint.route("/getlevel/<LevelID>")
+def APILevelRount(LevelID):
+    return jsonify(APIGetLevel(LevelID))
 
 @app.route("/database/")
 def DatabaseRoute():

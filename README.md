@@ -39,6 +39,8 @@ The requirements for GDPyS are different to existing alternatives. They include:
 - MySQL Server
 - Roughly 17 character domain such as devvgdpys.ussr.pl (more or less, few tweaks when editing the exe and routes could allow for more or less)
 
+Read [the wiki](https://github.com/RealistikDash/GDPyS/wiki/How-to-set-up-GDPyS) for more information.
+
 # Credits
 - Some of this code is a direct port of [Cvolton's GMDPrivate Server](https://github.com/Cvolton/GMDprivateServer) into Python. Furthermore, his database structure has been used as a base.
 

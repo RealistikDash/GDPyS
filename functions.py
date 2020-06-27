@@ -1561,7 +1561,7 @@ def UserSearchHandler(request):
 def APIGetLevel(LevelID):
     """API handler that returns json for level info."""
     #ok here we get the level data from db
-    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLenght, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, Awarded, Magic, starDemon, starAuto, starFeatured, starEpic WHERE isDeleted = 0 and levelID = %s LIMIT 1",
+    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLenght, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, Awarded, Magic, starDemon, starAuto, starFeatured, starEpic FROM levels WHERE isDeleted = 0 and levelID = %s LIMIT 1",
     (
         LevelID,
     ))

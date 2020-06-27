@@ -1556,3 +1556,64 @@ def UserSearchHandler(request):
             "8" : round(User[11])
         }) + "|"
     return ReturnString[:-1] + f"#{UserCount}:{Offset}:10"
+
+def APIGetLevel(LevelID):
+    """API handler that returns json for level info."""
+    #ok here we get the level data from db
+    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLenght, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, Awarded, Magic, starDemon, starAuto, starFeatured, starEpic WHERE isDeleted = 0 and levelID = %s LIMIT 1",
+    (
+        LevelID,
+    ))
+    LevelData = mycursor.fetchone()
+    if LevelData == None:
+        return {
+            "status" : 204, #i think its 204
+            "message" : "No levels found with the specified level id."
+        }
+    #i think this is a gdpys bug lmao
+    if LevelData[5] == "0":
+        Description = ""
+    else:
+        Description = base64.b64decode(LevelData[5])
+    #changing the rate diff to words
+    Difficulty = {
+        0 : "na",
+        10 : "easy",
+        20 : "normal",
+        30 : "hard",
+        40 : "harder",
+        50 : "insane"
+    }[LevelData[10]]
+    #manual exceptions
+    if LevelData[17]:
+        Difficulty = "demon"
+    if LevelData[18]:
+        Difficulty = "auto"
+    return {
+        "status" : 200,
+        "id" : LevelData[1],
+        "name" : LevelData[4],
+        "description" : Description,
+        "likes" : LevelData[12],
+        "downloads" : LevelData[11],
+        "customsong" : bool(LevelData[8]),
+        "songid" : LevelData[8], #custom songs
+        "audiotrack" : LevelData[7], #in-game songs
+        "uploaded" : LevelData[14],
+        "coins" : LevelData[9],
+        "lenght" : LevelData[6],
+        "creator" : {
+            "username" : LevelData[0],
+            "userid" : LevelData[3],
+            "accountid" : LevelData[2]
+        },
+        "rate" : {
+            "difficulty" : Difficulty,
+            "stars" : LevelData[13],
+            "magic" : bool(LevelData[16]),
+            "awarded" : bool(LevelData[15]),
+            "featured" : bool(LevelData[19]),
+            "epic" : bool(LevelData[20])
+        },
+        "message" : "Success!"
+    }

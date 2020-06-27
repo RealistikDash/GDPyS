@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 17, 2020 at 12:20 PM
+-- Generation Time: Jun 27, 2020 at 09:11 PM
 -- Server version: 5.7.28-0ubuntu0.18.04.4
 -- PHP Version: 7.1.33-9+ubuntu18.04.1+deb.sury.org+1
 
@@ -64,12 +64,12 @@ CREATE TABLE `accounts` (
   `salt` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `registerDate` int(11) NOT NULL DEFAULT '0',
   `friendsCount` int(11) NOT NULL DEFAULT '0',
-  `saveKey` blob NOT NULL,
+  `saveKey` blob,
   `discordID` bigint(20) NOT NULL DEFAULT '0',
   `discordLinkReq` bigint(20) NOT NULL DEFAULT '0',
   `BcryptGJP` varchar(65) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `Privileges` int(6) NOT NULL DEFAULT '30',
-  `IsBot` int(1) NOT NULL
+  `IsBot` int(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -234,7 +234,7 @@ CREATE TABLE `levels` (
   `downloads` int(11) NOT NULL DEFAULT '0',
   `likes` int(11) NOT NULL DEFAULT '0',
   `starDemon` int(1) NOT NULL DEFAULT '0',
-  `starAuto` varchar(11) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  `starAuto` int(2) NOT NULL DEFAULT '0',
   `starStars` int(11) NOT NULL DEFAULT '0',
   `uploadDate` varchar(1337) COLLATE utf8_unicode_ci NOT NULL,
   `updateDate` bigint(11) NOT NULL,
@@ -786,12 +786,12 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `acccomments`
 --
 ALTER TABLE `acccomments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 --
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `actions`
 --
@@ -811,7 +811,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT for table `cpshares`
 --
@@ -841,7 +841,7 @@ ALTER TABLE `gauntlets`
 -- AUTO_INCREMENT for table `levels`
 --
 ALTER TABLE `levels`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `levelscores`
 --
@@ -921,7 +921,7 @@ ALTER TABLE `suggest`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

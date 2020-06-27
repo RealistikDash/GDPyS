@@ -7,8 +7,6 @@ import threading
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
 
-app.register_blueprint(APIBlueprint, url_prefix='/api')
-
 @app.route("/")
 def Home():
     return "Running GDPyS by RealistikDash!"
@@ -166,6 +164,22 @@ def DatabaseRoute():
 @app.errorhandler(500)
 def BadCodeError(error):
     return "-1"
+
+@APIBlueprint.errorhandler(500)
+def APIBadCodeError(error):
+    return jsonify({
+        "status" : 500,
+        "message" : "An internal server error has occured! Please report this to the owner or developer."
+    })
+
+@APIBlueprint.errorhandler(404)
+def APIBadCodeError(error):
+    return jsonify({
+        "status" : 404,
+        "message" : "What you're looking for is not here."
+    })
+
+app.register_blueprint(APIBlueprint, url_prefix='/api')
 
 if __name__ == "__main__":
     print(rf"""{Fore.BLUE}   _____ _____  _____        _____

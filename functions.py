@@ -15,7 +15,7 @@ import bcrypt
 from threading import Thread
 from PrivEnums import *
 import string
-
+#codeman things
 try:
     mydb = mysql.connector.connect(
         host=UserConfig["SQLHost"],

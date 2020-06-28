@@ -1,5 +1,6 @@
 # GDPyS
 GDPyS is a Python based Geometry Dash server, which can be used for making Private Servers.
+Join the [discord server](https://discord.gg/Un42FEV) to follow the development of GDPyS.
 
 # What works?
 GDPyS is still in **very** early development. This means that most things aren't completed and some things may not work as intended. So here is what is currently done:

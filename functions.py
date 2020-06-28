@@ -72,17 +72,21 @@ def LoginCheck(Udid, Username, Password, request):
     AccountID = Accounts[0][0] #choosing the closes one
 
     #User ID
-    mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
-    UserID = mycursor.fetchall()
-    if len(UserID) == 0:
+    mycursor.execute("SELECT userID, isBanned FROM users WHERE extID = %s", (AccountID,))
+    UIDFetch = mycursor.fetchone()
+    if UIDFetch == None:
         TheIP = request.remote_addr
         mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (AccountID, Username, TheIP))
         mydb.commit()
         #fetch again br uh
-        mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
-        UserID = mycursor.fetchall()
+        mycursor.execute("SELECT userID, isBanned FROM users WHERE extID = %s", (AccountID,))
+        UIDFetch = mycursor.fetchone()
 
-    UserID = UserID[0][0]
+    UserID = UIDFetch[0]
+
+    #we dont allow banned people to log in, tell them its disabled
+    if UIDFetch[1]:
+        return "-12"
 
     if not CheckPassword(AccountID, Password):
         return "-1"

@@ -1664,3 +1664,42 @@ def GetMessages(request):
         })+"|"
     
     return f"{MessageString[:-1]}#{Count}:{Offset}:10" #the 10 is the limit
+
+def GetMessage(request):
+    """Returns message to client."""
+    AccountID = request.form["accountID"]
+    GJP = request.form["gjp"]
+    MessageID = request.form["messageID"]
+    Log(f"User {AccountID} tries to DL message.")
+
+    if not VerifyGJP(AccountID, GJP):
+        return "-1"
+    
+    #now we get message data
+    mycursor.execute("SELECT * FROM messages WHERE messageID = %s AND (toAccountID = %s OR accID = %s) LIMIT 1", (MessageID, AccountID, AccountID))
+    Message = mycursor.fetchone()
+
+    if Message == None:
+        return "-1" #if no message found and so other checks arent ran
+
+    #we mark it as read if not already
+    if Message[9]:
+        mycursor.execute("UPDATE messages SET isNew = 0 WHERE messageID = %s AND accID = %s LIMIT 1", (MessageID, AccountID))
+        mydb.commit()
+    
+    GetSent = True if Message[4] else False
+    
+    mycursor.execute("SELECT userName, userID, extID FROM users WHERE extID = %s LIMIT 1", (Message[6 if GetSent else 4],))
+    ExtraUserData = mycursor.fetchone()
+    UploadAgo = TimeAgoFromNow(Message[7])[:-4]
+    return JointStringBuilder({
+        "1" : Message[5],
+        "2" : ExtraUserData[2],
+        "3" : ExtraUserData[1],
+        "4" : Message[3],
+        "5" : Message[2],
+        "6" : ExtraUserData[0],
+        "7" : UploadAgo,
+        "8" : Message[9],
+        "9" : int(GetSent)
+    })

@@ -23,6 +23,8 @@ GDPyS is still in **very** early development. This means that most things aren't
 - Rating levels
 - Permissions
 - Sending messages
+- Viewing messages
+- Reading messages
 - Searching users
 
 # Why GDPyS?

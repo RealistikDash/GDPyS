@@ -18,6 +18,7 @@ DefaultConfig = {
     "CronThreadDelay" : 3600,
     "LocalServer" : False,
     "LegacyPasswords" : False, #cvolton gmdprivateserver passwords if true, bcrypt if false
+    "MaxAccsPerIP" : 4,
     "CheatlessAC" : True, #global switch
     "CheatlessExtremeDemonMinAttempts" : 100, #if a user submits an extreme demon score under this att count, they will be banned
     "CheatlessScoreCheck" : True,

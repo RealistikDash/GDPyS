@@ -757,7 +757,7 @@ def GetLevels(request):
     SQLParams = []
     SQLFormats = [] #to prevent sql injection yeah
     #SO MANY IF STATEMENTS I HATE THIS
-    if CheckForm(Form, "featured") and Form["featured"]: # shouldve used request.form.get
+    if CheckForm(Form, "featured") and Form["featured"]:
         SQLParams.append("starFeatured = 1")
     if CheckForm(Form, "original") and Form["original"]:
         SQLParams.append("original = 0")
@@ -819,14 +819,15 @@ def GetLevels(request):
 
     #converting dict to sql
     if len(SQLParams) != 0:
-        Conditions = ""
+        Conditions = "WHERE "
         for Condition in SQLParams:
             Conditions += f"{Condition} AND"
         Conditions = Conditions[:-4]
+        Conditions += " "
     else:
         Conditions = ""
 
-    Query = f"SELECT * FROM levels WHERE {Conditions} AND users.isBanned = 0 ON userID = users.userID ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
+    Query = f"SELECT * FROM levels {Conditions}ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
     CountQuery = f"SELECT count(*) FROM levels {Conditions}"
 
     mycursor.execute(CountQuery, tuple(SQLFormats))

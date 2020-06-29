@@ -1491,9 +1491,9 @@ def MessagePost(request):
 
     #add to db!
     mycursor.execute("""INSERT INTO messages 
-                            (accID, toAccountID, userName, userID, secret, subject, body, timestamp)
+                            (accID, toAccountID, userName, userID, secret, subject, body, timestamp, isNew)
                             VALUES
-                            (%s, %s, %s, %s, %s, %s, %s, %s)
+                            (%s, %s, %s, %s, %s, %s, %s, %s, 1)
                             """,
                             (
                                 AccountID,
@@ -1622,3 +1622,45 @@ def APIGetLevel(LevelID):
         },
         "message" : "Success!"
     }
+
+def GetMessages(request):
+    """Gets messages for user."""
+    GJP = request.form["gjp"]
+    AccountID = request.form["accountID"]
+    Offset = int(request.form["page"]) * 10
+    Log(f"Getting messages for user {AccountID}.")
+
+    if not VerifyGJP(AccountID, GJP):
+        return "-1" 
+
+    GetSent = int(request.form.get("getSent", 0)) #0 = msgs received, 1= msgs sent by the user
+
+    SQLCondition = "toAccountID"
+
+    if not GetSent:
+        SQLCondition = "accID"
+    
+    mycursor.execute(f"SELECT * FROM messages WHERE {SQLCondition} = %s ORDER BY timestamp DESC LIMIT 10 OFFSET %s", (AccountID, Offset))
+    Messages = mycursor.fetchall()
+    #count query
+    mycursor.execute(f"SELECT COUNT(*) FROM messages WHERE {SQLCondition} = %s", (AccountID,))
+    Count = mycursor.fetchone()[0]
+    MessageString = ""
+
+    for Message in Messages:
+        UploadAgo = TimeAgoFromNow(Message[7])
+        #we get username and uid
+        mycursor.execute("SELECT userName, userID FROM users WHERE extID = %s LIMIT 1", (Message[6 if GetSent else 4],))
+        ExtraUserData = mycursor.fetchone()
+        MessageString += JointStringBuilder({
+            "1" : Message[5],
+            "2" : Message[4],
+            "3" : ExtraUserData[1],
+            "4" : Message[3],
+            "6" : ExtraUserData[0],
+            "7" : UploadAgo,
+            "8" : Message[9],
+            "9" : GetSent
+        })+"|"
+    
+    return f"{MessageString[:-1]}#{Count}:{Offset}:10" #the 10 is the limit

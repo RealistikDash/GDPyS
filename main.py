@@ -152,6 +152,11 @@ def PostMessageRoute():
 def UserSearchRoute():
     return UserSearchHandler(request)
 
+@app.route("//database/getGJUsers20.php", methods=["GET", "POST"])
+@app.route("/database/getGJUsers20.php", methods=["GET", "POST"])
+def GetMessagesRoute():
+    return GetMessages(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

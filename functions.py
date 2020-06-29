@@ -1637,7 +1637,7 @@ def GetMessages(request):
 
     SQLCondition = "toAccountID"
 
-    if not GetSent:
+    if GetSent:
         SQLCondition = "accID"
     
     mycursor.execute(f"SELECT * FROM messages WHERE {SQLCondition} = %s ORDER BY timestamp DESC LIMIT 10 OFFSET %s", (AccountID, Offset))
@@ -1648,7 +1648,7 @@ def GetMessages(request):
     MessageString = ""
 
     for Message in Messages:
-        UploadAgo = TimeAgoFromNow(Message[7])
+        UploadAgo = TimeAgoFromNow(Message[7])[:-4]
         #we get username and uid
         mycursor.execute("SELECT userName, userID FROM users WHERE extID = %s LIMIT 1", (Message[6 if GetSent else 4],))
         ExtraUserData = mycursor.fetchone()

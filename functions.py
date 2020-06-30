@@ -819,20 +819,21 @@ def GetLevels(request):
 
     #converting dict to sql
     if len(SQLParams) != 0:
-        Conditions = ""
+        Conditions = "WHERE "
         for Condition in SQLParams:
             Conditions += f"{Condition} AND"
-        Conditions = Conditions[:-4]
+        if not UserConfig["BannedLevelsHidden"]:
+            Conditions = Conditions[:-4]
     else:
         Conditions = ""
 
-    Query = f"SELECT * FROM levels INNER JOIN users ON levels.userID = users.userID WHERE {Conditions} AND users.isBanned = 0 ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
-    CountQuery = f"SELECT count(*) FROM levels WHERE {Conditions}"
+    Query = f"SELECT * FROM levels INNER JOIN users ON levels.userID = users.userID {Conditions} users.isBanned = 0 ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
+    CountQuery = f"SELECT count(*) FROM levels {Conditions}"
 
     #if the config for removing levels of banned people is disabled
     if not UserConfig["BannedLevelsHidden"]:
-        Query = f"SELECT * FROM levels WHERE {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
-        CountQuery = f"SELECT count(*) FROM levels WHERE {Conditions}"
+        Query = f"SELECT * FROM levels {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
+        CountQuery = f"SELECT count(*) FROM levels {Conditions}"
 
     mycursor.execute(CountQuery, tuple(SQLFormats))
     LevelCount = mycursor.fetchall()[0][0]

@@ -830,7 +830,7 @@ def GetLevels(request):
             Conditions = "" #ngl this is messy
 
     Query = f"SELECT * FROM levels INNER JOIN users ON levels.userID = users.userID {Conditions} users.isBanned = 0 ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
-    CountQuery = f"SELECT count(*) FROM levels {Conditions}"
+    CountQuery = f"SELECT count(*) FROM levels INNER JOIN users ON levels.userID = users.userID {Conditions} users.isBanned = 0"
 
     #if the config for removing levels of banned people is disabled
     if not UserConfig["BannedLevelsHidden"]:

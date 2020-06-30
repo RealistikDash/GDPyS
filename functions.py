@@ -825,7 +825,9 @@ def GetLevels(request):
         if not UserConfig["BannedLevelsHidden"]:
             Conditions = Conditions[:-4]
     else:
-        Conditions = ""
+        Conditions = "WHERE"
+        if not UserConfig["BannedLevelsHidden"]:
+            Conditions = "" #ngl this is messy
 
     Query = f"SELECT * FROM levels INNER JOIN users ON levels.userID = users.userID {Conditions} users.isBanned = 0 ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
     CountQuery = f"SELECT count(*) FROM levels {Conditions}"

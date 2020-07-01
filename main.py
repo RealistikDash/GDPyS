@@ -162,6 +162,10 @@ def GetMessagesRoute():
 def DownloadMessageRoute():
     return GetMessage(request)
 
+@app.route("/database/getGJComments21.php")
+def DeleteCommentRoute():
+    return DeleteCommentHandler(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

@@ -2,6 +2,13 @@
 GDPyS is a Python based Geometry Dash server, which can be used for making Private Servers.
 Join the [discord server](https://discord.gg/Un42FEV) to follow the development of GDPyS.
 
+## Major notes/changes
+Here are a list of some changes server owners and operators may not be familiar with that aare present in GDPyS.
+- Bans are very harsh. Not only are people hidden from the leaderboards, they additionally can't login and (while its optional) have their levels hidden from search.
+- Green users haave their abillities hugely cut down. For example, they can't upload levels, view leaderboards and more. While this may be bad in some cases, it overall makes your server more secure and makes it harder to bot.
+- There is a custom Awarded and Magic section. Rather than being randomly selected by an arbitrary value, levels now have to be nominated by moderators.
+- There is a completely new bitwise-based permission system. While it is more complex, it is faster and allows more to be done with it.
+
 # What works?
 GDPyS is still in **very** early development. This means that most things aren't completed and some things may not work as intended. So here is what is currently done:
 - Registering

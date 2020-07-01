@@ -854,7 +854,7 @@ def GetLevels(request):
             "2": Level[4],
             "3" : Level[5],
             "5" : Level[6],
-            "6" : Level[35], # TODO Replace this with a proper index
+            "6" : Level[35],
             "8" : "10",
             "9" : Level[21],
             "10" : Level[22],
@@ -1710,3 +1710,16 @@ def GetMessage(request):
         "8" : Message[9],
         "9" : int(GetSent)
     })
+
+def DeleteCommentHandler(request):
+    """Handles the comment deleting."""
+    AccountID = request.form["accountID"]
+    GJP = request.form["gjp"]
+    if not VerifyGJP(AccountID, GJP):
+        return "-1" #ignore green users,  they cant post comments anyways
+    
+    CommentID = request.form["commentID"]
+    UserID = AIDToUID(AccountID)
+    mycursor.execute("DELETE FROM comments WHERE userID = %s AND commentID = %s LIMIT 1", (UserID, CommentID)) #also squeezed a check that checks whether the person deleting the comment is that person into the query
+    mydb.commit()
+    return "1"

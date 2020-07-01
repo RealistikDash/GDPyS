@@ -854,7 +854,7 @@ def GetLevels(request):
             "2": Level[4],
             "3" : Level[5],
             "5" : Level[6],
-            "6" : Level[-10], # TODO Replace this with a proper index
+            "6" : Level[35], # TODO Replace this with a proper index
             "8" : "10",
             "9" : Level[21],
             "10" : Level[22],

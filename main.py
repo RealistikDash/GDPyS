@@ -162,11 +162,11 @@ def GetMessagesRoute():
 def DownloadMessageRoute():
     return GetMessage(request)
 
-@app.route("/database/getGJComments21.php")
+@app.route("/database/getGJComments21.php", methods=["GET", "POST"])
 def DeleteCommentRoute():
     return DeleteCommentHandler(request)
 
-@app.route("/database/getGJMapPacks21.php")
+@app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
 def GetMapPacksRoute():
     return MapPackHandelr(request)
 

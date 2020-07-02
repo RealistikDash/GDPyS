@@ -798,7 +798,10 @@ def GetLevels(request):
         Order = "likes"
     #no type 4 as it is already the default one
     elif Type == 5:
-        SQLParams.append("userID = %s")
+        Param5 = "levels.userID = %s"
+        if not UserConfig["BannedLevelsHidden"]:
+            Param5 = "userID = %s"
+        SQLParams.append(Param5)
         SQLFormats.append(Form["str"])
     elif Type == 6:
         SQLParams.append("starFeatured = 1 OR starFeatured = 2")

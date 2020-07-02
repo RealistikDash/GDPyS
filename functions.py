@@ -791,29 +791,32 @@ def GetLevels(request):
                 SQLFormats.append(ThingSearchStr)
     if Type == 1:
         Order = "downloads"
-    if Type == 2:
+    elif Type == 2:
         Order = "likes"
-    if Type == 3:
+    elif Type == 3:
         SQLParams.append(f"uploadDate > {round(time.time()) - 604800}")
         Order = "likes"
     #no type 4 as it is already the default one
-    if Type == 5:
+    elif Type == 5:
         SQLParams.append("userID = %s")
         SQLFormats.append(Form["str"])
-    if Type == 6:
+    elif Type == 6:
         SQLParams.append("starFeatured = 1 OR starFeatured = 2")
         Order = "uploadDate, rateDate DESC"
-    if Type == 7:
+    elif Type == 7:
         SQLParams.append("Magic = 1")
-    if Type == 11:
+    elif Type == 10: #mappacks
+        SQLParams.append("levelID in (%s)")
+        SQLFormats.append(Form["str"])
+    elif Type == 11:
         SQLParams.append("Awarded = 1")
-    if Type == 12:
+    elif Type == 12:
         # TODO: Followed
         pass
-    if Type == 13:
+    elif Type == 13:
         #TODO: Friends
         pass
-    if Type == 16:
+    elif Type == 16:
         SQLParams.append("NOT starEpic = 0")
         Order = "rateDate DESC, uploadDate"
 

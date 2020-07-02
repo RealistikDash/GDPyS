@@ -22,7 +22,7 @@ GDPyS is still in **very** early development. This means that most things aren't
 - Saving user data
 - Loading user data
 - Likes
-- Level searching (most filters done)
+- Level searchingfdfdfd (most filters done)
 - Online level download
 - Custom songs
 - Comment posting
@@ -33,6 +33,7 @@ GDPyS is still in **very** early development. This means that most things aren't
 - Viewing messages
 - Reading messages
 - Searching users
+- Mappacks
 
 # Why GDPyS?
 GDPyS is made with convenience and performance in mind. It provides performance benefits over existing alternatives while convenient features (such as error logs for easier debugging and automatic cron). Additionally, it is designed to be directly swappable with Cvolton's GMDPrivateServer, meaning you will able to reuse your existing database, save and level files.

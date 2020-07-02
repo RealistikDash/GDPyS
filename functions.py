@@ -1748,7 +1748,7 @@ def MapPackHandelr(request):
             "7" : Mappack[6], #colours (rgb)
             "8" : Mappack[7] #not gonna be using colors2. i dont even know what they are lmao
         }) + "|"
-        PackHash += f"{Mappack[0][0]}{len(Mappack[0])-1}{Mappack[3]}{Mappack[4]}" #why just why
+        PackHash += f"{str(Mappack[0])[0]}{len(str(Mappack[0]))-1}{Mappack[3]}{Mappack[4]}" #why just why
     
     PackHash = Sha1It(PackHash + "xI25fpAapCQg")
     return f"{PackStr[:-1]}#{PackCount}:{Offset}:10#{PackHash}"

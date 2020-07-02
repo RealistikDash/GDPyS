@@ -1746,7 +1746,7 @@ def MapPackHandelr(request):
             "5" : Mappack[4], #coins
             "6" : Mappack[5], #difficulty
             "7" : Mappack[6], #colours (rgb)
-            "8" : Mappack[7] #not gonna be using colors2. i dont even know what they are lmao
+            "8" : Mappack[6] #not gonna be using colors2. i dont even know what they are lmao
         }) + "|"
         PackHash += f"{str(Mappack[0])[0]}{len(str(Mappack[0]))-1}{Mappack[3]}{Mappack[4]}" #why just why
     

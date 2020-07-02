@@ -1723,3 +1723,32 @@ def DeleteCommentHandler(request):
     mycursor.execute("DELETE FROM comments WHERE userID = %s AND commentID = %s LIMIT 1", (UserID, CommentID)) #also squeezed a check that checks whether the person deleting the comment is that person into the query
     mydb.commit()
     return "1"
+
+def MapPackHandelr(request):
+    """Fetches the map packs and returns them to the gd client."""
+    Log("Getting mappacks.")
+    Offset = 10 * int(request.form.get("page", 0)) #turning page to an offset to be used in query below
+    #mappack count
+    mycursor.execute("SELECT COUNT(*) FROM mappacks")
+    PackCount = mycursor.fetchone()[0]
+    #Getting the mappacks
+    mycursor.execute("SELECT * FROM mappacks LIMIT 10 OFFSET %s", (Offset,))
+    MapPacks = mycursor.fetchall()
+    PackStr = ""
+    PackHash = ""
+   
+    for Mappack in MapPacks:
+        PackStr += JointStringBuilder({
+            "1" : Mappack[0], #pack id
+            "2" : Mappack[1], #pack name
+            "3" : Mappack[2], #pack levels
+            "4" : Mappack[3], #stars
+            "5" : Mappack[4], #coins
+            "6" : Mappack[5], #difficulty
+            "7" : Mappack[6], #colours (rgb)
+            "8" : Mappack[7] #not gonna be using colors2. i dont even know what they are lmao
+        }) + "|"
+        PackHash += f"{Mappack[0][0]}{len(Mappack[0])-1}{Mappack[3]}{Mappack[4]}" #why just why
+    
+    PackHash = Sha1It(PackHash + "xI25fpAapCQg")
+    return f"{PackStr[:-1]}#{PackCount}:{Offset}:10#{PackHash}"

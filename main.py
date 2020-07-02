@@ -166,6 +166,10 @@ def DownloadMessageRoute():
 def DeleteCommentRoute():
     return DeleteCommentHandler(request)
 
+@app.route("/database/getGJMapPacks21.php")
+def GetMapPacksRoute():
+    return MapPackHandelr(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

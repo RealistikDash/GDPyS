@@ -756,6 +756,16 @@ def GetLevels(request):
     Order = "uploadDate"
     SQLParams = []
     SQLFormats = [] #to prevent sql injection yeah
+
+    #gauntlets
+    Gauntlet = int(request.form.get("gauntlet", 0))
+    if Gauntlet != 0:
+        mycursor.execute("SELECT level1, level2, level3, level4, level5 FROM gauntlets WHERE ID = %s LIMIT 1", (Gauntlet,))
+        GauntletLevels = mycursor.fetchone()
+        if GauntletLevels == None:
+            SQLParams.append("levelID IN (%s)")
+            SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
+
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:
         SQLParams.append("starFeatured = 1")
@@ -1755,7 +1765,7 @@ def MapPackHandelr(request):
             "8" : Mappack[6] #not gonna be using colors2. i dont even know what they are lmao
         }) + "|"
         MappackID = str(Mappack[0])
-        PackHash += f"{MappackID[0]}{MappackID[len(MappackID)-1]}{Mappack[3]}{Mappack[4]}" #why just why oh got in hurts
+        PackHash += f"{MappackID[0]}{MappackID[len(MappackID)-1]}{Mappack[3]}{Mappack[4]}" #ok thas better
     
     PackHash = Sha1It(PackHash + "xI25fpAapCQg")
     return f"{PackStr[:-1]}#{PackCount}:{Offset}:10#{PackHash}"

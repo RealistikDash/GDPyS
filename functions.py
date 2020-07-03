@@ -1769,3 +1769,20 @@ def MapPackHandelr(request):
     
     PackHash = Sha1It(PackHash + "xI25fpAapCQg")
     return f"{PackStr[:-1]}#{PackCount}:{Offset}:10#{PackHash}"
+
+def GetGauntletsHandler():
+    """Returns all the gauntlet things to the gd client."""
+    mycursor.execute("SELECT * FROM gauntlets")
+    Gauntlets = mycursor.fetchall()
+    GauntletReturn = ""
+    HashReturn = ""
+
+    for Gauntlet in Gauntlets:
+        Levels = f"{Gauntlet[1]},{Gauntlet[2]},{Gauntlet[3]},{Gauntlet[4]},{Gauntlet[5]}"
+        GauntletReturn += JointStringBuilder({
+            "1" : Gauntlet[0],
+            "2" : Levels
+        })
+        HashReturn += f"{Gauntlet[0]}{Levels}" #screw adding
+    
+    return f"{GauntletReturn}#{SoloGen2(HashReturn)}"

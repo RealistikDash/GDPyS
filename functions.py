@@ -1782,7 +1782,7 @@ def GetGauntletsHandler():
         GauntletReturn += JointStringBuilder({
             "1" : Gauntlet[0],
             "2" : Levels
-        })
+        }) + "|"
         HashReturn += f"{Gauntlet[0]}{Levels}" #screw adding
     
-    return f"{GauntletReturn}#{SoloGen2(HashReturn)}"
+    return f"{GauntletReturn[:-1]}#{SoloGen2(HashReturn)}"

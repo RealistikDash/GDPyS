@@ -170,6 +170,10 @@ def DeleteCommentRoute():
 def GetMapPacksRoute():
     return MapPackHandelr(request)
 
+@app.route("/database/getGJGauntlets21.php", methods=["GET", "POST"])
+def GauntletRoute():
+    return GetGauntletsHandler(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

@@ -470,10 +470,10 @@ def CacheRanks():
 def CronThread():
     Log("Cron thread started!")
     while True:
-        time.sleep(UserConfig["CronThreadDelay"])
-        Log("Beginning cron action!")
+        Log("Running cron!")
         CacheRanks()
         CalculateCP()
+        time.sleep(UserConfig["CronThreadDelay"])
 
 def GetAccountUrl(request):
     """Returns something for the account url?"""

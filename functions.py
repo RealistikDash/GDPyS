@@ -1790,6 +1790,8 @@ def GetGauntletsHandler():
 
 def CalculateCP():
     """Cron job that calculates CP for the whole server."""
+    StartTime = time.time()
+    print("Beginning to calculate CP... ", end="")
     #first we get all user ids
     mycursor.execute("SELECT userID FROM users")
     UserIDs = mycursor.fetchall()
@@ -1798,6 +1800,8 @@ def CalculateCP():
     for UserID in UserIDs:
         UserCalcCP(UserID[0])
     mydb.commit()
+    Finished = round((time.time() - StartTime) * 1000, 2)
+    print(f"Done! {Finished}ms")
 
 def UserCalcCP(UserID : int):
     """Calculates CP for specified user id."""

@@ -1081,13 +1081,13 @@ def GetComments(request):
     if Data["levelID"] == 0 or Data["levelID"] == "":
         #all comments
         DisplayID = True
-        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE userID = %s ORDER BY {Column} DESC LIMIT {Data['count']} OFFSET {Offset}", (Data["levelID"],))
+        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE userID = %s ORDER BY {Column} DESC LIMIT %s OFFSET %s", (Data["userID"], Data['count'], Offset))
         Comments = mycursor.fetchall()
         mycursor.execute("SELECT count(*) FROM comments WHERE userID = %s", (Data["levelID"],))
         CommentCount = mycursor.fetchall()[0][0]
     else:
         DisplayID = False
-        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE levelID = %s ORDER BY {Column} DESC LIMIT {Data['count']} OFFSET {Offset}", (Data["levelID"],))
+        mycursor.execute(f"SELECT levelID, commentID, timestamp, comment, userID, likes, isSpam, percent FROM comments WHERE levelID = %s ORDER BY {Column} DESC LIMIT %s OFFSET %s", (Data["levelID"], Data['count'], Offset))
         Comments = mycursor.fetchall()
         mycursor.execute("SELECT count(*) FROM comments WHERE levelID = %s", (Data["levelID"],))
         CommentCount = mycursor.fetchall()[0][0]

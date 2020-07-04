@@ -1065,7 +1065,7 @@ def GetComments(request):
     #ok this is prob stupid but yolo
     #btw to explain how this works, first value is key, second value is the default one if not set
     # NOTE: This was before i found out about request.form.get
-    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0]]
+    ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0], ["userID", 0]]
 
     for Key in ToGet:
         try:

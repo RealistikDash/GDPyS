@@ -473,6 +473,7 @@ def CronThread():
         time.sleep(UserConfig["CronThreadDelay"])
         Log("Beginning cron action!")
         CacheRanks()
+        CalculateCP()
 
 def GetAccountUrl(request):
     """Returns something for the account url?"""
@@ -1786,3 +1787,39 @@ def GetGauntletsHandler():
         HashReturn += f"{Gauntlet[0]}{Levels}" #screw adding
     
     return f"{GauntletReturn[:-1]}#{SoloGen2(HashReturn)}"
+
+def CalculateCP():
+    """Cron job that calculates CP for the whole server."""
+    #first we get all user ids
+    mycursor.execute("SELECT userID FROM users")
+    UserIDs = mycursor.fetchall()
+
+    #fetching the counts and calculation total pp
+    for UserID in UserIDs:
+        UserCalcCP(UserID[0])
+    mydb.commit()
+
+def UserCalcCP(UserID : int):
+    """Calculates CP for specified user id."""
+    UserCP = 0
+    #count rated levels
+    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starStars > 0 AND userID = %s", (UserID,))
+    UserCP += mycursor.fetchone()[0]
+    #count featured levels
+    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starFeatured > 0 AND userID = %s", (UserID,))
+    UserCP += mycursor.fetchone()[0]
+    #count epic levels
+    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starEpic > 0 AND userID = %s", (UserID,))
+    UserCP += mycursor.fetchone()[0]
+    #count magic levels
+    if UserConfig["MagicGivesCP"]:
+        mycursor.execute("SELECT COUNT(*) FROM levels WHERE Magic > 0 AND userID = %s", (UserID,))
+        UserCP += mycursor.fetchone()[0]
+    #count awarded levels
+    if UserConfig["AwardGivesCP"]:
+        mycursor.execute("SELECT COUNT(*) FROM levels WHERE Awarded > 0 AND userID = %s", (UserID,))
+        UserCP += mycursor.fetchone()[0]
+    
+    #lastly we give the cp to them
+    mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
+    mydb.commit()

@@ -19,6 +19,8 @@ DefaultConfig = {
     "LocalServer" : False,
     "LegacyPasswords" : False, #cvolton gmdprivateserver passwords if true, bcrypt if false
     "MaxAccsPerIP" : 4,
+    "MagicGivesCP" : True, #makes magic levels give cp
+    "AwardGivesCP" : True, #makes awarded levels give cp
     "BannedLevelsHidden" : True,
     "CheatlessAC" : True, #global switch
     "CheatlessExtremeDemonMinAttempts" : 100, #if a user submits an extreme demon score under this att count, they will be banned

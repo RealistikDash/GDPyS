@@ -124,7 +124,7 @@ def SongRoute():
 
 @app.route("//database/getGJComments21.php", methods=["GET", "POST"])
 @app.route("/database/getGJComments21.php", methods=["GET", "POST"])
-@app.route("/database/getGJCommentHistory.php")
+@app.route("/database/getGJCommentHistory.php", methods=["GET", "POST"])
 def CommentGetRoute():
     return GetComments(request)
 

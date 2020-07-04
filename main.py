@@ -124,6 +124,7 @@ def SongRoute():
 
 @app.route("//database/getGJComments21.php", methods=["GET", "POST"])
 @app.route("/database/getGJComments21.php", methods=["GET", "POST"])
+@app.route("/database/getGJCommentHistory.php")
 def CommentGetRoute():
     return GetComments(request)
 
@@ -162,7 +163,7 @@ def GetMessagesRoute():
 def DownloadMessageRoute():
     return GetMessage(request)
 
-@app.route("/database/getGJComments21.php", methods=["GET", "POST"])
+@app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
 def DeleteCommentRoute():
     return DeleteCommentHandler(request)
 

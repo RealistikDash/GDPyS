@@ -472,7 +472,7 @@ def CronThread():
     while True:
         Log("Running cron!")
         CacheRanks()
-        CalculateCPThreaded()
+        CalculateCP()
         time.sleep(UserConfig["CronThreadDelay"])
 
 def GetAccountUrl(request):
@@ -1827,18 +1827,3 @@ def UserCalcCP(UserID : int):
     #lastly we give the cp to them
     mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
     mydb.commit()
-
-def CalculateCPThreaded():
-    """Test version of the calculate CP cronjob to test threading."""
-    StartTime = time.time()
-    print("Beginning to calculate CP... ", end="")
-    #first we get all user ids
-    mycursor.execute("SELECT userID FROM users")
-    UserIDs = mycursor.fetchall()
-
-    #fetching the counts and calculation total pp
-    for UserID in UserIDs:
-        Thread(target=UserCalcCP, args=(UserID[0],)).start()
-    mydb.commit()
-    Finished = round((time.time() - StartTime) * 1000, 2)
-    print(f"Done! {Finished}ms")

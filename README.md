@@ -22,7 +22,7 @@ GDPyS is still in **very** early development. This means that most things aren't
 - Saving user data
 - Loading user data
 - Likes
-- Level searchingfdfdfd (most filters done)
+- Level searching (most filters done)
 - Online level download
 - Custom songs
 - Comment posting

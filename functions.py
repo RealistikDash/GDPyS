@@ -314,7 +314,7 @@ def UpdateUserScore(request):
         )
     mydb.commit()
     Success(f"Successfully updated the user profile for {request.form['userName']}!")
-    return UserID
+    return str(UserID)
 
 def JointStringBuilder(Content: dict):
     """Builds a joint string out of a dict."""

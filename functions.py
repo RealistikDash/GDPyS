@@ -1297,7 +1297,7 @@ class GDPySBot:
 Bot = GDPySBot()
 Bot.Connect()
 
-def CheatlessScoreCheck(Score: dict):
+def CheatlessScoreCheck(Score: dict) -> bool:
     """Runs a score validity verification."""
     #ok here i will assume that the owner or mod of the gdps doesnt act stupid and rate free extremes.
     #this is an example score dict
@@ -1309,7 +1309,6 @@ def CheatlessScoreCheck(Score: dict):
         "Coins" : 0
     }
     if UserConfig["CheatlessAC"] and UserConfig["CheatlessScoreCheck"]:
-        #for now we will only check completed scores
         if Score["Percentage"] == 100:
             CLCheck(f"Running score check on a score on the level {Score['LevelID']}")
             #ok lads first we get the level data
@@ -1319,17 +1318,29 @@ def CheatlessScoreCheck(Score: dict):
             #first check! invalid score
             if LevelData == None:
                 CheatlessBan(Score["AccountID"], "invalid level score submission")
-                return
+                return False
             
             #next we do coin check
             if LevelData[3] == 1 and Score["Coins"] > LevelData[4]:
                 CheatlessBan(Score["AccountID"], "unachievable coin count")
-                return
+                return False
 
             #now we check if they beat the extreme in like 5 attempts. this will rely on the mods not being stupid and rating
             if LevelData[1] == 10 and LevelData[2] == 6 and Score["Attempts"] < UserConfig["CheatlessExtremeDemonMinAttempts"]:
                 CheatlessBan(Score["AccountID"], "too quick demon completion")
-                return
+                return False
+            
+            #if there are invalid values given
+            if Score["Attempts"] < 0 or Score["Coins"] > 3 or Score["Coins"] < 0:
+                CheatlessBan(Score["AccountID"], "invalid level score data")
+                return False
+
+            return True
+        else: #checks for uncomplete levels
+            #has coins when not completed level
+            if Score["Coins"] > 0:
+                CheatlessBan(Score["AccountID"], "coins on uncompleted level")
+                return False
 
 def CheatlessBan(AccountID: int, Offence: str):
     """Initiates and official CheatlessAC ban!"""
@@ -1827,3 +1838,56 @@ def UserCalcCP(UserID : int):
     #lastly we give the cp to them
     mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
     mydb.commit()
+
+def ScoreSubmitHandler(request):
+    """Handles the score submission request by the client."""
+    # NOTE this will be slower but it will be better in a lot of ways
+    #also this is used for submitting the score AND getting all of the scores
+    
+    ##### SCORE UPDATE #####
+    {
+        "AccountID" : 1,
+        "LevelID" : 222,
+        "Percentage" : 100,
+        "Attempts" : 10,
+        "Coins" : 0
+    }
+
+    Coins = int(request.form["s9"]) - 5819
+    Atttempts = int(request.form["s1"]) - 8354 #bruh
+    GJP = request.form["gjp"]
+    LevelID = request.form["levelID"]
+    AccountID = request.form["accountID"]
+    Percent = int(request.form["percent"])
+
+    if not VerifyGJP(AccountID, GJP):
+        return "-1"
+
+    CheatlessStruct = {
+        "AccountID" : AccountID,
+        "LevelID" : LevelID,
+        "Percentage" : Percent,
+        "Attempts" : Atttempts,
+        "Coins" : Coins
+    }
+
+    Timestamp = round(time.time())
+    #get prev scores
+    mycursor.execute("SELECT * FROM levelscores WHERE accountID = %s and levelID = %s LIMIT 1", (AccountID, LevelID))
+    Score = mycursor.fetchone()
+    #new scores
+    if Score == None and Percent != 0: #no prev scores
+        #creting new score
+        #dont thread the check
+        if CheatlessScoreCheck(CheatlessStruct):
+            mycursor.execute("INSERT INTO levelSCORES (accountID, levelID, percent, uploadDate, coins, attempts) VALUES (%s, %s, %s, %s, %s, %s)", (
+                AccountID, LevelID, Percent, Timestamp, Coins, Atttempts
+            ))
+            mydb.commit()
+    #dont do anything if the percentage is same or lower OR update it if percent is same and coin count is different
+    elif Score[3] < Percent or (Score[3] == Percent and Coins > Score[6]):
+        Thread(target=CheatlessScoreCheck, args=(CheatlessScoreCheck,)).start() #to not slow it down
+        mycursor.execute("UPDATE levelscores SET percent = %s, uploadDate = %s, attempts = %s, coins = %s WHERE scoreID = %s LIMIT 1", (
+            Percent, Timestamp, Atttempts, Coins, Score[0]
+            ))
+        mydb.commit()

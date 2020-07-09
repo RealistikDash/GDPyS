@@ -1860,6 +1860,7 @@ def ScoreSubmitHandler(request):
     AccountID = request.form["accountID"]
     Percent = int(request.form["percent"])
 
+    Log(f"User {AccountID} tries to submit a score!")
     if not VerifyGJP(AccountID, GJP):
         return "-1"
 
@@ -1877,6 +1878,7 @@ def ScoreSubmitHandler(request):
     Score = mycursor.fetchone()
     #new scores
     if Score == None and Percent != 0: #no prev scores
+        Log("New score on level!")
         #creting new score
         #dont thread the check
         if CheatlessScoreCheck(CheatlessStruct):
@@ -1886,6 +1888,7 @@ def ScoreSubmitHandler(request):
             mydb.commit()
     #dont do anything if the percentage is same or lower OR update it if percent is same and coin count is different
     elif Score[3] < Percent or (Score[3] == Percent and Coins > Score[6]):
+        Log("Existing score updated.")
         Thread(target=CheatlessScoreCheck, args=(CheatlessScoreCheck,)).start() #to not slow it down
         mycursor.execute("UPDATE levelscores SET percent = %s, uploadDate = %s, attempts = %s, coins = %s WHERE scoreID = %s LIMIT 1", (
             Percent, Timestamp, Atttempts, Coins, Score[0]

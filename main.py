@@ -175,6 +175,10 @@ def GetMapPacksRoute():
 def GauntletRoute():
     return GetGauntletsHandler()
 
+@app.route("/database/getGJLevelScores211.php", methods=["GET", "POST"])
+def LevelLBsRoute():
+    return ScoreSubmitHandler(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

@@ -472,8 +472,11 @@ def CronThread():
     Log("Cron thread started!")
     while True:
         Log("Running cron!")
+        StartTime = time.time()
         CacheRanks()
         CalculateCP()
+        MaxStarCountBan()
+        Log(f"Cron done! Took {round(time.time() - StartTime, 2)}s")
         time.sleep(UserConfig["CronThreadDelay"])
 
 def GetAccountUrl(request):
@@ -1895,3 +1898,27 @@ def ScoreSubmitHandler(request):
             Percent, Timestamp, Atttempts, Coins, Score[0]
             ))
         mydb.commit()
+
+def MaxStarCountBan() -> None:
+    """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
+    # TODO : Make the same thing for usercoins and regular coins
+    if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
+        StartTime = time.time()
+        print("Running CheatlessAC Cron Starcount Check... ", end="")
+        TotalStars = 187 #from RobTop levels
+        #get all star rated levels
+        mycursor.execute("SELECT starStars FROM levels WHERE starStars > 0")
+        StarredLevels = mycursor.fetchall()
+
+        #add em all up
+        for Level in StarredLevels:
+            TotalStars += Level[0]
+        
+        #count query
+        mycursor.execute("SELECT COUNT(*) FROM users WHERE stars > %s", (TotalStars,))
+        BannedCount = mycursor.fetchone()[0]
+        #ban em
+        mycursor.execute("UPDATE users SET isBanned = 1 WHERE stars > %s", (TotalStars,))
+        mydb.commit()
+
+        print(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")

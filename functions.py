@@ -1880,7 +1880,7 @@ def ScoreSubmitHandler(request):
         #creting new score
         #dont thread the check
         if CheatlessScoreCheck(CheatlessStruct):
-            mycursor.execute("INSERT INTO levelSCORES (accountID, levelID, percent, uploadDate, coins, attempts) VALUES (%s, %s, %s, %s, %s, %s)", (
+            mycursor.execute("INSERT INTO levelscores (accountID, levelID, percent, uploadDate, coins, attempts) VALUES (%s, %s, %s, %s, %s, %s)", (
                 AccountID, LevelID, Percent, Timestamp, Coins, Atttempts
             ))
             mydb.commit()

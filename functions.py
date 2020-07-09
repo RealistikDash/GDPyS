@@ -454,6 +454,7 @@ def Sha1It(Text: str):
     return hashlib.sha1(Text.encode()).hexdigest()
 
 def CacheRanks():
+    StartTime = time.time()
     print("Caching ranks... ", end="")
     mycursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
     Leaderboards = mycursor.fetchall()
@@ -465,7 +466,7 @@ def CacheRanks():
     for User in Leaderboards:
         UserRank += 1
         Ranks[str(User[0])] = UserRank
-    print("Done!")
+    print(f"Done! {round((time.time() - StartTime) / 1000, 2)}ms")
 
 def CronThread():
     Log("Cron thread started!")

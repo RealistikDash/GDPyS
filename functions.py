@@ -466,7 +466,7 @@ def CacheRanks():
     for User in Leaderboards:
         UserRank += 1
         Ranks[str(User[0])] = UserRank
-    print(f"Done! {round((time.time() - StartTime) / 1000, 2)}ms")
+    print(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
 
 def CronThread():
     Log("Cron thread started!")

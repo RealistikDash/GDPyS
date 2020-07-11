@@ -1922,3 +1922,23 @@ def MaxStarCountBan() -> None:
         mydb.commit()
 
         print(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
+
+def Select(TheList: list, Position: int, Thing):
+    """An SQL-like select thing.
+    
+    TheList: List to search through.
+    Position: The position to look in. Can be index or dict key
+    Thing: What position has to be to be added to the return.
+    """
+
+    ReturnList = []
+
+    #look through the list
+    for i in range(0, len(TheList)):
+        if TheList[i][Position] == Thing:
+            ReturnList.append(TheList[i])
+    
+    #make it tuple as less mem usage idk
+    TheReturn = tuple(ReturnList)
+    del ReturnList #so we dont wait for garbage collection????
+    return TheReturn

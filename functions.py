@@ -30,6 +30,8 @@ except Exception as e:
 
 mycursor = mydb.cursor(buffered=True) #creates a thing to allow us to run mysql commands
 
+# TODO: Add SQL index creation
+
 Ranks = {}
 PrivilegeCache = {} # Privileges will be cached here
 
@@ -1849,14 +1851,6 @@ def ScoreSubmitHandler(request):
     #also this is used for submitting the score AND getting all of the scores
     
     ##### SCORE UPDATE #####
-    {
-        "AccountID" : 1,
-        "LevelID" : 222,
-        "Percentage" : 100,
-        "Attempts" : 10,
-        "Coins" : 0
-    }
-
     Coins = int(request.form["s9"]) - 5819
     Atttempts = int(request.form["s1"]) - 8354 #bruh
     GJP = request.form["gjp"]
@@ -1898,6 +1892,20 @@ def ScoreSubmitHandler(request):
             Percent, Timestamp, Atttempts, Coins, Score[0]
             ))
         mydb.commit()
+    
+    #Get Scores
+    Type = int(request.form.get("type", 1))
+
+    #I WISH SWITCH STATEMENTS EXISTED
+    #TODO: type 0 = friends
+    if Type == 1:
+        mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s ORDER BY percent DESC LIMIT 50", (LevelID,))
+    
+    if Type == 2:
+        AfterTime = Timestamp - 604800 #week ago
+        mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s AND uploadDate > %s ORDER BY percent DESC LIMIT 50", (LevelID, AfterTime))
+    
+    Scores = mycursor.fetchall()
 
 def MaxStarCountBan() -> None:
     """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""

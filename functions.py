@@ -1907,6 +1907,44 @@ def ScoreSubmitHandler(request):
     
     Scores = mycursor.fetchall()
 
+    SQLList =""
+    #so we can get all the user data in one query
+    for Score in Scores:
+        SQLList += f"{Score[1]},"
+    
+    if len(SQLList) != "":
+        SQLList = SQLList[:-1]
+
+    #get all the user date
+    mycursor.execute("SELECT extID, userName, userID, icon, color1, color2, iconType, special FROM users WHERE extID in (%s) AND isBanned = 0", (SQLList,))
+    AllUserData = mycursor.fetchall()
+
+    ReturnStr = ""
+    for i in range(0, len(Scores)):
+        #in a for loop to also get places
+        Score = Scores[i]
+        UserData = Select(AllUserData, 0, Score[1]) #got userdata from prev query
+        if not UserData == []:
+            #skip users that are either banned or something weird had happened to them
+            ReturnStr += JointStringBuilder({
+                1 : UserData[1],
+                2 : UserData[2],
+                3 : Score[3],
+                6 : i,
+                9 : UserData[3],
+                10 : UserData[4],
+                11 : UserData[5],
+                13 : Score[6],
+                14 : UserData[6],
+                15 : UserData[7],
+                16 : UserData[0],
+                42 : TimeAgoFromNow(Score[4])
+            }) + "|"
+    
+    if len(ReturnStr) == 0:
+        return ""
+    return ReturnStr[:-1]
+
 def MaxStarCountBan() -> None:
     """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
     # TODO : Make the same thing for usercoins and regular coins

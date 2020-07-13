@@ -1923,7 +1923,7 @@ def ScoreSubmitHandler(request):
     for i in range(0, len(Scores)):
         #in a for loop to also get places
         Score = Scores[i]
-        UserData = Select(AllUserData, 0, Score[1]) #got userdata from prev query
+        UserData = Select(AllUserData, 0, str(Score[1])) #got userdata from prev query
         if not UserData == ():
             #skip users that are either banned or something weird had happened to them
             ReturnStr += JointStringBuilder({

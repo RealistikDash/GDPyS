@@ -1986,7 +1986,7 @@ def Select(TheList: list, Position: int, Thing):
             ReturnList.append(TheList[i])
     """
 
-    for ThingL in List:
+    for ThingL in TheList:
         if ThingL[Position] == Thing:
             ReturnList.append(ThingL)
     

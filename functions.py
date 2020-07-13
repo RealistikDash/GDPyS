@@ -1924,7 +1924,7 @@ def ScoreSubmitHandler(request):
         #in a for loop to also get places
         Score = Scores[i]
         UserData = Select(AllUserData, 0, Score[1]) #got userdata from prev query
-        if not UserData == []:
+        if not UserData == ():
             #skip users that are either banned or something weird had happened to them
             ReturnStr += JointStringBuilder({
                 1 : UserData[1],
@@ -1980,9 +1980,15 @@ def Select(TheList: list, Position: int, Thing):
     ReturnList = []
 
     #look through the list
+    """
     for i in range(0, len(TheList)):
         if TheList[i][Position] == Thing:
             ReturnList.append(TheList[i])
+    """
+
+    for ThingL in List:
+        if ThingL[Position] == Thing:
+            ReturnList.append(ThingL)
     
     #make it tuple as less mem usage idk
     TheReturn = tuple(ReturnList)

@@ -1939,7 +1939,7 @@ def ScoreSubmitHandler(request):
                 14 : UserData[6],
                 15 : UserData[7],
                 16 : UserData[0],
-                42 : TimeAgoFromNow(Score[4])
+                42 : TimeAgoFromNow(Score[4])[:-4]
             }) + "|"
     
     if len(ReturnStr) == 0:

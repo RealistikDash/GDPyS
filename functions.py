@@ -1925,6 +1925,7 @@ def ScoreSubmitHandler(request):
         Score = Scores[i]
         UserData = Select(AllUserData, 0, str(Score[1])) #got userdata from prev query
         if not UserData == ():
+            UserData = UserData[0]
             #skip users that are either banned or something weird had happened to them
             ReturnStr += JointStringBuilder({
                 1 : UserData[1],

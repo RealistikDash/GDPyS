@@ -1294,7 +1294,7 @@ class GDPySBot:
         Timestamp = round(time.time())
 
         #and we create the message
-        mycursor.execute("INSERT INTO messages (accID, toAccountID, userName, userID, subject, body, timestamp) VALUES (%s, %s, 'GDPyS Bot', %s, %s, %s, %s)",
+        mycursor.execute("INSERT INTO messages (accID, toAccountID, userName, userID, subject, body, timestamp, isNew) VALUES (%s, %s, 'GDPyS Bot', %s, %s, %s, %s, 1)",
             (self.BotID, Target, self.BotUserId, Subject, Body, Timestamp)
         )
         mydb.commit()
@@ -1315,7 +1315,10 @@ def CheatlessScoreCheck(Score: dict) -> bool:
         "Coins" : 0
     }
     if UserConfig["CheatlessAC"] and UserConfig["CheatlessScoreCheck"]:
-        if Score["Percentage"] == 100:
+        if Score["Percentage"] > 100:
+            CheatlessBan(Score["AccountID"], "invalid level score submission")
+            return
+        elif Score["Percentage"] == 100:
             CLCheck(f"Running score check on a score on the level {Score['LevelID']}")
             #ok lads first we get the level data
             mycursor.execute("SELECT levelName, starStars, starDemonDiff, starCoins, coins FROM levels WHERE levelID = %s LIMIT 1", (Score['LevelID'],))
@@ -1327,7 +1330,7 @@ def CheatlessScoreCheck(Score: dict) -> bool:
                 return False
             
             #next we do coin check
-            if LevelData[3] == 1 and Score["Coins"] > LevelData[4]:
+            if Score["Coins"] > LevelData[4]:
                 CheatlessBan(Score["AccountID"], "unachievable coin count")
                 return False
 

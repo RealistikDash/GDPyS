@@ -1890,11 +1890,11 @@ def ScoreSubmitHandler(request):
     #dont do anything if the percentage is same or lower OR update it if percent is same and coin count is different
     elif Score[3] < Percent or (Score[3] == Percent and Coins > Score[6]):
         Log("Existing score updated.")
-        Thread(target=CheatlessScoreCheck, args=(CheatlessStruct,)).start() #to not slow it down
-        mycursor.execute("UPDATE levelscores SET percent = %s, uploadDate = %s, attempts = %s, coins = %s WHERE scoreID = %s LIMIT 1", (
-            Percent, Timestamp, Atttempts, Coins, Score[0]
-            ))
-        mydb.commit()
+        if CheatlessScoreCheck(CheatlessStruct):
+            mycursor.execute("UPDATE levelscores SET percent = %s, uploadDate = %s, attempts = %s, coins = %s WHERE scoreID = %s LIMIT 1", (
+                Percent, Timestamp, Atttempts, Coins, Score[0]
+                ))
+            mydb.commit()
     
     #Get Scores
     Type = int(request.form.get("type", 1))

@@ -1289,8 +1289,8 @@ class GDPySBot:
     def SendMessage(self, Target: int, Body: str, Subject: str):
         """Sends a message from the bot."""
         #first we base64 encode the body and subject
-        Subject = base64.b64encode(Subject).decode("ascii")
-        Body = base64.b64encode(Body).decode("ascii")
+        Subject = base64.b64encode(Subject.encode()).decode("ascii")
+        Body = base64.b64encode(Body.encode()).decode("ascii")
         Timestamp = round(time.time())
 
         #and we create the message

@@ -22,6 +22,7 @@ DefaultConfig = {
     "MagicGivesCP" : True, #makes magic levels give cp
     "AwardGivesCP" : True, #makes awarded levels give cp
     "BannedLevelsHidden" : True,
+    "LevelCacheSize" : 200, #will store levels in memory. CAN BE EXPENSIVE
     "CheatlessAC" : True, #global switch
     "CheatlessExtremeDemonMinAttempts" : 100, #if a user submits an extreme demon score under this att count, they will be banned
     "CheatlessScoreCheck" : True,

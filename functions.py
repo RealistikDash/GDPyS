@@ -35,6 +35,8 @@ mycursor = mydb.cursor(buffered=True) #creates a thing to allow us to run mysql 
 Ranks = {}
 PrivilegeCache = {} # Privileges will be cached here
 
+LevelDLCache = {} #the level data will be stored here so it doesnt have to be redownloaded
+
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
     #ok here is the plan of action
@@ -929,88 +931,6 @@ def SoloGen(LevelString: str):
 def SoloGen2(LevelString: str):
     """Port of genSolo2 from Cvolton's GMDPrivateServer."""
     return Sha1It(LevelString + "xI25fpAapCQg")
-
-def DLLevel(request):
-    """Returns a stored level."""
-
-    LevelID = int(request.form["levelID"])
-    Log(f"Getting level {LevelID}!")
-    #include dailies around here
-
-    #getting the level
-    mycursor.execute("SELECT * FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
-    Level = mycursor.fetchall()
-    if len(Level) == 0:
-        return "-1"
-
-    Level = Level[0]
-
-    #bump the downloads
-    Downloads = Level[22] + 1
-    mycursor.execute("UPDATE levels SET downloads = %s WHERE levelID = %s", (Downloads, LevelID))
-    mydb.commit()
-
-    UpdateAgo = TimeAgoFromNow(Level[28])[:-4]
-    UploadAgo = TimeAgoFromNow(Level[27])[:-4]
-
-    Password = Level[10]
-    PasswordXor = 0
-    if Level[10] != 0:
-        PasswordXor = base64.b64encode(Xor(Level[10], 26364).encode("ascii")).decode("ascii")
-
-    if os.path.exists(f"Data/Levels/{LevelID}"):
-        LevelFiles = open(f"Data/Levels/{LevelID}", "r").readlines()[0]
-    else:
-        LevelFiles = Level[18]
-    
-    if LevelFiles[0:3] == "kS1":
-        LevelFiles = base64.b64encode(zlib.compress(LevelFiles)).decode("ascii")
-        LevelFiles = LevelFiles.replace("/", "_")
-        LevelFiles = LevelFiles.replace("+", "-")
-    
-    ReturnStr = JointStringBuilder({
-        "1" : LevelID,
-        "2" : Level[4],
-        "3" : Level[5],
-        "4" : LevelFiles,
-        "5" : Level[6],
-        "6" : Level[35],
-        "8" : "10",
-        "9" : Level[21],
-        "10" : Downloads,
-        "11" : "1",
-        "12" : Level[8],
-        "13" : Level[0],
-        "14" : Level[23],
-        "15" : Level[7],
-        "17" : Level[24],
-        "18" : Level[26],
-        "19" : Level[31],
-        "25" : Level[25],
-        "27" : PasswordXor,
-        "28" : UploadAgo,
-        "29" : UpdateAgo,
-        "30" : Level[11],
-        "31" : "1",
-        "42" : Level[33],
-        "43" : Level[34],
-        "45" : Level[14],
-        "35" : Level[13],
-        "36" : Level[17],
-        "37" : Level[15],
-        "38" : Level[30],
-        "39" : Level[16],
-        "46" : "1",
-        "47" : "2",
-        "48" : "1",
-        "40" : Level[42]
-    })
-
-    ReturnStr += f"#{SoloGen(LevelFiles)}#"
-    CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0"
-    ReturnStr += SoloGen2(CoolString) + "#" + CoolString
-    Success(f"Served level {LevelID}!")
-    return ReturnStr
 
 def CheckBcryptPw(dbpassword, painpassword):
     """
@@ -1998,3 +1918,116 @@ def Select(TheList: list, Position: int, Thing):
     TheReturn = tuple(ReturnList)
     del ReturnList #so we dont wait for garbage collection????
     return TheReturn
+
+def DropCachedLevel(LevelID : int) -> None:
+    """Removes level from cache."""
+    del LevelDLCache[LevelID]
+
+def LevelInCache(LevelID) -> bool:
+    """Checks if level is already in cache."""
+    return LevelID in list(LevelDLCache.keys())
+
+def CacheLevel(LevelID: int) -> bool:
+    """Caches level file. Stores in dict if level not already in cache. Returns bool based on whether successful or not."""
+    if not os.path.exists(f"Data/Levels/{LevelID}"):
+        #it may be levelString
+        mycursor.execute("SELECT levelString FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
+        Level = mycursor.fetchone()
+        if Level is None:
+            return False
+        if Level[0] == "":
+            return False
+        LevelFiles = Level[0]
+    else:
+        LevelFiles = open(f"Data/Levels/{LevelID}", "r").readlines()[0]
+    #if level is already in we will just overwrite it. no need for checks
+    LevelDLCache[LevelID] = LevelFiles
+    #remove level if too long
+    if len(LevelDLCache) > UserConfig["LevelCacheSize"]:
+        LevelDLCache.pop(0)
+    return True
+
+def GetLevelDL(LevelID: int) -> str:
+    """Gets level file from cache or loads it."""
+    if not LevelInCache(LevelID):
+        CacheLevel(LevelID) #cache it if not cached
+    return LevelDLCache[LevelID] 
+
+def DLLevel(request):
+    """Returns a stored level."""
+
+    LevelID = int(request.form["levelID"])
+    Log(f"Getting level {LevelID}!")
+    #include dailies around here
+
+    #getting the level
+    mycursor.execute("SELECT * FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
+    Level = mycursor.fetchall()
+    if len(Level) == 0:
+        return "-1"
+
+    Level = Level[0]
+
+    #bump the downloads
+    Downloads = Level[22] + 1
+    mycursor.execute("UPDATE levels SET downloads = %s WHERE levelID = %s", (Downloads, LevelID))
+    mydb.commit()
+
+    UpdateAgo = TimeAgoFromNow(Level[28])[:-4]
+    UploadAgo = TimeAgoFromNow(Level[27])[:-4]
+
+    Password = Level[10]
+    PasswordXor = 0
+    if Level[10] != 0:
+        PasswordXor = base64.b64encode(Xor(Level[10], 26364).encode("ascii")).decode("ascii")
+
+    LevelFiles = GetLevelDL(LevelID)
+    
+    if LevelFiles[0:3] == "kS1":
+        LevelFiles = base64.b64encode(zlib.compress(LevelFiles)).decode("ascii")
+        LevelFiles = LevelFiles.replace("/", "_")
+        LevelFiles = LevelFiles.replace("+", "-")
+    
+    ReturnStr = JointStringBuilder({
+        "1" : LevelID,
+        "2" : Level[4],
+        "3" : Level[5],
+        "4" : LevelFiles,
+        "5" : Level[6],
+        "6" : Level[35],
+        "8" : "10",
+        "9" : Level[21],
+        "10" : Downloads,
+        "11" : "1",
+        "12" : Level[8],
+        "13" : Level[0],
+        "14" : Level[23],
+        "15" : Level[7],
+        "17" : Level[24],
+        "18" : Level[26],
+        "19" : Level[31],
+        "25" : Level[25],
+        "27" : PasswordXor,
+        "28" : UploadAgo,
+        "29" : UpdateAgo,
+        "30" : Level[11],
+        "31" : "1",
+        "42" : Level[33],
+        "43" : Level[34],
+        "45" : Level[14],
+        "35" : Level[13],
+        "36" : Level[17],
+        "37" : Level[15],
+        "38" : Level[30],
+        "39" : Level[16],
+        "46" : "1",
+        "47" : "2",
+        "48" : "1",
+        "40" : Level[42]
+    })
+
+    ReturnStr += f"#{SoloGen(LevelFiles)}#"
+    CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0"
+    ReturnStr += SoloGen2(CoolString) + "#" + CoolString
+    Success(f"Served level {LevelID}!")
+    return ReturnStr

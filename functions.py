@@ -1237,7 +1237,7 @@ def CheatlessScoreCheck(Score: dict) -> bool:
     if UserConfig["CheatlessAC"] and UserConfig["CheatlessScoreCheck"]:
         if Score["Percentage"] > 100:
             CheatlessBan(Score["AccountID"], "invalid level score submission")
-            return
+            return False
         elif Score["Percentage"] == 100:
             CLCheck(f"Running score check on a score on the level {Score['LevelID']}")
             #ok lads first we get the level data
@@ -1264,12 +1264,13 @@ def CheatlessScoreCheck(Score: dict) -> bool:
                 CheatlessBan(Score["AccountID"], "invalid level score data")
                 return False
 
-            return True
         else: #checks for uncomplete levels
             #has coins when not completed level
             if Score["Coins"] > 0:
                 CheatlessBan(Score["AccountID"], "coins on uncompleted level")
                 return False
+        
+    return True
 
 def CheatlessBan(AccountID: int, Offence: str):
     """Initiates and official CheatlessAC ban!"""

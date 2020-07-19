@@ -852,7 +852,7 @@ def GetLevels(request):
         AccountID = request.form["accountID"]
         if not VerifyGJP(AccountID, request.form["gjp"]):
             return "-1"
-        SQLParams.append("extID in (%s)")
+        SQLParams.append("levels.extID in (%s)")
         SQLFormats.append(ListToCommaString(GetFriendsList(AccountID)))
     elif Type == 16:
         SQLParams.append("NOT starEpic = 0")

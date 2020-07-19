@@ -196,18 +196,16 @@ def GetUserDataFunction(request):
         Append = ""
         #check for incoming reqs
         mycursor.execute("SELECT count(*) FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person2 = %s AND person1 = %s)", (TargetAccid, FromAccid, FromAccid, TargetAccid))
-        if len(mycursor.fetchone()[0]) > 0:
+        if mycursor.fetchone()[0] > 0:
             FriendState = 1
         else:
             mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (TargetAccid, FromAccid))
-            IncomingReq = len(mycursor.fetchall())
-            if IncomingReq != 0:
+            if len(mycursor.fetchall()):
                 FriendState = 3
             else: #so other queries arent ran if we already found it
                 #outgoing reqs
                 mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (FromAccid, TargetAccid))
-                IncomingReq = len(mycursor.fetchall())
-                if IncomingReq != 0:
+                if len(mycursor.fetchall()):
                     FriendState = 4
 
     mycursor.execute("SELECT * FROM users WHERE extID = %s LIMIT 1", (TargetAccid,))

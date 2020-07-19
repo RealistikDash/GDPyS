@@ -849,8 +849,11 @@ def GetLevels(request):
         # TODO: Followed
         pass
     elif Type == 13:
-        #TODO: Friends
-        pass
+        AccountID = request.form["accountID"]
+        if not VerifyGJP(AccountID, request.form["gjp"]):
+            return "-1"
+        SQLParams.append("extID in (%s)")
+        SQLFormats.append(ListToCommaString(GetFriendsList(AccountID)))
     elif Type == 16:
         SQLParams.append("NOT starEpic = 0")
         Order = "rateDate DESC, uploadDate"
@@ -1833,12 +1836,13 @@ def ScoreSubmitHandler(request):
     #Get Scores
     Type = int(request.form.get("type", 1))
 
-    #I WISH SWITCH STATEMENTS EXISTED
-    #TODO: type 0 = friends
-    if Type == 1:
+    #I WISH SWITCH STATEMENTS EXISTED and I might do something about this involving tuples
+    if Type == 0:
+        mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s AND accountID in (%s) ORDER BY percent DESC LIMIT 50", (LevelID, ListToCommaString(GetFriendsList(AccountID))))
+    elif Type == 1:
         mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s ORDER BY percent DESC LIMIT 50", (LevelID,))
     
-    if Type == 2:
+    elif Type == 2:
         AfterTime = Timestamp - 604800 #week ago
         mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s AND uploadDate > %s ORDER BY percent DESC LIMIT 50", (LevelID, AfterTime))
     
@@ -2053,3 +2057,22 @@ def RemoveMessageHandler(request):
     if not VerifyGJP(AccountID, request.form["gjp"]):
         return "-1"
     # TODO: Finish
+
+def ListToCommaString(TheList: list):
+    """Converts a Python list to a comma separated string."""
+    Res = ""
+    for Elem in TheList:
+        Res += f"{Elem},"
+    return Res[:-1]
+
+def GetFriendsList(AccountID: int):
+    """Returns a list of account ids of the users friends."""
+    mycursor.execute("SELECT accountID FROM friendreqs WHERE toAccountID = %s", (AccountID,))
+    Friends = mycursor.fetchall()
+    mycursor.execute("SELECT toAccountID FROM friendreqs WHERE accountID = %s", (AccountID,))
+    Friends1 = mycursor.fetchall()
+    FriendsRetrun = []
+
+    for Friend in (Friends + Friends1):
+        FriendsRetrun.append(Friend[0])
+    return FriendsRetrun

@@ -37,6 +37,21 @@ PrivilegeCache = {} # Privileges will be cached here
 
 LevelDLCache = {} #the level data will be stored here so it doesnt have to be redownloaded
 
+def DecodeGJP(GJP) -> str:
+    """Decodes the GJP sent by the client.
+    
+    NOTE: 
+    DO NOT STORE THE RETURN OF THIS FUNCTION. THAT IS REALLY UNSAFE.
+    
+    CREDIT: 
+    Taken from Cvolton's GMD private server
+    https://github.com/Cvolton/GMDprivateServer/blob/master/incl/lib/GJPCheck.php
+    This is just a python port of that function."""
+    #TODO: this can be a one-liner
+    GJP = GJP.replace("_", "/").replace("-", "+")
+    GJP = base64.b64decode(GJP)
+    return Xor(GJP, 37526)
+
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
     #ok here is the plan of action
@@ -46,7 +61,7 @@ def VerifyGJP(AccountID: int, GJP: str):
     return True
 
 def FixUserInput(String):
-    """Gets rid of potentially problematic user input."""
+    """[DEPRECATED] Gets rid of potentially problematic user input."""
     String = String.replace(r"\0", "")
     String = String.replace("#", "")
     String = String.replace("|", "")
@@ -181,7 +196,7 @@ def GetUserDataFunction(request):
         Append = ""
         #check for incoming reqs
         mycursor.execute("SELECT count(*) FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person2 = %s AND person1 = %s)", (TargetAccid, FromAccid, FromAccid, TargetAccid))
-        if len(mycursor.fetchall()) > 0:
+        if len(mycursor.fetchone()[0]) > 0:
             FriendState = 1
         else:
             mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (TargetAccid, FromAccid))
@@ -2032,3 +2047,11 @@ def DLLevel(request):
     ReturnStr += SoloGen2(CoolString) + "#" + CoolString
     Success(f"Served level {LevelID}!")
     return ReturnStr
+
+def RemoveMessageHandler(request):
+    """Handles message remove request."""
+    AccountID = request.form["accountID"]
+
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    # TODO: Finish

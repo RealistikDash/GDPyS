@@ -50,15 +50,13 @@ def DecodeGJP(GJP) -> str:
     #TODO: this can be a one-liner
     GJP = GJP.replace("_", "/").replace("-", "+")
     GJP = base64.b64decode(GJP)
-    return Xor(GJP, 37526)
+    return Xor(GJP.decode(), 37526)
 
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
-    #ok here is the plan of action
-    #upon register, create a gjp from the password, bcrypt it and then store in db
-    #here, we will bcrypt this gjp and check it with the one that is in the db
-    #i got recommentded encrypting more than decrypting it
-    return True
+    mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    Password = mycursor.fetchone()[0]
+    return CheckBcryptPw(Password, DecodeGJP(GJP))
 
 def FixUserInput(String):
     """[DEPRECATED] Gets rid of potentially problematic user input."""

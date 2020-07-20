@@ -2092,12 +2092,12 @@ def SendFriendReq(request):
     mycursor.execute("SELECT COUNT(*) FROM friendships WHERE (person1=%s AND person2=%s) OR (person1=%s AND person2=%s)", (AccountID, TargetAccountID, TargetAccountID, AccountID))
     if mycursor.fetchone()[0]:
         return "-1"
-    mycursor.execute("SELECT COUNT(*) FROM accounts WHERE accountID = %s AND frS = 1")
+    mycursor.execute("SELECT COUNT(*) FROM accounts WHERE accountID = %s AND frS = 1", (TargetAccountID,))
     if mycursor.fetchone()[0]:
         return "-1" 
     mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE (accountID = %s AND toAccountID = %s) OR (accountID = %s AND toAccountID = %s)", (AccountID, TargetAccountID, TargetAccountID, AccountID))
     if mycursor.fetchone()[0]:
         return "-1" 
-    mycursor.execute("INSERT INTO friendreqs (accountID, toAccountID, comment, uploadDate) VALUES (%s, %s, %s, %s)", (AccountID, TargerAccountID, Message, round(time.time())))
+    mycursor.execute("INSERT INTO friendreqs (accountID, toAccountID, comment, uploadDate) VALUES (%s, %s, %s, %s)", (AccountID, TargetAccountID, Message, round(time.time())))
     mydb.commit()
     return "1"

@@ -2101,3 +2101,13 @@ def SendFriendReq(request):
     mycursor.execute("INSERT INTO friendreqs (accountID, toAccountID, comment, uploadDate) VALUES (%s, %s, %s, %s)", (AccountID, TargetAccountID, Message, round(time.time())))
     mydb.commit()
     return "1"
+
+def DeleteFriendRequest(request):
+    """Handles friend request deletion."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    Target = request.form["targetAccountID"]
+    mycursor.execute("DELETE FROM friendships WHERE accountID = %s AND toAccountID = %s", ((AccountID, Target),(Target, AccountID)[0 if int(request.form.get("isSender", 0)) else 1]))
+    mydb.commit()
+    return "1"

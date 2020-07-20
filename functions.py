@@ -130,10 +130,6 @@ def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
     #getting password from db
     DBPassword = GetBcryptPassword(AccountID)
-    #if said user dont exist
-    if len(DBPassword) == 0:
-        return False
-    DBPassword = DBPassword[0][0]
     if not UserConfig["LegacyPasswords"]:
         return CheckBcryptPw(DBPassword, Password)
     return True

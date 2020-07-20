@@ -179,6 +179,10 @@ def GauntletRoute():
 def LevelLBsRoute():
     return ScoreSubmitHandler(request)
 
+@app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
+def FriendReqRoute():
+    return SendFriendReq(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

@@ -32,10 +32,18 @@ mycursor = mydb.cursor(buffered=True) #creates a thing to allow us to run mysql 
 
 # TODO: Add SQL index creation
 
+#caches
 Ranks = {}
 PrivilegeCache = {} # Privileges will be cached here
-
 LevelDLCache = {} #the level data will be stored here so it doesnt have to be redownloaded
+BrcyptCache = {} #so we dont call mysql in gjpchecks
+
+def GetBcryptPassword(AccountID):
+    """Gets a users password from cache or gets it from db and caches it."""
+    if AccountID not in list(BrcyptCache.keys()):
+        mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+        BrcyptCache[AccountID] = mycursor.fetchone()[0]
+    return BrcyptCache[AccountID]
 
 def DecodeGJP(GJP) -> str:
     """Decodes the GJP sent by the client.
@@ -54,9 +62,7 @@ def DecodeGJP(GJP) -> str:
 
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
-    mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
-    Password = mycursor.fetchone()[0]
-    return CheckBcryptPw(Password, DecodeGJP(GJP))
+    return CheckBcryptPw(GetBcryptPassword(AccountID), DecodeGJP(GJP))
 
 def FixUserInput(String):
     """[DEPRECATED] Gets rid of potentially problematic user input."""
@@ -79,7 +85,6 @@ def GetServerIP():
 
 def LoginCheck(Udid, Username, Password, request):
     """Checks login and password"""
-    Username = FixUserInput(Username)
     mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (Username,))
     Accounts = mycursor.fetchall()
     if len(Accounts) == 0:
@@ -123,8 +128,7 @@ def HashPassword(PlainPassword: str):
 def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
     #getting password from db
-    mycursor.execute("SELECT password FROM accounts WHERE accountID = %s", (AccountID,))
-    DBPassword = mycursor.fetchall()
+    DBPassword = GetBcryptPassword(AccountID)
     #if said user dont exist
     if len(DBPassword) == 0:
         return False

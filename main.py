@@ -183,6 +183,9 @@ def LevelLBsRoute():
 def FriendReqRoute():
     return SendFriendReq(request)
 
+@app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
+def DeleteFriendReqRoute():
+    return DeleteFriendRequest(request)
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

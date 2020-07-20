@@ -43,6 +43,7 @@ def GetBcryptPassword(AccountID):
     if AccountID not in list(BrcyptCache.keys()):
         mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
         BrcyptCache[AccountID] = mycursor.fetchone()[0]
+        Log(f"Cached Bcrypt for {AccountID}")
     return BrcyptCache[AccountID]
 
 def DecodeGJP(GJP) -> str:
@@ -1166,6 +1167,7 @@ def HasPrivilege(AccountID: int, Privilege):
         "Privileges" : DBPriv,
         "Expiry" : round(time.time()) + 600
     }
+    Log(f"Cached privileges for account {AccountID}")
 
     #and now alas we check if they have it
     return bool(DBPriv & Privilege)
@@ -1965,6 +1967,7 @@ def CacheLevel(LevelID: int) -> bool:
     #remove level if too long
     if len(LevelDLCache) > UserConfig["LevelCacheSize"]:
         LevelDLCache.pop(0)
+    Log(f"Cached level {LevelID}.")
     return True
 
 def GetLevelDL(LevelID: int) -> str:

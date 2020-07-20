@@ -2076,3 +2076,28 @@ def GetFriendsList(AccountID: int):
     for Friend in (Friends + Friends1):
         FriendsRetrun.append(Friend[0])
     return FriendsRetrun
+
+def SendFriendReq(request):
+    """Handles the send friend req action."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    TargetAccountID = request.form["toAccountID"]
+    Message = request.form["comment"]
+
+    #stupid checks
+    mycursor.execute("SELECT COUNT(*) FROM blocks WHERE (person1 = %s AND person2 = %s) OR (person1 = %s AND person2 = %s)", (AccountID, TargetAccountID, TargetAccountID, AccountID))
+    if mycursor.fetchone()[0]:
+        return "-1"
+    mycursor.execute("SELECT COUNT(*) FROM friendships WHERE (person1=%s AND person2=%s) OR (person1=%s AND person2=%s)", (AccountID, TargetAccountID, TargetAccountID, AccountID))
+    if mycursor.fetchone()[0]:
+        return "-1"
+    mycursor.execute("SELECT COUNT(*) FROM accounts WHERE accountID = %s AND frS = 1")
+    if mycursor.fetchone()[0]:
+        return "-1" 
+    mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE (accountID = %s AND toAccountID = %s) OR (accountID = %s AND toAccountID = %s)", (AccountID, TargetAccountID, TargetAccountID, AccountID))
+    if mycursor.fetchone()[0]:
+        return "-1" 
+    mycursor.execute("INSERT INTO friendreqs (accountID, toAccountID, comment, uploadDate) VALUES (%s, %s, %s, %s)", (AccountID, TargerAccountID, Message, round(time.time())))
+    mydb.commit()
+    return "1"

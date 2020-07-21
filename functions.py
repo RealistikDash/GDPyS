@@ -2135,7 +2135,7 @@ def GetFriendReqList(request):
         mycursor.execute(f"SELECT id FROM friendreqs WHERE {Col} = %s LIMIT 10 OFFSET %s", (AccountID, Offset))
         AList = ""
         for x in mycursor.fetchall():
-            Alist+=f"{x[0]},"
+            AList+=f"{x[0]},"
         mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE id in (%s)", (AList[:-1],))
         mydb.commit()
     ReturnStr = ""

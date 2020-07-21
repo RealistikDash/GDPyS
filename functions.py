@@ -1585,7 +1585,7 @@ def APIGetLevel(LevelID):
     if LevelData[5] == "0":
         Description = ""
     else:
-        Description = base64.b64decode(LevelData[5])
+        Description = base64.b64decode(LevelData[5]).decode()
     #changing the rate diff to words
     Difficulty = {
         0 : "na",

@@ -1585,7 +1585,7 @@ def APIGetLevel(LevelID):
     if LevelData[5] == "0":
         Description = ""
     else:
-        Description = base64.b64decode(LevelData[5])
+        Description = base64.b64decode(LevelData[5]).decode()
     #changing the rate diff to words
     Difficulty = {
         0 : "na",
@@ -1600,6 +1600,17 @@ def APIGetLevel(LevelID):
         Difficulty = "demon"
     if LevelData[18]:
         Difficulty = "auto"
+    Comments = []
+    mycursor.execute("SELECT userID, userName, comment, timestamp, likes, percent FROM comments WHERE levelID = %s", (LevelID,))
+    for Comment in mycursor.fetchall():
+        Comments.append({
+            "userID" : Comment[0],
+            "username" : Comment[1],
+            "comment" : base64.b64decode(Comment[2]).decode(),
+            "timestamp" : Comment[3],
+            "likes" : Comment[4],
+            "percent" : Comment[5]
+        })
     return {
         "status" : 200,
         "id" : LevelData[1],
@@ -1626,6 +1637,7 @@ def APIGetLevel(LevelID):
             "featured" : bool(LevelData[19]),
             "epic" : bool(LevelData[20])
         },
+        "comments" : Comments,
         "message" : "Success!"
     }
 

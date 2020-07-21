@@ -1664,7 +1664,7 @@ def GetMessage(request):
         return "-1" #if no message found and so other checks arent ran
 
     #we mark it as read if not already
-    if Message[9]:
+    if not Message[9]:
         mycursor.execute("UPDATE messages SET isNew = 1 WHERE messageID = %s AND accID = %s LIMIT 1", (MessageID, AccountID))
         mydb.commit()
     

@@ -771,7 +771,7 @@ def GetLevels(request):
     Type = int(request.form.get("type", 0))
 
     #pages
-    Offset = request.form.get("page", "0")
+    Offset = request.form.get("page", "0") * 10
 
     Order = "uploadDate"
     SQLParams = []
@@ -1153,7 +1153,7 @@ def PostComment(request):
     LevelID = request.form["levelID"]
     Comment = request.form["comment"]
     #Check if its not a command
-    DeB64 = base64.b64decode(Comment)
+    DeB64 = base64.b64decode(Comment).decode()
     if DeB64.startswith(UserConfig["CommandPrefix"]):
         return str(int(CommentCommand(DeB64, {
             "LevelID" : LevelID,

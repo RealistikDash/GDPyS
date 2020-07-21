@@ -2131,5 +2131,22 @@ def GetFriendReqList(request):
     Count = mycursor.fetchone()[0]
     ReturnStr = ""
     for Request in FriendReqs:
-        mycursor.execute("SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID = %s LIMIT 1", ()) #TODO: turn these individual requests and turn them into 
+        mycursor.execute("SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID = %s LIMIT 1", (Request[1] if GetSent else Request[0],)) #TODO: turn these individual requests and turn them into 
+        UserData = mycursor.fetchone()
+        ReturnStr += JointStringBuilder({
+            "1" : UserData[0],
+            "2" : UserData[1],
+            "9" : UserData[2],
+            "10" : UserData[3],
+            "11" : UserData[4],
+            "14" : UserData[5],
+            "15" : UserData[6],
+            "16" : UserData[7],
+            "32" : Request[4],
+            "35" : Request[2],
+            "37" : TimeAgoFromNow(Request[3]),
+            "41" : Request[5]
+        }) + "|"
+    
+    return f"{ReturnStr[:-1]}#{Count}:{Offset}:10"
     

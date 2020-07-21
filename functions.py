@@ -13,7 +13,7 @@ import os
 import urllib.parse
 import bcrypt
 from threading import Thread
-from PrivEnums import *
+from Enums import *
 import string
 from logger import logger
 

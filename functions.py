@@ -2132,7 +2132,7 @@ def GetFriendReqList(request):
     if not GetSent:
         #mark em as read
         # I HATE EVERYTHING ABOUT THIS... SUBQUERIES DONT WORK AS THIS REQUIRES LIMIT AND OFFSETEHIO GFNWERIGUOWLHRWEFQUEHJFGRWOIJGRWIG
-        mycursor.execute(f"SELECT id FROM friendships WHERE {Col} = %s LIMIT 10 OFFSET %s", (AccountID, Offset))
+        mycursor.execute(f"SELECT id FROM friendreqs WHERE {Col} = %s LIMIT 10 OFFSET %s", (AccountID, Offset))
         AList = ""
         for x in mycursor.fetchall():
             Alist+=f"{x[0]},"

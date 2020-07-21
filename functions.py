@@ -15,6 +15,7 @@ import bcrypt
 from threading import Thread
 from PrivEnums import *
 import string
+from logger import logger
 
 try:
     mydb = mysql.connector.connect(
@@ -23,9 +24,9 @@ try:
         passwd=UserConfig["SQLPassword"],
         database=UserConfig['SQLDatabase']
     ) #connects to database
-    print(f"{Fore.GREEN} Successfully connected to MySQL!")
+    logger.info(f"{Fore.GREEN}[GDPyS] Successfully connected to MySQL!{Fore.RESET}")
 except Exception as e:
-    print(f"{Fore.RED} Failed connecting to MySQL! Aborting!\n Error: {e}{Fore.RESET}")
+    logger.error(f"{Fore.RED}[GDPyS] Failed connecting to MySQL! Aborting!\n Error: {e}{Fore.RESET}")
     exit()
 
 mycursor = mydb.cursor(buffered=True) #creates a thing to allow us to run mysql commands
@@ -461,7 +462,6 @@ def Rewards(request):
     EncodedReturn = EncodedReturn.replace("+", "-")
     ShaReturn = Sha1It(EncodedReturn + "pC26fpYaQCtg")
     Success("Boom chest data done.")
-    print(f"bruhh{EncodedReturn}|{ShaReturn}")
     return f"bruhh{EncodedReturn}|{ShaReturn}"
 
 def Sha1It(Text: str):
@@ -470,7 +470,7 @@ def Sha1It(Text: str):
 
 def CacheRanks():
     StartTime = time.time()
-    print("Caching ranks... ", end="")
+    logger.info("Caching ranks... ")
     mycursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
     Leaderboards = mycursor.fetchall()
     Leaderboards.reverse()
@@ -481,7 +481,7 @@ def CacheRanks():
     for User in Leaderboards:
         UserRank += 1
         Ranks[str(User[0])] = UserRank
-    print(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
+    logger.info(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
 
 def CronThread():
     Log("Cron thread started!")
@@ -1773,7 +1773,7 @@ def GetGauntletsHandler():
 def CalculateCP():
     """Cron job that calculates CP for the whole server."""
     StartTime = time.time()
-    print("Beginning to calculate CP... ", end="")
+    logger.info("Beginning to calculate CP... ")
     #first we get all user ids
     mycursor.execute("SELECT userID FROM users")
     UserIDs = mycursor.fetchall()
@@ -1783,7 +1783,7 @@ def CalculateCP():
         UserCalcCP(UserID[0])
     mydb.commit()
     Finished = round((time.time() - StartTime) * 1000, 2)
-    print(f"Done! {Finished}ms")
+    logger.info(f"Done! {Finished}ms")
 
 def UserCalcCP(UserID : int):
     """Calculates CP for specified user id."""
@@ -1917,7 +1917,7 @@ def MaxStarCountBan() -> None:
     # TODO : Make the same thing for usercoins and regular coins
     if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
         StartTime = time.time()
-        print("Running CheatlessAC Cron Starcount Check... ", end="")
+        logger.info("Running CheatlessAC Cron Starcount Check... ", end="")
         TotalStars = 187 #from RobTop levels
         #get all star rated levels
         mycursor.execute("SELECT starStars FROM levels WHERE starStars > 0")
@@ -1934,7 +1934,7 @@ def MaxStarCountBan() -> None:
         mycursor.execute("UPDATE users SET isBanned = 1 WHERE stars > %s", (TotalStars,))
         mydb.commit()
 
-        print(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
+        logger.info(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
 
 def Select(TheList: list, Position: int, Thing):
     """An SQL-like select thing.

@@ -222,7 +222,7 @@ def APINotFoundError(error):
 app.register_blueprint(APIBlueprint, url_prefix='/api')
 
 if __name__ == "__main__":
-    print(rf"""{Fore.BLUE}   _____ _____  _____        _____
+    print(rf"""{Fore.BLUE}   _____ _____  _____        _____ # this does not need to be logged as it should be on stdout
   / ____|  __ \|  __ \      / ____|
  | |  __| |  | | |__) |   _| (___
  | | |_ | |  | |  ___/ | | |\___ \

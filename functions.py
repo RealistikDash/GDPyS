@@ -1601,7 +1601,7 @@ def APIGetLevel(LevelID):
     if LevelData[18]:
         Difficulty = "auto"
     Comments = []
-    mycursor.execute("SELECT userID, userName, comment, timestamp, likes, percent WHERE levelID = %s", (LevelID,))
+    mycursor.execute("SELECT userID, userName, comment, timestamp, likes, percent FROM comments WHERE levelID = %s", (LevelID,))
     for Comment in mycursor.fetchall():
         Comments.append({
             "userID" : Comment[0],

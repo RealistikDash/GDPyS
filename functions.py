@@ -2130,7 +2130,12 @@ def GetFriendReqList(request):
     mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE {} = %s ".format(Col), (AccountID,))
     Count = mycursor.fetchone()[0]
     #mark em as read
-    mycursor.execute(f"UPDATE friendreqs SET isNew = 0 WHERE id in (SELECT id FROM friendships WHERE {Col} = %s LIMIT 10 OFFSET %s)", (AccountID, Offset))
+    # I HATE EVERYTHING ABOUT THIS... SUBQUERIES DONT WORK AS THIS REQUIRES LIMIT AND OFFSETEHIO GFNWERIGUOWLHRWEFQUEHJFGRWOIJGRWIG
+    mycursor.execute(f"SELECT id FROM friendships WHERE {Col} = %s LIMIT 10 OFFSET %s", (Offset,))
+    AList = ""
+    for x in mycursor.fetchall():
+        Alist+=f"{x[0]},"
+    mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE id in (%s)", (AList[:-1],))
     mydb.commit()
     ReturnStr = ""
     for Request in FriendReqs:

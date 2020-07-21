@@ -1230,7 +1230,7 @@ class GDPySBot:
         Timestamp = round(time.time())
 
         #and we create the message
-        mycursor.execute("INSERT INTO messages (accID, toAccountID, userName, userID, subject, body, timestamp, isNew) VALUES (%s, %s, 'GDPyS Bot', %s, %s, %s, %s, 1)",
+        mycursor.execute("INSERT INTO messages (accID, toAccountID, userName, userID, subject, body, timestamp, isNew) VALUES (%s, %s, 'GDPyS Bot', %s, %s, %s, %s, 0)",
             (self.BotID, Target, self.BotUserId, Subject, Body, Timestamp)
         )
         mydb.commit()
@@ -1474,7 +1474,7 @@ def MessagePost(request):
     mycursor.execute("""INSERT INTO messages 
                             (accID, toAccountID, userName, userID, secret, subject, body, timestamp, isNew)
                             VALUES
-                            (%s, %s, %s, %s, %s, %s, %s, %s, 1)
+                            (%s, %s, %s, %s, %s, %s, %s, %s, 0)
                             """,
                             (
                                 AccountID,
@@ -1665,7 +1665,7 @@ def GetMessage(request):
 
     #we mark it as read if not already
     if Message[9]:
-        mycursor.execute("UPDATE messages SET isNew = 0 WHERE messageID = %s AND accID = %s LIMIT 1", (MessageID, AccountID))
+        mycursor.execute("UPDATE messages SET isNew = 1 WHERE messageID = %s AND accID = %s LIMIT 1", (MessageID, AccountID))
         mydb.commit()
     
     GetSent = True if Message[4] else False
@@ -2112,3 +2112,25 @@ def DeleteFriendRequest(request):
     mycursor.execute("DELETE FROM friendreqs WHERE accountID = %s AND toAccountID = %s", ((AccountID, Target),(Target, AccountID))[0 if int(request.form.get("isSender", 0)) else 1])
     mydb.commit()
     return "1"
+
+def GetFriendReqList(request):
+    """Handles the friend req list request by the client."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    
+    Offset = int(request.form["page"]) * 10
+    GetSent = bool(int(request.form.get("getSent", 0))) #FOR THE MEME
+    Col = "accountID" if GetSent else "toAccountID"
+
+    mycursor.execute("SELECT * FROM friendreqs WHERE {} = %s LIMIT 10 OFFSET %s".format(Col), (AccountID, Offset)) #never format except when you trust the input 1000%
+    FriendReqs = mycursor.fetchall()
+    #check right here. dont bother wiht the count query if there
+    if len(FriendReqs) == 0:
+        return "-2" #lonely
+    mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE {} = %s ".format(Col), (AccountID,))
+    Count = mycursor.fetchone()[0]
+    ReturnStr = ""
+    for Request in FriendReqs:
+        mycursor.execute("SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID = %s LIMIT 1", ()) #TODO: turn these individual requests and turn them into 
+    

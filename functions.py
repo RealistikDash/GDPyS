@@ -2129,6 +2129,9 @@ def GetFriendReqList(request):
         return "-2" #lonely
     mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE {} = %s ".format(Col), (AccountID,))
     Count = mycursor.fetchone()[0]
+    #mark em as read
+    mycursor.execute("UPDATE friendreqs SET isNew = 0 OFFSET %s LIMIT 10", (Offset,))
+    mydb.commit()
     ReturnStr = ""
     for Request in FriendReqs:
         mycursor.execute("SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID = %s LIMIT 1", (Request[1] if GetSent else Request[0],)) #TODO: turn these individual requests and turn them into 
@@ -2144,7 +2147,7 @@ def GetFriendReqList(request):
             "16" : UserData[7],
             "32" : Request[4],
             "35" : Request[2],
-            "37" : TimeAgoFromNow(Request[3]),
+            "37" : TimeAgoFromNow(Request[3])[:-4],
             "41" : Request[5]
         }) + "|"
     

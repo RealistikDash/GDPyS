@@ -2129,14 +2129,15 @@ def GetFriendReqList(request):
         return "-2" #lonely
     mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE {} = %s ".format(Col), (AccountID,))
     Count = mycursor.fetchone()[0]
-    #mark em as read
-    # I HATE EVERYTHING ABOUT THIS... SUBQUERIES DONT WORK AS THIS REQUIRES LIMIT AND OFFSETEHIO GFNWERIGUOWLHRWEFQUEHJFGRWOIJGRWIG
-    mycursor.execute(f"SELECT id FROM friendships WHERE {Col} = %s LIMIT 10 OFFSET %s", (Offset,))
-    AList = ""
-    for x in mycursor.fetchall():
-        Alist+=f"{x[0]},"
-    mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE id in (%s)", (AList[:-1],))
-    mydb.commit()
+    if not GetSent:
+        #mark em as read
+        # I HATE EVERYTHING ABOUT THIS... SUBQUERIES DONT WORK AS THIS REQUIRES LIMIT AND OFFSETEHIO GFNWERIGUOWLHRWEFQUEHJFGRWOIJGRWIG
+        mycursor.execute(f"SELECT id FROM friendships WHERE {Col} = %s LIMIT 10 OFFSET %s", (AccountID, Offset))
+        AList = ""
+        for x in mycursor.fetchall():
+            Alist+=f"{x[0]},"
+        mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE id in (%s)", (AList[:-1],))
+        mydb.commit()
     ReturnStr = ""
     for Request in FriendReqs:
         mycursor.execute("SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID = %s LIMIT 1", (Request[1] if GetSent else Request[0],)) #TODO: turn these individual requests and turn them into 

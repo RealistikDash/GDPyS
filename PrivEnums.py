@@ -14,3 +14,4 @@ CommandSetAcc = 2 << 9
 CommandRename = 2 << 10
 ModReqMod = 2 << 11
 ModSuggestLevel = 2 << 12
+ModBanUser = 2 << 13

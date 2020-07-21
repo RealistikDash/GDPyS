@@ -1122,6 +1122,25 @@ def DeleteAccComment(request):
     mydb.commit()
     return "1"
 
+def CommentCommand(Comment: str, Extra: dict) -> bool:
+    """Handles comment commands."""
+    #Example extra dict
+    #{
+    #    "LevelID" : 432423,
+    #    "AccountID" : 543534
+    #}
+    Command = Comment[1:].split(" ")
+    ###I WANT SWITCH STATEMENTS
+    if Command[0] == "setacc" and HasPrivilege(Extra["AccountID"], CommandSetAcc):
+        mycursor.execute("SELECT userID, extID FROM users WHERE isRegistered = 1 AND userName LIKE %s LIMIT 1", (Command[1],))
+        User = mycursor.fetchone()
+        if User is None:
+            return False
+        mycursor.execute("UPDATE levels SET userName = %s, userID = %s, extID = %s WHERE levelID = %s LIMIT 1", (Command[1], User[0], User[1], Extra["LevelID"]))
+        mydb.commit()
+        return True
+    return False
+
 def PostComment(request):
     """Posts a level comment."""
     Username = request.form["userName"] #why is this passed? idk... ill still use it
@@ -1133,6 +1152,13 @@ def PostComment(request):
     UserID = AIDToUID(AccountID)
     LevelID = request.form["levelID"]
     Comment = request.form["comment"]
+    #Check if its not a command
+    DeB64 = base64.b64decode(Comment)
+    if DeB64.startswith(UserConfig["CommandPrefix"]):
+        return str(int(CommentCommand(DeB64, {
+            "LevelID" : LevelID,
+            "AccountID" : AccountID
+        }))) #cursed
     Timestamp = round(time.time())
     #we finally add the comment
     mycursor.execute("INSERT INTO comments (levelID, userID, comment, timeStamp, percent, userName) VALUES (%s, %s, %s, %s, %s, %s)", (LevelID, UserID, Comment, Timestamp, Percent, Username))

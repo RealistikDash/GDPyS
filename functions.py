@@ -2130,7 +2130,7 @@ def GetFriendReqList(request):
     mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE {} = %s ".format(Col), (AccountID,))
     Count = mycursor.fetchone()[0]
     #mark em as read
-    mycursor.execute("UPDATE friendreqs SET isNew = 0 OFFSET %s LIMIT 10", (Offset,))
+    mycursor.execute("UPDATE friendreqs SET isNew = 0 LIMIT 10 OFFSET %s", (Offset,))
     mydb.commit()
     ReturnStr = ""
     for Request in FriendReqs:

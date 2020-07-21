@@ -180,19 +180,18 @@ def GetUserDataFunction(request):
     Blocks = mycursor.fetchall()
     if len(Blocks) > 0:
         return "-1"
+    Append = ""
+    FriendState = 0
     #gets messages and friend requests (thanks cvolton again)
     if TargetAccid == FromAccid: #its the user checking themselves out
-        FriendState = 0
         mycursor.execute("SELECT count(*) FROM friendreqs WHERE toAccountID = %s", (TargetAccid,))
-        FreindReqs = mycursor.fetchall()[0]
+        FreindReqs = mycursor.fetchone()[0]
         mycursor.execute("SELECT count(*) FROM messages WHERE toAccountID = %s AND isNew=0", (TargetAccid,))
-        NewMessages = mycursor.fetchall()[0]
+        NewMessages = mycursor.fetchone()[0]
         mycursor.execute("SELECT count(*) FROM friendships WHERE (person1 = %s AND isNew2 = '1') OR  (person2 = %s AND isNew1 = '1')", (FromAccid, FromAccid,))
-        NewFirends = mycursor.fetchall()[0]
+        NewFirends = mycursor.fetchone()[0]
         Append = f":38:{NewMessages}:39:{FreindReqs}:40:{NewFirends}"
     else:
-        FriendState = 0
-        Append = ""
         #check for incoming reqs
         mycursor.execute("SELECT count(*) FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person2 = %s AND person1 = %s)", (TargetAccid, FromAccid, FromAccid, TargetAccid))
         if mycursor.fetchone()[0] > 0:

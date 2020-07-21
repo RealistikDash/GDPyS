@@ -771,7 +771,7 @@ def GetLevels(request):
     Type = int(request.form.get("type", 0))
 
     #pages
-    Offset = request.form.get("page", "0") * 10
+    Offset = int(request.form.get("page", 0)) * 10
 
     Order = "uploadDate"
     SQLParams = []

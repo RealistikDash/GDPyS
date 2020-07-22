@@ -1,5 +1,6 @@
 import threading
 import os
+from main import app
     
 def add_plugins():
     def exec_plugin(code):

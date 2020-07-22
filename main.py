@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, Blueprint, jsonify
+from flask import Flask, render_template, request, redirect, Blueprint, jsonify, session
 from functions import *
 from config import *
 from console import *
@@ -6,6 +6,7 @@ import threading
 
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
+ToolBlueprint = Blueprint("tools", __name__)
 app.config['JSON_SORT_KEYS'] = False
 
 @app.route("/")
@@ -218,8 +219,28 @@ def APINotFoundError(error):
         "status" : 404,
         "message" : "What you're looking for is not here."
     })
+###########TOOLS
+# TODO : Make separate file
+ExampleSession = {
+    "AccountID" : 0,
+    "Username" : "",
+    "Privileges" : 3,
+    "LoggedIn" : False
+}
+
+#fill session
+@ToolBlueprint.before_request
+def BeforeRequest(): 
+    if "LoggedIn" not in list(dict(session).keys()): #we checking if the session doesnt already exist
+        for x in list(ExampleSession.keys()):
+            session[x] = ExampleSession[x]
+
+@ToolBlueprint.route("/")
+def HomeToolRoute():
+    return render_template("home.html", session=session, title = "Home")
 
 app.register_blueprint(APIBlueprint, url_prefix='/api')
+app.register_blueprint(ToolBlueprint, url_prefix='/tools')
 
 if __name__ == "__main__":
     print(rf"""{Fore.BLUE}   _____ _____  _____        _____

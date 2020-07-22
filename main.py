@@ -8,6 +8,7 @@ app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
 ToolBlueprint = Blueprint("tools", __name__)
 app.config['JSON_SORT_KEYS'] = False
+app.config['SECRET_KEY'] = os.urandom(24).hex()
 
 @app.route("/")
 def Home():

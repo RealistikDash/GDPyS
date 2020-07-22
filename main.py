@@ -229,6 +229,12 @@ ExampleSession = {
     "LoggedIn" : False
 }
 
+def SetSession(NewSession: dict) -> None:
+    """Sets the session to something new."""
+    session.clear()
+    for a in list(NewSession.keys()):
+        session[a] = NewSession[a]
+
 #fill session
 @ToolBlueprint.before_request
 def BeforeRequest(): 
@@ -239,6 +245,18 @@ def BeforeRequest():
 @ToolBlueprint.route("/")
 def HomeToolRoute():
     return render_template("home.html", session=session, title = "Home")
+
+@ToolBlueprint.route("/login", methods=["GET", "POST"])
+def ToolsLoginRoute():
+    if request.method == "GET":
+        return render_template("login.html", session=session, title = "Login")
+    #POST REQUEST
+    A = ToolLoginCheck(request)
+    if not A[0]: #login failed
+        return render_template("login.html", session=session, title = "Login", BadAlert=A[1])
+    #login success
+    SetSession(A[1])
+    return redirect("/")
 
 app.register_blueprint(APIBlueprint, url_prefix='/api')
 app.register_blueprint(ToolBlueprint, url_prefix='/tools')

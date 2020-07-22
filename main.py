@@ -3,6 +3,7 @@ from functions import *
 from config import *
 from console import *
 import threading
+from plugin import add_plugins
 
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
@@ -232,5 +233,6 @@ if __name__ == "__main__":
                       |___/
  {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
     """)
+    add_plugins()
     threading.Thread(target=CronThread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

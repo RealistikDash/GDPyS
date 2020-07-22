@@ -233,7 +233,7 @@ def APINotFoundError(error):
         "message" : "What you're looking for is not here."
     })
 
-app.register_blueprint(APIBlueprint, url_prefix="/api")
+app.register_blueprint(APIBlueprint, url_prefix='/api')
 
 if __name__ == "__main__":
     print(rf"""{Fore.BLUE}   _____ _____  _____        _____ # this does not need to be logged as it should be on stdout

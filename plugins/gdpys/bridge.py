@@ -1,37 +1,35 @@
-import asyncio
-import threading
-from bridge import Bridge
+import listeners
 
-bridge = Bridge()
+l = listeners.Listener()
 
-class Client:
+class Bridge:
     
     def login(self, username):
-        pass
+        l.login(username)
     
     def register(self, username, email):
-        pass
+        l.register(username, email)
     
     def level_upload(self, username, levelid):
-        pass
+        l.level_upload(username, levelid)
     
     def suggest_stars(self, levelid, stars, featured):
-        pass
+        l.suggest_stars(levelid, stars, featured)
     
     def send_friend_request(self, accountid, toaccountid, comment):
-        pass
+        l.send_friend_request(accountid, toaccountid, comment)
     
     def upload_account_comment(self, username, comment):
-        pass
+        l.upload_account_comment(username, comment)
     
     def delete_account_comment(self, accountid, commentid):
-        pass
+        l.delete_account_comment(accountid, commentid)
     
     def upload_comment(self, username, comment):
-        pass
+        l.upload_comment(username, comment)
     
     def request_mod(self, userid):
-        pass
+        l.request_mod(userid)
     
     def like(self, like):
-        pass
+        l.like(like)

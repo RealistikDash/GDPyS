@@ -30,8 +30,7 @@ DefaultConfig = {
     "CheatlessExtremeDemonMinAttempts" : 100, #if a user submits an extreme demon score under this att count, they will be banned
     "CheatlessScoreCheck" : True,
     "CheatlessCronChecks" : True,
-    "CheatlessMaxStars" : 5000,
-    "LogLevel" : "INFO" # can be ERROR, DEBUG, WARNING, INFO
+    "CheatlessMaxStars" : 5000
 }
 
 class JsonFile:
@@ -70,7 +69,7 @@ else:
 
     if AllGood:
         # setup logging
-        logger.setLevel(UserConfig["LogLevel"])
+        logger.setLevel("INFO")
         logger.info(Fore.GREEN+"Configuration loaded successfully! Loading..." + Fore.RESET)
     else:
         #fixes config

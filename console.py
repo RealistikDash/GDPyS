@@ -4,7 +4,6 @@ from logger import logger
 from config import UserConfig
 
 init()
-logger.setLevel(UserConfig["LogLevel"])
 
 def Log(Text):
     """Logs a thing in console."""

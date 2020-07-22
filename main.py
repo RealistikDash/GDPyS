@@ -4,7 +4,9 @@ from config import *
 from console import *
 import threading
 from plugin import add_plugins
+from plugins.gdpys.client import Client
 
+client = Client()
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -21,12 +23,14 @@ def LoginHandler():
     Username = request.form["userName"]
     Password = request.form["password"]
     Log(f"{Username} attempts login...")
+    client.login(Username)
     answer = LoginCheck(Udid, Username, Password, request)
     return answer
 
 @app.route("/database///accounts/registerGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/registerGJAccount.php", methods=["GET", "POST"])
 def RegisterHandler():
+    client.register(request.form['userName'], FixUserInput(request.form["email"]))
     return RegisterFunction(request)
 
 
@@ -45,6 +49,7 @@ def AccountComments():
 @app.route("/database///uploadGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJAccComment20.php", methods=["GET", "POST"])
 def UploadAccComment():
+    client.upload_account_comment(request.form["userName"], request.form["comment"])
     Result = InsertAccComment(request)
     return Result
 
@@ -71,6 +76,7 @@ def GetScores():
 @app.route("/database///requestUserAccess.php", methods=["GET", "POST"])
 @app.route("/database/requestUserAccess.php", methods=["GET", "POST"])
 def GetMod():
+    client.request_mod(request.form["accountID"])
     return IsMod(request)
 
 @app.route("/database///getGJRewards.php", methods=["GET", "POST"])
@@ -101,11 +107,13 @@ def LoadRoute():
 @app.route("//database/likeGJItem211.php", methods=["GET", "POST"])
 @app.route("/database/likeGJItem211.php", methods=["GET", "POST"])
 def LikeRoute():
+    client.like(bool(request.form["like"]))
     return LikeFunction(request)
 
 @app.route("//database/uploadGJLevel21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJLevel21.php", methods=["GET", "POST"])
 def LevelUploadRoute():
+    client.level_upload(request.form["userName"], request.form["levelID"])
     return UploadLevel(request)
 
 @app.route("//database/getGJLevels21.php", methods=["GET", "POST"])
@@ -132,16 +140,19 @@ def CommentGetRoute():
 @app.route("//database/deleteGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/deleteGJAccComment20.php", methods=["GET", "POST"])
 def DeleteAccCommentRoute():
+    client.delete_account_comment(request.form["accountID"], request.form["commentID"])
     return DeleteAccComment(request)
 
 @app.route("//database/uploadGJComment21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJComment21.php", methods=["GET", "POST"])
 def PostCommentRoute():
+    client.upload_comment(request.form["userName"], request.form["comment"])
     return PostComment(request)
 
 @app.route("//database/suggestGJStars20.php", methods=["GET", "POST"])
 @app.route("/database/suggestGJStars20.php", methods=["GET", "POST"])
 def LevelSuggestRoute():
+    client.suggest_stars(request.form["levelID"], int(request.form["stars"]), request.form["feature"])
     return LevelSuggest(request)
 
 @app.route("//database/uploadGJMessage20.php", methods=["GET", "POST"])
@@ -166,6 +177,7 @@ def DownloadMessageRoute():
 
 @app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
 def DeleteCommentRoute():
+    client.delete_comment(request.form["accountID"], request.form["commentID"])
     return DeleteCommentHandler(request)
 
 @app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
@@ -182,6 +194,7 @@ def LevelLBsRoute():
 
 @app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
 def FriendReqRoute():
+    client.send_friend_request(request.form["accountID"], request.form["toAccountID"], request.form["comment"])
     return SendFriendReq(request)
 
 @app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
@@ -220,7 +233,7 @@ def APINotFoundError(error):
         "message" : "What you're looking for is not here."
     })
 
-app.register_blueprint(APIBlueprint, url_prefix='/api')
+app.register_blueprint(APIBlueprint, url_prefix="/api")
 
 if __name__ == "__main__":
     print(rf"""{Fore.BLUE}   _____ _____  _____        _____ # this does not need to be logged as it should be on stdout

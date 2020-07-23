@@ -1158,6 +1158,18 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mycursor.execute("UPDATE levels SET userName = %s, userID = %s, extID = %s WHERE levelID = %s LIMIT 1", (Command[1], User[0], User[1], Extra["LevelID"]))
         mydb.commit()
         return True
+    elif Command[0] == "daily" and HasPrivilege(Extra["AccountID"], ModSetDaily):
+        #port of cvoltons command as its his system
+        Tmw = (datetime.today() + timedelta(days=1)).total_seconds()
+        mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
+        Timestamp = mycursor.fetchone()
+        if Timestamp == None:
+            NewTimestamp = Tmw #no prev up to date levels
+        else:
+            NewTimestamp = Timestamp + 86400 #add a day
+        mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp) VALUES (%s, %s)", (Extra["LevelID"], NewTimestamp))
+        mydb.commit()
+        return True
     return False
 
 def PostComment(request):

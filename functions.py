@@ -1870,7 +1870,7 @@ def ScoreSubmitHandler(request):
     mycursor.execute("SELECT * FROM levelscores WHERE accountID = %s and levelID = %s LIMIT 1", (AccountID, LevelID))
     Score = mycursor.fetchone()
     #new scores
-    if Score == None and Percent != 0: #no prev scores
+    if Score == None or Percent != 0: #no prev scores
         Log("New score on level!")
         #creting new score
         #dont thread the check

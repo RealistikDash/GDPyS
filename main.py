@@ -207,6 +207,10 @@ def DeleteFriendReqRoute():
 def GetFriendReqRoute():
     return GetFriendReqList(request)
 
+@app.route("/database/getGJDailyLevel.php")
+def GetDailyRoute():
+    return GetDaily(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):

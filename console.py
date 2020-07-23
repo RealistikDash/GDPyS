@@ -1,30 +1,26 @@
 from colorama import Fore, init
 from datetime import datetime
+from logger import logger
+from config import UserConfig
 
 init()
 
-def FormattedTime(DateTimeObject = None):
-    """Returns a formatted time string."""
-    if DateTimeObject == None:
-        DateTimeObject = datetime.now()
-    return DateTimeObject.strftime("%H:%M:%S")
-
 def Log(Text):
     """Logs a thing in console."""
-    print(f"{Fore.MAGENTA} [GDPyS] [{FormattedTime()}] {Text} {Fore.RESET}")
+    logger.info(f"{Fore.MAGENTA}[GDPyS] {Text}{Fore.RESET}")
 
 def Success(Text):
     """Logs a thing in console."""
-    print(f"{Fore.GREEN} [GDPyS] [{FormattedTime()}] {Text} {Fore.RESET}")
+    logger.info(f"{Fore.GREEN}[GDPyS] {Text}{Fore.RESET}")
 
 def Fail(Text):
     """Logs a thing in console."""
-    print(f"{Fore.RED} [GDPyS] [{FormattedTime()}] {Text} {Fore.RESET}")
+    logger.warning(f"{Fore.RED}[GDPyS] {Text}{Fore.RESET}") # might be changed to error later
 
 def CLCheck(Text):
     """Logs a CheatlessAC message to console."""
-    print(f"{Fore.MAGENTA} [Cheatless] [{FormattedTime()}] {Text} {Fore.RESET}")
+    logger.info(f"{Fore.MAGENTA}[Cheatless] {Text}{Fore.RESET}")
 
 def CLBan(Text):
     """Logs when a person gets anticheat banned."""
-    print(f"{Fore.RED} [Cheatless] [{FormattedTime()}] {Text} {Fore.RESET}")
+    logger.info(f"{Fore.RED}[Cheatless] {Text}{Fore.RESET}")

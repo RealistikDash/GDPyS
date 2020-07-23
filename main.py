@@ -207,7 +207,7 @@ def DeleteFriendReqRoute():
 def GetFriendReqRoute():
     return GetFriendReqList(request)
 
-@app.route("/database/getGJDailyLevel.php")
+@app.route("/database/getGJDailyLevel.php", methods=["GET", "POST"])
 def GetDailyRoute():
     return GetDaily(request)
 

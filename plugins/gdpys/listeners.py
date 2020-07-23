@@ -62,5 +62,10 @@ class Listener: # this has taken many nights of sleep deprivation ~spook
         for name, coro in self.coros.items():
             if name=="on_like":
                 asyncio.run(coro(like))
+    
+    def ready(self):
+        for name, coro in self.coros.items():
+            if name=="on_ready":
+                asyncio.run(coro())
                 
 listener = Listener()

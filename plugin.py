@@ -2,8 +2,10 @@ import threading
 import os
     
 def add_plugins():
-    def exec_plugin(code):
+    def exec_plugin(code, name):
         exec(code)
+        print(f"Loaded plugin {name}!")
+
     if not os.path.exists("plugins"):
         os.mkdir("plugins")
     for plugin in os.listdir("plugins"):
@@ -11,4 +13,4 @@ def add_plugins():
             continue
         print(f"Loading plugin {plugin}")
         f = open("plugins/" + plugin, "r")
-        threading.Thread(target=exec_plugin, args=[f.read()]).start()
+        threading.Thread(target=exec_plugin, args=[f.read(), plugin]).start()

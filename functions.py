@@ -1929,7 +1929,7 @@ def MaxStarCountBan() -> None:
     # TODO : Make the same thing for usercoins and regular coins
     if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
         StartTime = time.time()
-        logger.info("Running CheatlessAC Cron Starcount Check... ", end="")
+        logger.info("Running CheatlessAC Cron Starcount Check... ")
         TotalStars = 187 #from RobTop levels
         #get all star rated levels
         mycursor.execute("SELECT starStars FROM levels WHERE starStars > 0")

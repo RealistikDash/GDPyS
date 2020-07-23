@@ -33,3 +33,6 @@ class Bridge: # this might be deleted later ~spook
     
     def like(self, like):
         l.like(like)
+    
+    def delete_comment(self, accountid, commentid):
+        l.delete_comment(accountid, commentid)

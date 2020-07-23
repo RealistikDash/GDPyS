@@ -42,6 +42,11 @@ class Listener: # this has taken many nights of sleep deprivation ~spook
         for name, coro in self.coros.items():
             if name=="on_delete_account_comment":
                 asyncio.run(coro(accountid, commentid))
+    
+    def delete_comment(self, accountid, commentid):
+        for name, coro in self.coros.items():
+            if name=="on_delete_comment":
+                asyncio.run(coro(accountid, commentid))
 
     def upload_comment(self, username, comment):
         for name, coro in self.coros.items():

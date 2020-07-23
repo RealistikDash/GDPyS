@@ -1160,7 +1160,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         return True
     elif Command[0] == "daily" and HasPrivilege(Extra["AccountID"], ModSetDaily):
         #port of cvoltons command as its his system
-        Tmw = (datetime.today() + timedelta(days=1)).total_seconds()
+        Tmw = time.mktime((datetime.today() + timedelta(days=1)).timetuple())
         mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
         Timestamp = mycursor.fetchone()
         if Timestamp == None:
@@ -2280,6 +2280,6 @@ def GetDaily(request):
     else:
         DayToday = datetime.today().weekday() + 1#add 1 as starts at o
         EndTime = datetime.today() + timedelta(days=7-DayToday) #new level every monday
-        TimeToChange = EndTime.total_seconds()
+        TimeToChange = time.mktime(EndTime.timetuple())
         LevelID += 100001 #idk what he was thinking either
     return f"{LevelID}|{TimeToChange}"

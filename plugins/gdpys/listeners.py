@@ -5,7 +5,6 @@ class Listener: # this has taken many nights of sleep deprivation ~spook
         self.coros = {}
         
     def event(self, coro):
-        print(coro.__name__)
         self.coros[coro.__name__] = coro
         return coro
             
@@ -58,3 +57,5 @@ class Listener: # this has taken many nights of sleep deprivation ~spook
         for name, coro in self.coros.items():
             if name=="on_like":
                 asyncio.run(coro(like))
+                
+listener = Listener()

@@ -1,6 +1,6 @@
-import listeners
+from . import listeners
 
-l = listeners.Listener()
+l = listeners.listener
 
 class Bridge: # this might be deleted later ~spook
     

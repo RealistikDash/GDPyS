@@ -2,7 +2,7 @@ import listeners
 
 l = listeners.Listener()
 
-class Bridge:
+class Bridge: # this might be deleted later ~spook
     
     def login(self, username):
         l.login(username)

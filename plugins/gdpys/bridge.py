@@ -36,3 +36,6 @@ class Bridge: # this might be deleted later ~spook
     
     def delete_comment(self, accountid, commentid):
         l.delete_comment(accountid, commentid)
+    
+    def ready(self):
+        l.ready()

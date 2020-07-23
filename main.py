@@ -276,7 +276,8 @@ app.register_blueprint(APIBlueprint, url_prefix='/api')
 app.register_blueprint(ToolBlueprint, url_prefix='/tools')
 
 if __name__ == "__main__":
-    print(rf"""{Fore.BLUE}   _____ _____  _____        _____ # this does not need to be logged as it should be on stdout
+    # this does not need to be logged as it should be on stdout
+    print(rf"""{Fore.BLUE}   _____ _____  _____        _____ 
   / ____|  __ \|  __ \      / ____|
  | |  __| |  | | |__) |   _| (___
  | | |_ | |  | |  ___/ | | |\___ \
@@ -287,5 +288,6 @@ if __name__ == "__main__":
  {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
     """)
     add_plugins()
+    bridge.ready()
     threading.Thread(target=CronThread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

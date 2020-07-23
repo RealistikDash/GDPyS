@@ -9,6 +9,6 @@ def add_plugins():
     for plugin in os.listdir("plugins"):
         if os.path.isdir("plugins/" + plugin):
             continue
-        print(plugin)
+        print(f"Loading plugin {plugin}")
         f = open("plugins/" + plugin, "r")
         threading.Thread(target=exec_plugin, args=[f.read()]).start()

@@ -3,9 +3,11 @@
 import json
 from os import path
 from colorama import init, Fore
-
+from logger import logger
+from datetime import datetime
 
 init() #Colorama thing
+
 DefaultConfig = {
     "Port" : 80,
     #SQL Info
@@ -50,10 +52,11 @@ class JsonFile:
 
 UserConfig = JsonFile.GetDict("config.json")
 #Config Checks
+
 if UserConfig == {}:
-    print(Fore.YELLOW+" No config found! Generating!"+Fore.RESET)
+    logger.warning(Fore.YELLOW+"No config found! Generating!"+Fore.RESET)
     JsonFile.SaveDict(DefaultConfig, "config.json")
-    print(Fore.WHITE+" Config created! It is named config.json. Edit it accordingly and start the server again!")
+    logger.info(Fore.WHITE+"Config created! It is named config.json. Edit it accordingly and start the server again!")
     exit()
 else:
     #config check and updater
@@ -65,13 +68,15 @@ else:
             NeedSet.append(key)
 
     if AllGood:
-        print(Fore.GREEN+" Configuration loaded successfully! Loading..." + Fore.RESET)
+        # setup logging
+        logger.setLevel("INFO")
+        logger.info(Fore.GREEN+"Configuration loaded successfully! Loading..." + Fore.RESET)
     else:
         #fixes config
-        print(Fore.BLUE+" Updating config..." + Fore.RESET)
+        logger.info(Fore.BLUE+"Updating config..." + Fore.RESET)
         for Key in NeedSet:
             UserConfig[Key] = DefaultConfig[Key]
-            print(Fore.BLUE+f" Option {Key} added to config. Set default to '{DefaultConfig[Key]}'." + Fore.RESET)
-        print(Fore.GREEN+" Config updated! Please edit the new values to your liking." + Fore.RESET)
+            logger.info(Fore.BLUE+f"Option {Key} added to config. Set default to '{DefaultConfig[Key]}'." + Fore.RESET)
+        logger.info(Fore.GREEN+"Config updated! Please edit the new values to your liking." + Fore.RESET)
         JsonFile.SaveDict(UserConfig, "config.json")
         exit()

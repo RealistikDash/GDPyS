@@ -16,6 +16,7 @@ from threading import Thread
 from Enums import *
 import string
 from logger import logger
+from datetime import datetime, timedelta
 
 try:
     mydb = mysql.connector.connect(
@@ -2246,4 +2247,27 @@ def ToolLoginCheck(request) -> bool:
         "Privileges" : User[3],
         "LoggedIn" : True
     })
-    
+
+def GetDaily(request):
+    """Responds with a daily or weekly level. Using Cvolton's system."""
+    Weekly = int(request.form.get("weekly", 0))
+    Timestamp = round(time.time())
+    mycursor.execute("SELECT feaID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
+    LevelID = mycursor.fetchone()
+    if LevelID == None:
+        return "-1"
+    LevelID = LevelID[0]
+
+    #calculate time till level change
+    TimeToChange = 0
+    if not Weekly:
+        #this is big brain time
+        now = datetime.now()
+        SecondsSinceMidnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds() #calculate time since midnight
+        TimeToChange = 86400 - SecondsSinceMidnight #substract for seconds in day to get time til next midnight
+    else:
+        DayToday = datetime.today().weekday() + 1#add 1 as starts at o
+        EndTime = datetime.today() + timedelta(days=7-DayToday) #new level every monday
+        TimeToChange = EndTime.total_seconds()
+        LevelID += 100001 #idk what he was thinking either
+    return f"{LevelID}|{TimeToChange}"

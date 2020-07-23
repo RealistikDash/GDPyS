@@ -38,6 +38,27 @@ Ranks = {}
 PrivilegeCache = {} # Privileges will be cached here
 LevelDLCache = {} #the level data will be stored here so it doesnt have to be redownloaded
 BrcyptCache = {} #so we dont call mysql in gjpchecks
+UserIDCache = {} #caches user ids (1 less query!)
+
+def CacheUserIDs():
+    """Caches all UserIDs from table. Used to remove the query from AIDToUID."""
+    Log("Caching UserIDs.")
+    mycursor.execute("SELECT extID, userID FROM users")
+    UserIDs = mycursor.fetchall()
+    for a in UserIDs:
+        UserIDCache[int(a[0])] = a[1]
+
+def GetUIDFromCache(AccID: int) -> int:
+    """Returns UID from cache if there. Caches it if not there."""
+    AccID = int(AccID)
+    try:
+        return UserIDCache[AccID]
+    except IndexError:
+        mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (AccID,))
+        UserIDCache[AccID] = mycursor.fetchone()[0]
+        Log(f"Cached UserID for {AccID}")
+        return UserIDCache[AccID]
+        
 
 def GetBcryptPassword(AccountID):
     """Gets a users password from cache or gets it from db and caches it."""
@@ -221,11 +242,7 @@ def GetUserDataFunction(request):
 
 def AIDToUID(AccountID: int):
     """Gets user ID from Account ID."""
-    mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (AccountID,))
-    Thing = mycursor.fetchall()
-    if len(Thing) == 0:
-        return None
-    return Thing[0][0]
+    return GetUIDFromCache(AccountID) #calls this function now
 
 def TimeAgoFromNow(Timestamp):
     """Returns a string of how long ago from now was a timestamp."""
@@ -488,6 +505,7 @@ def CronThread():
     while True:
         Log("Running cron!")
         StartTime = time.time()
+        CacheUserIDs()
         CacheRanks()
         CalculateCP()
         MaxStarCountBan()

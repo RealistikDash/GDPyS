@@ -1148,7 +1148,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     #    "LevelID" : 432423,
     #    "AccountID" : 543534
     #}
-    Command = Comment[1:].split(" ")
+    Command = Comment[len(UserConfig["CommandPrefix"]):].split(" ")
     ###I WANT SWITCH STATEMENTS
     if Command[0] == "setacc" and HasPrivilege(Extra["AccountID"], CommandSetAcc):
         mycursor.execute("SELECT userID, extID FROM users WHERE isRegistered = 1 AND userName LIKE %s LIMIT 1", (Command[1],))
@@ -2040,14 +2040,31 @@ def GetLevelDL(LevelID: int) -> str:
         CacheLevel(LevelID) #cache it if not cached
     return LevelDLCache[LevelID] 
 
+def GetUserString(UID):
+    """Returns user string."""
+    mycursor.execute("SELECT userName, extID, userID FROM users WHERE userID = %s LIMIT 1", (UID,))
+    User = mycursor.fetchone() #assume it exist
+    return f"{User[2]}:{User[0]}:{User[1]}"
+
 def DLLevel(request):
     """Returns a stored level."""
 
     LevelID = int(request.form["levelID"])
     Log(f"Getting level {LevelID}!")
-    if LevelID == -1:
-        LevelID = int(request.form["feaID"])
-    #TODO: ADD WEEKLY
+    IsDaily = False
+    FeaID = 0
+    if LevelID == -1: #would make into dict switch-like statement but it would be slower
+        mycursor.execute("SELECT levelID, feaID FROM dialyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
+        a=mycursor.fetchone()
+        LevelID = a[0]
+        FeaID = a[1]
+        IsDaily = True
+    elif LevelID == -2: #would make into dict switch-like statement but it would be slower
+        mycursor.execute("SELECT levelID, feaID FROM dialyfeatures WHERE timestamp < %s AND type = 1 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
+        a=mycursor.fetchone()
+        LevelID = a[0]
+        FeaID = a[1]+100001
+        IsDaily = True
 
     #getting the level
     mycursor.execute("SELECT * FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
@@ -2116,8 +2133,12 @@ def DLLevel(request):
     })
 
     ReturnStr += f"#{SoloGen(LevelFiles)}#"
-    CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0"
-    ReturnStr += SoloGen2(CoolString) + "#" + CoolString
+    CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},{FeaID}"
+    ReturnStr += SoloGen2(CoolString) + "#"
+    if not IsDaily:
+        ReturnStr += CoolString
+    else:
+        ReturnStr += GetUserString(Level[35])
     Success(f"Served level {LevelID}!")
     return ReturnStr
 

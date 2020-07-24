@@ -2283,4 +2283,4 @@ def GetDaily(request):
         EndTime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=7-DayToday) #new level every monday
         TimeToChange = time.mktime(EndTime.timetuple())
         LevelID += 100001 #idk what he was thinking either
-    return f"{LevelID}|{TimeToChange}"
+    return f"{LevelID}|{round(TimeToChange)}"

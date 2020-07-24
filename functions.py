@@ -2045,7 +2045,9 @@ def DLLevel(request):
 
     LevelID = int(request.form["levelID"])
     Log(f"Getting level {LevelID}!")
-    #include dailies around here
+    if LevelID == -1:
+        LevelID = int(request.form["feaID"])
+    #TODO: ADD WEEKLY
 
     #getting the level
     mycursor.execute("SELECT * FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
@@ -2264,7 +2266,7 @@ def GetDaily(request):
     """Responds with a daily or weekly level. Using Cvolton's system."""
     Weekly = int(request.form.get("weekly", 0))
     Timestamp = round(time.time())
-    mycursor.execute("SELECT feaID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
+    mycursor.execute("SELECT levelID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
     LevelID = mycursor.fetchone()
     if LevelID == None:
         Fail("No daily level set!")

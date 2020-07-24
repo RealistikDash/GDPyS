@@ -2054,13 +2054,13 @@ def DLLevel(request):
     IsDaily = False
     FeaID = 0
     if LevelID == -1: #would make into dict switch-like statement but it would be slower
-        mycursor.execute("SELECT levelID, feaID FROM dialyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
+        mycursor.execute("SELECT levelID, feaID FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
         a=mycursor.fetchone()
         LevelID = a[0]
         FeaID = a[1]
         IsDaily = True
     elif LevelID == -2: #would make into dict switch-like statement but it would be slower
-        mycursor.execute("SELECT levelID, feaID FROM dialyfeatures WHERE timestamp < %s AND type = 1 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
+        mycursor.execute("SELECT levelID, feaID FROM dailyfeatures WHERE timestamp < %s AND type = 1 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
         a=mycursor.fetchone()
         LevelID = a[0]
         FeaID = a[1]+100001

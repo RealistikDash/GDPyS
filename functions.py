@@ -2267,6 +2267,7 @@ def GetDaily(request):
     mycursor.execute("SELECT feaID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
     LevelID = mycursor.fetchone()
     if LevelID == None:
+        Fail("No daily level set!")
         return "-1"
     LevelID = LevelID[0]
 
@@ -2278,7 +2279,7 @@ def GetDaily(request):
         SecondsSinceMidnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds() #calculate time since midnight
         TimeToChange = 86400 - SecondsSinceMidnight #substract for seconds in day to get time til next midnight
     else:
-        DayToday = datetime.today().weekday() + 1#add 1 as starts at o
+        DayToday = datetime.today().weekday()
         EndTime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=7-DayToday) #new level every monday
         TimeToChange = time.mktime(EndTime.timetuple())
         LevelID += 100001 #idk what he was thinking either

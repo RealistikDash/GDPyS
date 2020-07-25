@@ -856,12 +856,12 @@ def GetLevels(request):
         SQLParams.append("starFeatured = 1 OR starFeatured = 2")
         Order = "uploadDate, rateDate DESC"
     elif Type == 7:
-        SQLParams.append("Magic = 1")
+        SQLParams.append("magic = 1")
     elif Type == 10: #mappacks
         SQLParams.append("levelID in (%s)")
         SQLFormats.append(Form["str"])
     elif Type == 11:
-        SQLParams.append("Awarded = 1")
+        SQLParams.append("awarded = 1")
     elif Type == 12:
         # TODO: Followed
         pass
@@ -1098,14 +1098,14 @@ def GetRoleForUser(AccountID):
         "Badge" : 0,
         "Colour" : "256,256,256"
     }
-    mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    mycursor.execute("SELECT privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
     UserPriv = mycursor.fetchone()
     if UserPriv == None:
         return Default
 
     UserPriv = UserPriv[0]
 
-    mycursor.execute("SELECT ID, Name, Colour FROM PrivilegeGroups WHERE Privileges = %s LIMIT 1", (UserPriv,))
+    mycursor.execute("SELECT id, name, colour FROM privilegegroups WHERE privileges = %s LIMIT 1", (UserPriv,))
     PrivRole = mycursor.fetchone()
     if PrivRole == None:
         return Default
@@ -1208,7 +1208,7 @@ def HasPrivilege(AccountID: int, Privilege):
     
     #username either not cached or expired
     #getting privs from db
-    mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    mycursor.execute("SELECT privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
     DBPriv = mycursor.fetchone()
     if DBPriv == None:
         return False
@@ -1238,7 +1238,7 @@ class GDPySBot:
 
     def _CheckBot(self):
         """Checks if the bot account exists."""
-        mycursor.execute("SELECT COUNT(*) FROM accounts WHERE IsBot = 1")
+        mycursor.execute("SELECT COUNT(*) FROM accounts WHERE isBot = 1")
         BotCount = mycursor.fetchone()[0]
         if BotCount == 0:
             return False
@@ -1246,7 +1246,7 @@ class GDPySBot:
 
     def _FetchID(self):
         """Gets the bots accountID."""
-        mycursor.execute("SELECT accountID FROM accounts WHERE IsBot = 1 LIMIT 1")
+        mycursor.execute("SELECT accountID FROM accounts WHERE isBot = 1 LIMIT 1")
         return mycursor.fetchone()[0]
     
     def _SetUserId(self):
@@ -1258,7 +1258,7 @@ class GDPySBot:
         """Creates the bot account."""
         Timestamp = round(time.time())
         Password = HashPassword(RandomString(16)) #no one ever ever ever should access the bot account. if they do, you messed up big time
-        mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, IsBot) VALUES (%s, %s, 'rel@es.to', '', '', %s, 1)", (BotName, Password, Timestamp))
+        mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, isBot) VALUES (%s, %s, 'rel@es.to', '', '', %s, 1)", (BotName, Password, Timestamp))
         mydb.commit() #so the fetchid before works???
         mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, '1.1.1.1')", (self._FetchID(), BotName,))
         mydb.commit()
@@ -1602,7 +1602,7 @@ def UserSearchHandler(request):
 def APIGetLevel(LevelID):
     """API handler that returns json for level info."""
     #ok here we get the level data from db
-    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLength, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, Awarded, Magic, starDemon, starAuto, starFeatured, starEpic FROM levels WHERE isDeleted = 0 and levelID = %s LIMIT 1",
+    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLength, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, awarded, magic, starDemon, starAuto, starFeatured, starEpic FROM levels WHERE isDeleted = 0 and levelID = %s LIMIT 1",
     (
         LevelID,
     ))
@@ -1842,11 +1842,11 @@ def UserCalcCP(UserID : int):
     UserCP += mycursor.fetchone()[0]
     #count magic levels
     if UserConfig["MagicGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE Magic > 0 AND userID = %s", (UserID,))
+        mycursor.execute("SELECT COUNT(*) FROM levels WHERE magic > 0 AND userID = %s", (UserID,))
         UserCP += mycursor.fetchone()[0]
     #count awarded levels
     if UserConfig["AwardGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE Awarded > 0 AND userID = %s", (UserID,))
+        mycursor.execute("SELECT COUNT(*) FROM levels WHERE awarded > 0 AND userID = %s", (UserID,))
         UserCP += mycursor.fetchone()[0]
     
     #lastly we give the cp to them
@@ -2258,7 +2258,7 @@ def ToolLoginCheck(request) -> bool:
     Username = request.form["username"]
     Password = request.form["password"]
 
-    mycursor.execute("SELECT userName, password, accountID, Privileges FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
+    mycursor.execute("SELECT userName, password, accountID, privileges FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
     User = mycursor.fetchone()
     if User == None:
         return (False, "User not found!")

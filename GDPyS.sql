@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 27, 2020 at 09:11 PM
+-- Generation Time: Jul 25, 2020 at 07:29 PM
 -- Server version: 5.7.28-0ubuntu0.18.04.4
 -- PHP Version: 7.1.33-9+ubuntu18.04.1+deb.sury.org+1
 
@@ -67,9 +67,8 @@ CREATE TABLE `accounts` (
   `saveKey` blob,
   `discordID` bigint(20) NOT NULL DEFAULT '0',
   `discordLinkReq` bigint(20) NOT NULL DEFAULT '0',
-  `BcryptGJP` varchar(65) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `Privileges` int(6) NOT NULL DEFAULT '30',
-  `IsBot` int(1) NOT NULL DEFAULT '0'
+  `privileges` int(6) NOT NULL DEFAULT '30',
+  `isBot` int(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -252,8 +251,8 @@ CREATE TABLE `levels` (
   `isCPShared` int(11) NOT NULL DEFAULT '0',
   `isDeleted` int(11) NOT NULL DEFAULT '0',
   `isLDM` int(11) NOT NULL DEFAULT '0',
-  `Awarded` int(11) NOT NULL DEFAULT '0',
-  `Magic` int(11) NOT NULL DEFAULT '0'
+  `awarded` int(11) NOT NULL DEFAULT '0',
+  `magic` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -384,14 +383,14 @@ CREATE TABLE `poll` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `PrivilegeGroups`
+-- Table structure for table `privilegegroups`
 --
 
-CREATE TABLE `PrivilegeGroups` (
-  `ID` int(20) NOT NULL,
-  `Name` varchar(20) NOT NULL,
-  `Privileges` bigint(20) NOT NULL,
-  `Colour` varchar(255) NOT NULL
+CREATE TABLE `privilegegroups` (
+  `id` int(20) NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `privileges` bigint(20) NOT NULL,
+  `colour` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -717,10 +716,10 @@ ALTER TABLE `poll`
   ADD PRIMARY KEY (`optionID`);
 
 --
--- Indexes for table `PrivilegeGroups`
+-- Indexes for table `privilegegroups`
 --
-ALTER TABLE `PrivilegeGroups`
-  ADD PRIMARY KEY (`ID`);
+ALTER TABLE `privilegegroups`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `quests`
@@ -786,17 +785,17 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `acccomments`
 --
 ALTER TABLE `acccomments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `actions`
 --
 ALTER TABLE `actions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `bannedips`
 --
@@ -811,7 +810,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `cpshares`
 --
@@ -821,12 +820,12 @@ ALTER TABLE `cpshares`
 -- AUTO_INCREMENT for table `dailyfeatures`
 --
 ALTER TABLE `dailyfeatures`
-  MODIFY `feaID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `feaID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `friendreqs`
 --
 ALTER TABLE `friendreqs`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `friendships`
 --
@@ -836,17 +835,17 @@ ALTER TABLE `friendships`
 -- AUTO_INCREMENT for table `gauntlets`
 --
 ALTER TABLE `gauntlets`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `levels`
 --
 ALTER TABLE `levels`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 --
 -- AUTO_INCREMENT for table `levelscores`
 --
 ALTER TABLE `levelscores`
-  MODIFY `scoreID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `scoreID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `links`
 --
@@ -856,12 +855,12 @@ ALTER TABLE `links`
 -- AUTO_INCREMENT for table `mappacks`
 --
 ALTER TABLE `mappacks`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `modactions`
 --
@@ -883,10 +882,10 @@ ALTER TABLE `modips`
 ALTER TABLE `poll`
   MODIFY `optionID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table `PrivilegeGroups`
+-- AUTO_INCREMENT for table `privilegegroups`
 --
-ALTER TABLE `PrivilegeGroups`
-  MODIFY `ID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `privilegegroups`
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `quests`
 --
@@ -911,7 +910,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `songs`
 --
 ALTER TABLE `songs`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=931350;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT for table `suggest`
 --
@@ -921,7 +920,7 @@ ALTER TABLE `suggest`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

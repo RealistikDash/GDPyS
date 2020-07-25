@@ -37,3 +37,29 @@ hr {
 .dropdown-item {
    color: white;
 }
+
+.circular {
+   border-radius: 50%;
+}
+
+.masthead {
+   height: 100vh;
+   min-height: 200px;
+   max-height: 300px;
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+   margin-bottom: 20px;
+}
+
+.Hometext {
+   margin-top: 50px;
+   margin-bottom: 50px;
+}
+
+.FitBgImage {
+   background-position: center;
+   background-size: cover;
+   background-repeat: no-repeat;
+}
+

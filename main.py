@@ -6,6 +6,7 @@ import threading
 from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
 from migrations import ImportGDPySDatabase
+from constants import __version__
 
 bridge = Bridge()
 app = Flask(__name__)
@@ -263,7 +264,7 @@ def BeforeRequest():
 
 @ToolBlueprint.route("/")
 def HomeToolRoute():
-    return render_template("home.html", session=session, title = "Home")
+    return render_template("home.html", session=session, title = "Home", ver=__version__)
 
 @ToolBlueprint.route("/login", methods=["GET", "POST"])
 def ToolsLoginRoute():

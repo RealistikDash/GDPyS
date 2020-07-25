@@ -16,3 +16,5 @@ ModReqMod = 2 << 11
 ModSuggestLevel = 2 << 12
 ModBanUser = 2 << 13
 ModSetDaily = 2 << 14
+
+__version__ = "InDev"

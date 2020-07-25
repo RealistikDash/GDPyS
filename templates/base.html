@@ -11,6 +11,12 @@
         <!--CSS IMPORTS-->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
         <link rel="stylesheet" href="/static/css/GDPyS.css">
+        <!--
+        META
+        ETAM
+        TAME
+        AMET
+        -->
         {% block head %}{% endblock %}
     </head>
     <body>
@@ -54,6 +60,16 @@
             </button>
         </div>
         {% endif %}
+        <header class="masthead" style="background: linear-gradient(90deg,#000, #00000000,#000), url({% block image %}{% endblock %}) !important; margin-top: 40px;">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12 text-center">
+                        <h1 class="font-weight-light PageName">{{ StandardPass['PageTitle'] }}</h1>
+                        <!--<p class="lead">RealistikDash was here</p>-->
+                    </div>
+                </div>
+            </div>
+        </header>
         <div class="container">
             {% block content %}{% endblock %}
         </div>

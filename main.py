@@ -5,6 +5,7 @@ from console import *
 import threading
 from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
+from migrations import ImportGDPySDatabase
 
 bridge = Bridge()
 app = Flask(__name__)

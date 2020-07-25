@@ -9,10 +9,10 @@
                       |___/
 The main CSS style for the GDPyS frontend portion.
 */
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora&display=swap');
 
 body, html {
-    font-family: "Roboto";
+    font-family: "Sora";
     background-color: #2e323c;
     background-size: cover;
     height: 100%;

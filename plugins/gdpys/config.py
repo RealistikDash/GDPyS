@@ -24,3 +24,7 @@ class Config:
             return json.load(open(self.pluginconfig, "r"))[key]
         except KeyError:
             raise ConfigError("Could not find key in config!")
+    
+    @property
+    def config(self):
+        return open(self.pluginconfig, "r").read()

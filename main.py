@@ -278,6 +278,14 @@ def ToolsLoginRoute():
     SetSession(A[1])
     return redirect("/")
 
+@ToolBlueprint.errorhandler(500)
+def Tool500():
+    return render_template("500.html", session=session, title = "Code Broke")
+
+@ToolBlueprint.errorhandler(404)
+def Tool404():
+    return render_template("404.html", session=session, title = "Page Missing")
+
 app.register_blueprint(APIBlueprint, url_prefix='/api')
 app.register_blueprint(ToolBlueprint, url_prefix='/tools')
 

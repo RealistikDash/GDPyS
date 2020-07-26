@@ -56,14 +56,6 @@
                 {% endif %}
             </ul>
         </nav>
-        {% if BadAlert %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ BadAlert }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {% endif %}
         <header class="masthead" style="background: linear-gradient(90deg,#000, #00000000,#000), url({% block image %}{% endblock %}) no-repeat !important; margin-top: 40px; background-size: cover !important">
             <div class="container h-100">
                 <div class="row h-100 align-items-center">
@@ -74,6 +66,14 @@
                 </div>
             </div>
         </header>
+        {% if BadAlert %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ BadAlert }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}
         <div class="container">
             {% block content %}{% endblock %}
         </div>

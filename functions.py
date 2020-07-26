@@ -13,9 +13,10 @@ import os
 import urllib.parse
 import bcrypt
 from threading import Thread
-from Enums import *
+from constants import *
 import string
 from logger import logger
+from datetime import datetime, timedelta
 
 try:
     mydb = mysql.connector.connect(
@@ -855,12 +856,12 @@ def GetLevels(request):
         SQLParams.append("starFeatured = 1 OR starFeatured = 2")
         Order = "uploadDate, rateDate DESC"
     elif Type == 7:
-        SQLParams.append("Magic = 1")
+        SQLParams.append("magic = 1")
     elif Type == 10: #mappacks
         SQLParams.append("levelID in (%s)")
         SQLFormats.append(Form["str"])
     elif Type == 11:
-        SQLParams.append("Awarded = 1")
+        SQLParams.append("awarded = 1")
     elif Type == 12:
         # TODO: Followed
         pass
@@ -1097,14 +1098,14 @@ def GetRoleForUser(AccountID):
         "Badge" : 0,
         "Colour" : "256,256,256"
     }
-    mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    mycursor.execute("SELECT privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
     UserPriv = mycursor.fetchone()
     if UserPriv == None:
         return Default
 
     UserPriv = UserPriv[0]
 
-    mycursor.execute("SELECT ID, Name, Colour FROM PrivilegeGroups WHERE Privileges = %s LIMIT 1", (UserPriv,))
+    mycursor.execute("SELECT id, name, colour FROM privilegegroups WHERE privileges = %s LIMIT 1", (UserPriv,))
     PrivRole = mycursor.fetchone()
     if PrivRole == None:
         return Default
@@ -1147,7 +1148,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     #    "LevelID" : 432423,
     #    "AccountID" : 543534
     #}
-    Command = Comment[1:].split(" ")
+    Command = Comment[len(UserConfig["CommandPrefix"]):].split(" ")
     ###I WANT SWITCH STATEMENTS
     if Command[0] == "setacc" and HasPrivilege(Extra["AccountID"], CommandSetAcc):
         mycursor.execute("SELECT userID, extID FROM users WHERE isRegistered = 1 AND userName LIKE %s LIMIT 1", (Command[1],))
@@ -1155,6 +1156,18 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         if User is None:
             return False
         mycursor.execute("UPDATE levels SET userName = %s, userID = %s, extID = %s WHERE levelID = %s LIMIT 1", (Command[1], User[0], User[1], Extra["LevelID"]))
+        mydb.commit()
+        return True
+    elif Command[0] == "daily" and HasPrivilege(Extra["AccountID"], ModSetDaily):
+        #port of cvoltons command as its his system
+        Tmw = time.mktime((datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=1)).timetuple())
+        mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
+        Timestamp = mycursor.fetchone()
+        if Timestamp == None:
+            NewTimestamp = Tmw #no prev up to date levels
+        else:
+            NewTimestamp = Timestamp + 86400 #add a day
+        mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp) VALUES (%s, %s)", (Extra["LevelID"], NewTimestamp))
         mydb.commit()
         return True
     return False
@@ -1195,7 +1208,7 @@ def HasPrivilege(AccountID: int, Privilege):
     
     #username either not cached or expired
     #getting privs from db
-    mycursor.execute("SELECT Privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
+    mycursor.execute("SELECT privileges FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
     DBPriv = mycursor.fetchone()
     if DBPriv == None:
         return False
@@ -1225,7 +1238,7 @@ class GDPySBot:
 
     def _CheckBot(self):
         """Checks if the bot account exists."""
-        mycursor.execute("SELECT COUNT(*) FROM accounts WHERE IsBot = 1")
+        mycursor.execute("SELECT COUNT(*) FROM accounts WHERE isBot = 1")
         BotCount = mycursor.fetchone()[0]
         if BotCount == 0:
             return False
@@ -1233,7 +1246,7 @@ class GDPySBot:
 
     def _FetchID(self):
         """Gets the bots accountID."""
-        mycursor.execute("SELECT accountID FROM accounts WHERE IsBot = 1 LIMIT 1")
+        mycursor.execute("SELECT accountID FROM accounts WHERE isBot = 1 LIMIT 1")
         return mycursor.fetchone()[0]
     
     def _SetUserId(self):
@@ -1245,7 +1258,7 @@ class GDPySBot:
         """Creates the bot account."""
         Timestamp = round(time.time())
         Password = HashPassword(RandomString(16)) #no one ever ever ever should access the bot account. if they do, you messed up big time
-        mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, IsBot) VALUES (%s, %s, 'rel@es.to', '', '', %s, 1)", (BotName, Password, Timestamp))
+        mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, isBot) VALUES (%s, %s, 'rel@es.to', '', '', %s, 1)", (BotName, Password, Timestamp))
         mydb.commit() #so the fetchid before works???
         mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, '1.1.1.1')", (self._FetchID(), BotName,))
         mydb.commit()
@@ -1589,7 +1602,7 @@ def UserSearchHandler(request):
 def APIGetLevel(LevelID):
     """API handler that returns json for level info."""
     #ok here we get the level data from db
-    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLength, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, Awarded, Magic, starDemon, starAuto, starFeatured, starEpic FROM levels WHERE isDeleted = 0 and levelID = %s LIMIT 1",
+    mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLength, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, awarded, magic, starDemon, starAuto, starFeatured, starEpic FROM levels WHERE isDeleted = 0 and levelID = %s LIMIT 1",
     (
         LevelID,
     ))
@@ -1829,11 +1842,11 @@ def UserCalcCP(UserID : int):
     UserCP += mycursor.fetchone()[0]
     #count magic levels
     if UserConfig["MagicGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE Magic > 0 AND userID = %s", (UserID,))
+        mycursor.execute("SELECT COUNT(*) FROM levels WHERE magic > 0 AND userID = %s", (UserID,))
         UserCP += mycursor.fetchone()[0]
     #count awarded levels
     if UserConfig["AwardGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE Awarded > 0 AND userID = %s", (UserID,))
+        mycursor.execute("SELECT COUNT(*) FROM levels WHERE awarded > 0 AND userID = %s", (UserID,))
         UserCP += mycursor.fetchone()[0]
     
     #lastly we give the cp to them
@@ -2027,12 +2040,31 @@ def GetLevelDL(LevelID: int) -> str:
         CacheLevel(LevelID) #cache it if not cached
     return LevelDLCache[LevelID] 
 
+def GetUserString(UID):
+    """Returns user string."""
+    mycursor.execute("SELECT userName, extID, userID FROM users WHERE userID = %s LIMIT 1", (UID,))
+    User = mycursor.fetchone() #assume it exist
+    return f"{User[2]}:{User[0]}:{User[1]}"
+
 def DLLevel(request):
     """Returns a stored level."""
 
     LevelID = int(request.form["levelID"])
     Log(f"Getting level {LevelID}!")
-    #include dailies around here
+    IsDaily = False
+    FeaID = 0
+    if LevelID == -1: #would make into dict switch-like statement but it would be slower
+        mycursor.execute("SELECT levelID, feaID FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
+        a=mycursor.fetchone()
+        LevelID = a[0]
+        FeaID = a[1]
+        IsDaily = True
+    elif LevelID == -2: #would make into dict switch-like statement but it would be slower
+        mycursor.execute("SELECT levelID, feaID FROM dailyfeatures WHERE timestamp < %s AND type = 1 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
+        a=mycursor.fetchone()
+        LevelID = a[0]
+        FeaID = a[1]+100001
+        IsDaily = True
 
     #getting the level
     mycursor.execute("SELECT * FROM levels WHERE levelID = %s LIMIT 1", (LevelID,))
@@ -2101,8 +2133,12 @@ def DLLevel(request):
     })
 
     ReturnStr += f"#{SoloGen(LevelFiles)}#"
-    CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},0"
-    ReturnStr += SoloGen2(CoolString) + "#" + CoolString
+    CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},{FeaID}"
+    ReturnStr += SoloGen2(CoolString) + "#"
+    if not IsDaily:
+        ReturnStr += CoolString
+    else:
+        ReturnStr += GetUserString(Level[35])
     Success(f"Served level {LevelID}!")
     return ReturnStr
 
@@ -2222,7 +2258,7 @@ def ToolLoginCheck(request) -> bool:
     Username = request.form["username"]
     Password = request.form["password"]
 
-    mycursor.execute("SELECT userName, password, accountID, Privileges FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
+    mycursor.execute("SELECT userName, password, accountID, privileges FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
     User = mycursor.fetchone()
     if User == None:
         return (False, "User not found!")
@@ -2246,4 +2282,28 @@ def ToolLoginCheck(request) -> bool:
         "Privileges" : User[3],
         "LoggedIn" : True
     })
-    
+
+def GetDaily(request):
+    """Responds with a daily or weekly level. Using Cvolton's system."""
+    Weekly = int(request.form.get("weekly", 0))
+    Timestamp = round(time.time())
+    mycursor.execute("SELECT levelID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
+    LevelID = mycursor.fetchone()
+    if LevelID == None:
+        Fail("No daily level set!")
+        return "-1"
+    LevelID = LevelID[0]
+
+    #calculate time till level change
+    TimeToChange = 0
+    if not Weekly:
+        #this is big brain time
+        now = datetime.now()
+        SecondsSinceMidnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds() #calculate time since midnight
+        TimeToChange = 86400 - SecondsSinceMidnight #substract for seconds in day to get time til next midnight
+    else:
+        DayToday = datetime.today().weekday()
+        EndTime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=7-DayToday) #new level every monday
+        TimeToChange = time.mktime(EndTime.timetuple())
+        LevelID += 100001 #idk what he was thinking either
+    return f"{LevelID}|{round(TimeToChange)}"

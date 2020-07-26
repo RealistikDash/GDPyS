@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = os.urandom(24).hex()
 
 @app.route("/")
 def Home():
-    return "Running GDPyS by RealistikDash!"
+    return redirect("/tools")
 
 @app.route("/database///accounts/loginGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/loginGJAccount.php", methods=["GET", "POST"])

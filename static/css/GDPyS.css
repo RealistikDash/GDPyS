@@ -9,3 +9,57 @@
                       |___/
 The main CSS style for the GDPyS frontend portion.
 */
+@import url('https://fonts.googleapis.com/css2?family=Sora&display=swap');
+
+body, html {
+    font-family: "Sora";
+    background-color: #2e323c;
+    background-size: cover;
+    height: 100%;
+    color: white;
+    padding-bottom: 20px;
+    scrollbar-width: none;
+}
+
+hr {
+    color: white;
+}
+.card {
+    background-color: #212529;}
+.card text-center {
+    display: none;
+}
+
+.navbar-nav > li > .dropdown-menu {
+   background-color: #2022298f;
+}
+
+.dropdown-item {
+   color: white;
+}
+
+.circular {
+   border-radius: 50%;
+}
+
+.masthead {
+   height: 100vh;
+   min-height: 200px;
+   max-height: 300px;
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+   margin-bottom: 40px;
+}
+
+.Hometext {
+   margin-top: 50px;
+   margin-bottom: 50px;
+}
+
+.FitBgImage {
+   background-position: center;
+   background-size: cover;
+   background-repeat: no-repeat;
+}
+

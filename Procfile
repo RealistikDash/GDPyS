@@ -1,0 +1,1 @@
+release: python app.py

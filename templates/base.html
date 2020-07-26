@@ -66,15 +66,15 @@
                 </div>
             </div>
         </header>
-        {% if BadAlert %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ BadAlert }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {% endif %}
         <div class="container">
+            {% if BadAlert %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ BadAlert }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
             {% block content %}{% endblock %}
         </div>
         

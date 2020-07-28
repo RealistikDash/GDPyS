@@ -6,6 +6,8 @@ import threading
 from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
 import os
+from migrations import ImportGDPySDatabase
+from constants import __version__
 
 bridge = Bridge()
 app = Flask(__name__)
@@ -16,7 +18,7 @@ app.config['SECRET_KEY'] = os.urandom(24).hex()
 
 @app.route("/")
 def Home():
-    return "Running GDPyS by RealistikDash!"
+    return redirect("/tools")
 
 @app.route("/database///accounts/loginGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/loginGJAccount.php", methods=["GET", "POST"])
@@ -208,6 +210,10 @@ def DeleteFriendReqRoute():
 def GetFriendReqRoute():
     return GetFriendReqList(request)
 
+@app.route("/database/getGJDailyLevel.php", methods=["GET", "POST"])
+def GetDailyRoute():
+    return GetDaily(request)
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):
@@ -259,7 +265,7 @@ def BeforeRequest():
 
 @ToolBlueprint.route("/")
 def HomeToolRoute():
-    return render_template("home.html", session=session, title = "Home")
+    return render_template("home.html", session=session, title = "Home", ver=__version__)
 
 @ToolBlueprint.route("/login", methods=["GET", "POST"])
 def ToolsLoginRoute():

@@ -6,6 +6,8 @@ from colorama import init, Fore
 from logger import logger
 from datetime import datetime
 
+dir_path = path.dirname(path.realpath(__file__))
+
 init() #Colorama thing
 
 DefaultConfig = {
@@ -50,12 +52,12 @@ class JsonFile:
                 data = json.load(f)
             return data
 
-UserConfig = JsonFile.GetDict("config.json")
+UserConfig = JsonFile.GetDict(dir_path + "/config.json")
 #Config Checks
 
 if UserConfig == {}:
     logger.warning(Fore.YELLOW+"No config found! Generating!"+Fore.RESET)
-    JsonFile.SaveDict(DefaultConfig, "config.json")
+    JsonFile.SaveDict(DefaultConfig, dir_path + "/config.json")
     logger.info(Fore.WHITE+"Config created! It is named config.json. Edit it accordingly and start the server again!")
     exit()
 else:
@@ -78,5 +80,5 @@ else:
             UserConfig[Key] = DefaultConfig[Key]
             logger.info(Fore.BLUE+f"Option {Key} added to config. Set default to '{DefaultConfig[Key]}'." + Fore.RESET)
         logger.info(Fore.GREEN+"Config updated! Please edit the new values to your liking." + Fore.RESET)
-        JsonFile.SaveDict(UserConfig, "config.json")
+        JsonFile.SaveDict(UserConfig, dir_path + "/config.json")
         exit()

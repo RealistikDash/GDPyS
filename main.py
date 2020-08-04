@@ -7,6 +7,7 @@ from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
 from migrations import ImportGDPySDatabase
 from constants import __version__
+import os
 
 bridge = Bridge()
 app = Flask(__name__)
@@ -286,8 +287,8 @@ def Tool500():
 def Tool404():
     return render_template("404.html", session=session, title = "Page Missing")
 
-app.register_blueprint(APIBlueprint, url_prefix='/api')
-app.register_blueprint(ToolBlueprint, url_prefix='/tools')
+app.register_blueprint(APIBlueprint, url_prefix="/api")
+app.register_blueprint(ToolBlueprint, url_prefix="/tools")
 
 if __name__ == "__main__":
     # this does not need to be logged as it should be on stdout

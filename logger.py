@@ -1,11 +1,13 @@
 import logging
 from datetime import datetime
 
-def formatted_time(DateTimeObject = None):
+
+def formatted_time(DateTimeObject=None):
     """Returns a formatted time string."""
     if DateTimeObject == None:
         DateTimeObject = datetime.now()
     return DateTimeObject.strftime("%H:%M:%S")
 
+
 logging.basicConfig(format=f"[%(levelname)s] %(message)s ({FormattedTime()})")
-logger = logging.getLogger("GDPyS") # init loggers
+logger = logging.getLogger("GDPyS")  # init loggers

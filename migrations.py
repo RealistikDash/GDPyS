@@ -4,6 +4,7 @@ import re
 from mysql.connector import Error
 from os import path
 
+
 def execute_sql_file(cursor, sql_file):
     """Executes an SQL file.
     
@@ -12,19 +13,20 @@ def execute_sql_file(cursor, sql_file):
     statement = ""
 
     for line in open(sql_file):
-        if re.match(r'--', line):  # ignore sql comment lines
+        if re.match(r"--", line):  # ignore sql comment lines
             continue
-        if not re.search(r';$', line):  # keep appending lines that don't end in ';'
+        if not re.search(r";$", line):  # keep appending lines that don't end in ';'
             statement = statement + line
         else:  # when you get a line ending in ';' then exec statement and reset for next statement
             statement = statement + line
-            #print "\n\n[DEBUG] Executing SQL statement:\n%s" % (statement)
+            # print "\n\n[DEBUG] Executing SQL statement:\n%s" % (statement)
             try:
                 cursor.execute(statement)
             except Exception as e:
                 Fail(f"Could now execute command! Err {e}")
 
             statement = ""
+
 
 def import_gdpys_database(cursor):
     """Imports the GDPyS MySQL database."""

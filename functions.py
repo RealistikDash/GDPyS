@@ -98,7 +98,7 @@ def decode_gjp(GJP) -> str:
 
 def verify_gjp(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
-    return CheckBcryptPw(GetBcryptPassword(AccountID), DecodeGJP(GJP))
+    return check_bcrypt_pw(get_bcrypt_password(AccountID), decode_gjp(GJP))
 
 
 def fix_user_input(String):
@@ -158,7 +158,7 @@ def login_check(Udid, Username, Password, request):
     if UIDFetch[1]:
         return "-12"
 
-    if not CheckPassword(AccountID, Password):
+    if not check_password(AccountID, Password):
         return "-1"
 
     # lastly we check if they are allowed to log in
@@ -178,9 +178,9 @@ def hash_password(PlainPassword: str):
 def check_password(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
     # getting password from db
-    DBPassword = GetBcryptPassword(AccountID)
+    DBPassword = get_bcrypt_password(AccountID)
     if not UserConfig["LegacyPasswords"]:
-        return CheckBcryptPw(DBPassword, Password)
+        return check_bcrypt_pw(DBPassword, Password)
     return True
 
 
@@ -197,9 +197,9 @@ def register_function(request):
         Fail(f"Cound not register {request.form['userName']}! (username taken)")
         return "-2"
     # aight lets go register them
-    Username = FixUserInput(request.form["userName"])
-    Password = HashPassword(request.form["password"])
-    Email = FixUserInput(request.form["email"])
+    Username = fix_user_input(request.form["userName"])
+    Password = hash_password(request.form["password"])
+    Email = fix_user_input(request.form["email"])
     RegisterTime = round(time.time())
     # Query Time
     mycursor.execute(
@@ -227,12 +227,12 @@ def xor(data, key):
     return xored
 
 
-def get_user_data_fsunction(request):
+def get_user_data_function(request):
     """Gets the user data."""
     TargetAccid = request.form["targetAccountID"]
     FromAccid = request.form["accountID"]
     Log(f"Getting account data for {TargetAccid}")
-    if not VerifyGJP(FromAccid, request.form["gjp"]):
+    if not verify_gjp(FromAccid, request.form["gjp"]):
         return "-1"
     # checking for blocks
     mycursor.execute(
@@ -304,7 +304,7 @@ def get_user_data_fsunction(request):
 
 def aid_to_uid(AccountID: int):
     """Gets user ID from Account ID."""
-    return GetUIDFromCache(AccountID)  # calls this function now
+    return get_uid_from_cache(AccountID)  # calls this function now
 
 
 def time_ago_from_now(Timestamp):
@@ -352,7 +352,7 @@ def insert_acc_comment(request):
     Username = request.form["userName"]
     CommentContent = request.form["comment"]
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     # checking if they are allowed
     if not HasPrivilege(AccountID, UserPostAccComment):
@@ -378,7 +378,7 @@ def update_acc_Settings(request):
     Twitter = request.form["twitter"]
     Twitch = request.form["twitch"]
     Log(f"Updating account settings for {AccountID}")
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
 
     # setting the things
@@ -404,7 +404,7 @@ def update_user_score(request):
     if len(AccountID) == 0:
         return "-1"
     AccountID = AccountID[0][0]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     ToGet = [
         "userName",
@@ -550,7 +550,7 @@ def get_mod_badge(AccountID):
 def is_mod(request):
     """Returns whether the user is a mod (has badge)."""
     Log(f"User {request.form['accountID']} is checking mod status.")
-    if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
+    if not verify_gjp(request.form["accountID"], request.form["gjp"]):
         return "-1"
     if HasPrivilege(request.form["accountID"], ModReqMod):
         if HasPrivilege(request.form["accountID"], ModElderBadge):
@@ -564,7 +564,7 @@ def is_mod(request):
 def rewards(request):
     """Responsible for the chest rewards."""
     Log(f"Started getting chest data for {request.form['accountID']}")
-    if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
+    if not verify_gjp(request.form["accountID"], request.form["gjp"]):
         return "-1"
 
     Timestamp = round(time.time())
@@ -633,7 +633,7 @@ def rewards(request):
     return f"bruhh{EncodedReturn}|{ShaReturn}"
 
 
-def sha_1_It(Text: str):
+def sha1_It(Text: str):
     """Hashes text in SHA1."""
     return hashlib.sha1(Text.encode()).hexdigest()
 
@@ -659,10 +659,10 @@ def cron_thread():
     while True:
         Log("Running cron!")
         StartTime = time.time()
-        CacheUserIDs()
-        CacheRanks()
-        CalculateCP()
-        MaxStarCountBan()
+        cache_user_ids()
+        cache_ranks()
+        calculate_cp()
+        max_star_count_ban()
         Log(f"Cron done! Took {round(time.time() - StartTime, 2)}s")
         time.sleep(UserConfig["CronThreadDelay"])
 
@@ -672,7 +672,7 @@ def get_account_url(request):
     return request.url_root
 
 
-def SaveUserData(request):
+def save_user_data(request):
     """Saves the data of the user."""
     # ok so this is pretty much a direct port of cvoltons backupGJAccount to make sure the saves form the php server work with GDPyS
     Username = request.form["userName"]  # whY is name capitalised smh
@@ -690,7 +690,7 @@ def SaveUserData(request):
         Log("User not found!")
         return "-1"
     AccountID = AccountID[0][0]
-    if not CheckPassword(AccountID, Password):
+    if not check_password(AccountID, Password):
         Fail("Password didn't match!")
         return "-1"
 
@@ -751,7 +751,7 @@ def load_user_data(request):
         Log("User not found!")
         return "-1"
     AccountID = AccountID[0][0]
-    if not CheckPassword(AccountID, Password):
+    if not check_password(AccountID, Password):
         Fail("Password didn't match!")
         return "-1"
 
@@ -834,7 +834,7 @@ def upload_level(request):
         return "-1"
     AccountID = AccountID[0][0]
 
-    if not VerifyGJP(AccountID, GJP):
+    if not verify_gjp(AccountID, GJP):
         return "-1"
     if not HasPrivilege(AccountID, UserUploadLevel):
         return "-1"
@@ -1107,10 +1107,10 @@ def get_levels(request):
         pass
     elif Type == 13:
         AccountID = request.form["accountID"]
-        if not VerifyGJP(AccountID, request.form["gjp"]):
+        if not verify_gjp(AccountID, request.form["gjp"]):
             return "-1"
         SQLParams.append("levels.extID in (%s)")
-        SQLFormats.append(ListToCommaString(GetFriendsList(AccountID)))
+        SQLFormats.append(list_to_comma_string(get_friends_list(AccountID)))
     elif Type == 16:
         SQLParams.append("NOT starEpic = 0")
         Order = "rateDate DESC, uploadDate"
@@ -1403,7 +1403,7 @@ def get_role_for_user(AccountID):
 def delete_acc_comment(request):
     """Handler for deleting a comment"""
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     CommentID = request.form["commentID"]
 
@@ -1477,7 +1477,7 @@ def post_comment(request):
     AccountID = request.form.get(
         "accountID"
     )  # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     Percent = int(request.form.get("percent", 0))
     UserID = AIDToUID(AccountID)
@@ -1567,7 +1567,7 @@ class GDPySBot:
     def _register_bot(self, BotName="GDPySBot"):
         """Creates the bot account."""
         Timestamp = round(time.time())
-        Password = HashPassword(
+        Password = hash_password(
             RandomString(16)
         )  # no one ever ever ever should access the bot account. if they do, you messed up big time
         mycursor.execute(
@@ -1584,13 +1584,13 @@ class GDPySBot:
 
     def connect(self):
         """Sets up the bot to be able to be used."""
-        if not self._CheckBot():
+        if not self._check_bot():
             Log("Bot not found! Creating new account for it!")
             self._RegitsterBot()
 
-        self.BotID = self._FetchID()
+        self.BotID = self._fetch_id()
         self.Connected = True
-        self._SetUserId()
+        self._set_user_id()
 
     def get_id(self):
         """Returns the bot's account ID."""
@@ -1613,10 +1613,10 @@ class GDPySBot:
 
 # for now ill place the bot defenition her
 Bot = GDPySBot()
-Bot.Connect()
+Bot.connect()
 
 
-def CheatlessScoreCheck(Score: dict) -> bool:
+def cheatless_score_check(Score: dict) -> bool:
     """Runs a score validity verification."""
     # ok here i will assume that the owner or mod of the gdps doesnt act stupid and rate free extremes.
     # this is an example score dict
@@ -1626,7 +1626,7 @@ def CheatlessScoreCheck(Score: dict) -> bool:
             CheatlessBan(Score["AccountID"], "invalid level score submission")
             return False
         elif Score["Percentage"] == 100:
-            CLCheck(f"Running score check on a score on the level {Score['LevelID']}")
+            cl_check(f"Running score check on a score on the level {Score['LevelID']}")
             # ok lads first we get the level data
             mycursor.execute(
                 "SELECT levelName, starStars, starDemonDiff, starCoins, coins FROM levels WHERE levelID = %s LIMIT 1",
@@ -1669,7 +1669,7 @@ def CheatlessScoreCheck(Score: dict) -> bool:
 
 def cheatless_ban(AccountID: int, Offence: str):
     """Initiates and official CheatlessAC ban!"""
-    CLBan(f"User {AccountID} has been banned by CheatlessAC for {Offence}.")
+    cl_ban(f"User {AccountID} has been banned by CheatlessAC for {Offence}.")
     Bot.SendMessage(
         AccountID,
         Subject="[CheatlessAC] You have been banned!",
@@ -1684,7 +1684,7 @@ def cheatless_ban(AccountID: int, Offence: str):
 def level_suggest(request):
     """Suggests/rates a level and handles the route."""
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
 
     # grab vars from post req
@@ -1836,7 +1836,7 @@ def message_post(request):
     """Posts a message to user."""
     Log("Message send attempt!")
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
 
     Target = request.form["toAccountID"]
@@ -1881,7 +1881,7 @@ def message_post(request):
     return "1"
 
 
-def UserSearchHandler(request):
+def user_search_handler(request):
     """Handles user searches."""
 
     Search = f"%{request.form['str']}%"  # surrounding with % for the like search
@@ -2029,7 +2029,7 @@ def get_messages(request):
     Offset = int(request.form["page"]) * 10
     Log(f"Getting messages for user {AccountID}.")
 
-    if not VerifyGJP(AccountID, GJP):
+    if not verify_gjp(AccountID, GJP):
         return "-1"
 
     GetSent = int(
@@ -2087,7 +2087,7 @@ def get_message(request):
     MessageID = request.form["messageID"]
     Log(f"User {AccountID} tries to DL message.")
 
-    if not VerifyGJP(AccountID, GJP):
+    if not verify_gjp(AccountID, GJP):
         return "-1"
 
     # now we get message data
@@ -2135,7 +2135,7 @@ def delete_comment_handler(request):
     """Handles the comment deleting."""
     AccountID = request.form["accountID"]
     GJP = request.form["gjp"]
-    if not VerifyGJP(AccountID, GJP):
+    if not verify_gjp(AccountID, GJP):
         return "-1"  # ignore green users,  they cant post comments anyways
 
     CommentID = request.form["commentID"]
@@ -2215,7 +2215,7 @@ def calculate_cp():
 
     # fetching the counts and calculation total pp
     for UserID in UserIDs:
-        UserCalcCP(UserID[0])
+        user_calc_cp(UserID[0])
     mydb.commit()
     Finished = round((time.time() - StartTime) * 1000, 2)
     logger.info(f"Done! {Finished}ms")
@@ -2274,7 +2274,7 @@ def score_submit_handler(request):
     Percent = int(request.form["percent"])
 
     Log(f"User {AccountID} tries to submit a score!")
-    if not VerifyGJP(AccountID, GJP):
+    if not verify_gjp(AccountID, GJP):
         return "-1"
 
     CheatlessStruct = {
@@ -2320,7 +2320,7 @@ def score_submit_handler(request):
     if Type == 0:
         mycursor.execute(
             "SELECT * FROM levelscores WHERE levelID = %s AND accountID in (%s) ORDER BY percent DESC LIMIT 50",
-            (LevelID, ListToCommaString(GetFriendsList(AccountID))),
+            (LevelID, list_to_comma_string(get_friends_list(AccountID))),
         )
     elif Type == 1:
         mycursor.execute(
@@ -2385,7 +2385,7 @@ def score_submit_handler(request):
     return ReturnStr[:-1]
 
 
-def MaxStarCountBan() -> None:
+def max_star_count_ban() -> None:
     """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
     # TODO : Make the same thing for usercoins and regular coins
     if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
@@ -2477,8 +2477,8 @@ def cache_level(LevelID: int) -> bool:
 
 def get_level_dl(LevelID: int) -> str:
     """Gets level file from cache or loads it."""
-    if not LevelInCache(LevelID):
-        CacheLevel(LevelID)  # cache it if not cached
+    if not level_in_cache(LevelID):
+        cache_level(LevelID)  # cache it if not cached
     return LevelDLCache[LevelID]
 
 
@@ -2546,7 +2546,7 @@ def dl_level(request):
             "ascii"
         )
 
-    LevelFiles = GetLevelDL(LevelID)
+    LevelFiles = get_level_dl(LevelID)
 
     if LevelFiles[0:3] == "kS1":
         LevelFiles = base64.b64encode(zlib.compress(LevelFiles)).decode("ascii")
@@ -2599,7 +2599,7 @@ def dl_level(request):
     if not IsDaily:
         ReturnStr += CoolString
     else:
-        ReturnStr += GetUserString(Level[35])
+        ReturnStr += get_user_string(Level[35])
     Success(f"Served level {LevelID}!")
     return ReturnStr
 
@@ -2608,7 +2608,7 @@ def remove_message_handler(request):
     """Handles message remove request."""
     AccountID = request.form["accountID"]
 
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     # TODO: Finish
 
@@ -2641,7 +2641,7 @@ def get_friends_list(AccountID: int):
 def send_friend_req(request):
     """Handles the send friend req action."""
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     TargetAccountID = request.form["toAccountID"]
     Message = request.form["comment"]
@@ -2682,7 +2682,7 @@ def send_friend_req(request):
 def delete_friend_request(request):
     """Handles friend request deletion."""
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
     Target = request.form["targetAccountID"]
     mycursor.execute(
@@ -2698,7 +2698,7 @@ def delete_friend_request(request):
 def get_friend_req_list(request):
     """Handles the friend req list request by the client."""
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not verify_gjp(AccountID, request.form["gjp"]):
         return "-1"
 
     Offset = int(request.form["page"]) * 10

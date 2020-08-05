@@ -32,7 +32,7 @@ def import_gdpys_database(cursor):
     """Imports the GDPyS MySQL database."""
     if path.exists("GDPyS.sql"):
         Log("Importing GDPyS database!")
-        ExecuteSQLFile(cursor, "GDPyS.sql")
+        execute_sql_file(cursor, "GDPyS.sql")
         Success("Successfully imported database!")
     else:
         Fail("SQL file is missing! Make sure GDPyS.sql exists!")

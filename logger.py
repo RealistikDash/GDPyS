@@ -9,5 +9,5 @@ def formatted_time(DateTimeObject=None):
     return DateTimeObject.strftime("%H:%M:%S")
 
 
-logging.basicConfig(format=f"[%(levelname)s] %(message)s ({FormattedTime()})")
+logging.basicConfig(format=f"[%(levelname)s] %(message)s ({formatted_time()})")
 logger = logging.getLogger("GDPyS")  # init loggers

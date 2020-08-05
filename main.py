@@ -5,7 +5,7 @@ from console import *
 import threading
 from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
-from migrations import ImportGDPySDatabase
+from migrations import import_gdpys_database
 from constants import __version__
 
 bridge = Bridge()
@@ -30,28 +30,28 @@ def login_handler():
     Password = request.form["password"]
     Log(f"{Username} attempts login...")
     bridge.login(Username)
-    answer = LoginCheck(Udid, Username, Password, request)
+    answer = login_check(Udid, Username, Password, request)
     return answer
 
 
 @app.route("/database///accounts/registerGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/registerGJAccount.php", methods=["GET", "POST"])
 def register_handler():
-    bridge.register(request.form["userName"], FixUserInput(request.form["email"]))
-    return RegisterFunction(request)
+    bridge.register(request.form["userName"], fix_user_input(request.form["email"]))
+    return register_function(request)
 
 
 @app.route("/database///getGJUserInfo20.php", methods=["GET", "POST"])
 @app.route("/database/getGJUserInfo20.php", methods=["GET", "POST"])
 def get_user_data():
-    Userdata = GetUserDataFunction(request)
+    Userdata = get_user_data_function(request)
     return Userdata
 
 
 @app.route("/database///getGJAccountComments20.php", methods=["GET", "POST"])
 @app.route("/database/getGJAccountComments20.php", methods=["GET", "POST"])
 def account_comments():
-    Comments = GetAccComments(request)
+    Comments = get_acc_comments(request)
     return Comments
 
 
@@ -59,14 +59,14 @@ def account_comments():
 @app.route("/database/uploadGJAccComment20.php", methods=["GET", "POST"])
 def upload_acc_comment():
     bridge.upload_account_comment(request.form["userName"], request.form["comment"])
-    Result = InsertAccComment(request)
+    Result = insert_acc_comment(request)
     return Result
 
 
 @app.route("/database///updateGJAccSettings20.php", methods=["GET", "POST"])
 @app.route("/database/updateGJAccSettings20.php", methods=["GET", "POST"])
 def update_account_settings():
-    return UpdateAccSettings(request)
+    return update_acc_Settings(request)
 
 
 @app.route("/database/updateGJUserScore22.php", methods=["GET", "POST"])
@@ -77,38 +77,38 @@ def update_account_settings():
 @app.route("/database/updateGJUserScore201php", methods=["GET", "POST"])
 @app.route("/database///updateGJUserScore21.php", methods=["GET", "POST"])
 def update_score():
-    return UpdateUserScore(request)
+    return update_user_score(request)
 
 
 @app.route("/database///getGJScores20.php", methods=["GET", "POST"])
 @app.route("/database/getGJScores20.php", methods=["GET", "POST"])
 def get_scores():
-    return GetLeaderboards(request)
+    return get_leaderboards(request)
 
 
 @app.route("/database///requestUserAccess.php", methods=["GET", "POST"])
 @app.route("/database/requestUserAccess.php", methods=["GET", "POST"])
 def get_mod():
     bridge.request_mod(request.form["accountID"])
-    return IsMod(request)
+    return is_mod(request)
 
 
 @app.route("/database///getGJRewards.php", methods=["GET", "POST"])
 @app.route("/database/getGJRewards.php", methods=["GET", "POST"])
 def get_rewards():
-    return Rewards(request)
+    return rewards(request)
 
 
 @app.route("/database///getAccountURL.php", methods=["GET", "POST"])
 @app.route("/database/getAccountURL.php", methods=["GET", "POST"])
 def get_acc_url():
-    return GetAccountUrl(request)
+    return get_account_url(request)
 
 
 @app.route("//database/accounts/backupGJAccountNew.php", methods=["GET", "POST"])
 @app.route("/database/accounts/backupGJAccountNew.php", methods=["GET", "POST"])
 def save_route():
-    return SaveUserData(request)
+    return save_user_data(request)
 
 
 # this is a bit of routes dont you think?
@@ -119,60 +119,60 @@ def save_route():
 @app.route("//database/accounts/syncGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/syncGJAccount.php", methods=["GET", "POST"])
 def load_route():
-    return LoadUserData(request)
+    return load_user_data(request)
 
 
 @app.route("//database/likeGJItem211.php", methods=["GET", "POST"])
 @app.route("/database/likeGJItem211.php", methods=["GET", "POST"])
 def like_route():
     bridge.like(bool(request.form["like"]))
-    return LikeFunction(request)
+    return like_function(request)
 
 
 @app.route("//database/uploadGJLevel21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJLevel21.php", methods=["GET", "POST"])
 def level_upload_route():
     bridge.level_upload(request.form["userName"], request.form["levelID"])
-    return UploadLevel(request)
+    return upload_level(request)
 
 
 @app.route("//database/getGJLevels21.php", methods=["GET", "POST"])
 @app.route("/database/getGJLevels21.php", methods=["GET", "POST"])
 def get_levels_route():
-    return GetLevels(request)
+    return get_levels(request)
 
 
 @app.route("//database/downloadGJLevel22.php", methods=["GET", "POST"])
 @app.route("/database/downloadGJLevel22.php", methods=["GET", "POST"])
 def dl_level_route():
-    return DLLevel(request)
+    return dl_level(request)
 
 
 @app.route("//database/getGJSongInfo.php", methods=["GET", "POST"])
 @app.route("/database/getGJSongInfo.php", methods=["GET", "POST"])
 def song_route():
-    return GetSong(request)
+    return get_song(request)
 
 
 @app.route("//database/getGJComments21.php", methods=["GET", "POST"])
 @app.route("/database/getGJComments21.php", methods=["GET", "POST"])
 @app.route("/database/getGJCommentHistory.php", methods=["GET", "POST"])
 def comment_get_route():
-    return GetComments(request)
+    return get_comments(request)
 
 
 @app.route("//database/deleteGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/deleteGJAccComment20.php", methods=["GET", "POST"])
 def delete_acc_comment_route():
     bridge.delete_account_comment(request.form["accountID"], request.form["commentID"])
-    return DeleteAccComment(request)
+    return delete_acc_comment(request)
 
 
 @app.route("//database/uploadGJComment21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJComment21.php", methods=["GET", "POST"])
 def post_comment_route():
     bridge.upload_comment(request.form["userName"], request.form["comment"])
-    return PostComment(request)
+    return post_comment(request)
 
 
 @app.route("//database/suggestGJStars20.php", methods=["GET", "POST"])
@@ -181,52 +181,52 @@ def level_suggest_route():
     bridge.suggest_stars(
         request.form["levelID"], int(request.form["stars"]), request.form["feature"]
     )
-    return LevelSuggest(request)
+    return level_suggest(request)
 
 
 @app.route("//database/uploadGJMessage20.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJMessage20.php", methods=["GET", "POST"])
 def post_message_route():
-    return MessagePost(request)
+    return message_post(request)
 
 
 @app.route("//database/getGJUsers20.php", methods=["GET", "POST"])
 @app.route("/database/getGJUsers20.php", methods=["GET", "POST"])
 def user_search_route():
-    return UserSearchHandler(request)
+    return user_search_handler(request)
 
 
 @app.route("//database/getGJMessages20.php", methods=["GET", "POST"])
 @app.route("/database/getGJMessages20.php", methods=["GET", "POST"])
 def get_messages_route():
-    return GetMessages(request)
+    return get_messages(request)
 
 
 @app.route("//database/downloadGJMessage20.php", methods=["GET", "POST"])
 @app.route("/database/downloadGJMessage20.php", methods=["GET", "POST"])
 def download_message_route():
-    return GetMessage(request)
+    return get_message(request)
 
 
 @app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
 def delete_comment_route():
     bridge.delete_comment(request.form["accountID"], request.form["commentID"])
-    return DeleteCommentHandler(request)
+    return delete_comment_handler(request)
 
 
 @app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
 def get_map_packs_route():
-    return MapPackHandelr(request)
+    return map_pack_handler(request)
 
 
 @app.route("/database/getGJGauntlets21.php", methods=["GET", "POST"])
 def gauntlet_route():
-    return GetGauntletsHandler()
+    return get_gauntlets_handler()
 
 
 @app.route("/database/getGJLevelScores211.php", methods=["GET", "POST"])
 def level_lbs_route():
-    return ScoreSubmitHandler(request)
+    return score_submit_handler(request)
 
 
 @app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
@@ -234,28 +234,28 @@ def friend_req_route():
     bridge.send_friend_request(
         request.form["accountID"], request.form["toAccountID"], request.form["comment"]
     )
-    return SendFriendReq(request)
+    return send_friend_req(request)
 
 
 @app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
 def delete_friend_req_route():
-    return DeleteFriendRequest(request)
+    return delete_friend_request(request)
 
 
 @app.route("/database/getGJFriendRequests20.php", methods=["GET", "POST"])
 def get_friend_req_route():
-    return GetFriendReqList(request)
+    return get_friend_req_list(request)
 
 
 @app.route("/database/getGJDailyLevel.php", methods=["GET", "POST"])
 def get_daily_route():
-    return GetDaily(request)
+    return get_daily(request)
 
 
 ## API ROUTES ##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def api_level_route(LevelID):
-    return jsonify(APIGetLevel(LevelID))
+    return jsonify(api_get_level(LevelID))
 
 
 @app.route("/database/")
@@ -316,7 +316,7 @@ def tools_login_route():
     if request.method == "GET":
         return render_template("login.html", session=session, title="Login")
     # POST REQUEST
-    A = ToolLoginCheck(request)
+    A = tool_login_check(request)
     if not A[0]:  # login failed
         return render_template(
             "login.html", session=session, title="Login", BadAlert=A[1]
@@ -355,5 +355,5 @@ if __name__ == "__main__":
     )
     add_plugins()
     bridge.ready()
-    threading.Thread(target=CronThread).start()
+    threading.Thread(target=cron_thread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

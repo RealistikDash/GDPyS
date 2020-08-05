@@ -6,17 +6,17 @@ from config import UserConfig
 init()
 
 
-def log(Text):
+def Log(Text):
     """Logs a thing in console."""
     logger.info(f"{Fore.MAGENTA}[GDPyS] {Text}{Fore.RESET}")
 
 
-def success(Text):
+def Success(Text):
     """Logs a thing in console."""
     logger.info(f"{Fore.GREEN}[GDPyS] {Text}{Fore.RESET}")
 
 
-def fail(Text):
+def Fail(Text):
     """Logs a thing in console."""
     logger.warning(
         f"{Fore.RED}[GDPyS] {Text}{Fore.RESET}"
@@ -28,6 +28,6 @@ def cl_check(Text):
     logger.info(f"{Fore.MAGENTA}[Cheatless] {Text}{Fore.RESET}")
 
 
-def cl_Ban(Text):
+def cl_ban(Text):
     """Logs when a person gets anticheat banned."""
     logger.info(f"{Fore.RED}[Cheatless] {Text}{Fore.RESET}")

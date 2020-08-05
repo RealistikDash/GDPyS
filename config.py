@@ -30,7 +30,7 @@ DefaultConfig = {
     "CommandPrefix": "/",
     "CheatlessAC": True,  # global switch
     "CheatlessExtremeDemonMinAttempts": 100,  # if a user submits an extreme demon score under this att count, they will be banned
-    "CheatlessScoreCheck": True,
+    "cheatless_score_check": True,
     "CheatlessCronChecks": True,
     "CheatlessMaxStars": 5000,
 }
@@ -54,12 +54,12 @@ class JsonFile:
             return data
 
 
-UserConfig = JsonFile.GetDict(dir_path + "/config.json")
+UserConfig = JsonFile.get_dict(dir_path + "/config.json")
 # Config Checks
 
 if UserConfig == {}:
     logger.warning(Fore.YELLOW + "No config found! Generating!" + Fore.RESET)
-    JsonFile.SaveDict(DefaultConfig, dir_path + "/config.json")
+    JsonFile.save_dict(DefaultConfig, dir_path + "/config.json")
     logger.info(
         Fore.WHITE
         + "Config created! It is named config.json. Edit it accordingly and start the server again!"
@@ -95,5 +95,5 @@ else:
             + "Config updated! Please edit the new values to your liking."
             + Fore.RESET
         )
-        JsonFile.SaveDict(UserConfig, dir_path + "/config.json")
+        JsonFile.save_dict(UserConfig, dir_path + "/config.json")
         exit()

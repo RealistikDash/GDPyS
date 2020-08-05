@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-def FormattedTime(DateTimeObject = None):
+def formatted_time(DateTimeObject = None):
     """Returns a formatted time string."""
     if DateTimeObject == None:
         DateTimeObject = datetime.now()

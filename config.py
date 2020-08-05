@@ -37,13 +37,13 @@ DefaultConfig = {
 
 class JsonFile:
     @classmethod
-    def SaveDict(self, Dict, File):
+    def save_dict(self, Dict, File):
         """Saves a dict as a file"""
         with open(File, 'w') as json_file:
             json.dump(Dict, json_file, indent=4)
 
     @classmethod
-    def GetDict(self, file):
+    def get_dict(self, file):
         """Returns a dict from file name"""
         if not path.exists(file):
             return {}

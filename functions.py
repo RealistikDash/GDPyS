@@ -572,7 +572,7 @@ def SaveUserData(request):
     Success(f"User data for {Username} saved!")
     return "1"
 
-def LoadUserData(request):
+def load_user_data(request):
     """Returns the user data to be loaded."""
     Username = request.form["userName"]
     Password = request.form["password"]
@@ -609,7 +609,7 @@ def LoadUserData(request):
     Success(f"Successfully returned load data to {Username}!")
     return f"{SaveData};21;30;a;a"
 
-def LikeFunction(request):
+def like_function(request):
     """Likes a comment/level/accomments."""
     # Type 1 | Levels
     # Type 2 | Commetns
@@ -646,7 +646,7 @@ def LikeFunction(request):
     mydb.commit()
     return "1"
 
-def UploadLevel(request):
+def upload_level(request):
     """Handles the level uploading part."""
     Username = request.form["userName"]
     GJP = request.form["gjp"]
@@ -707,7 +707,7 @@ def UploadLevel(request):
     else:
         return "-1"
 
-def CheckForm(form, TheThing):
+def check_form(form, TheThing):
     """Checks if something in a form is set."""
     #I KNOW I CAN JUST CHECK IF THE THING IS IN THE KEYS BUT IM TOO LAZY TO DO THIS RN
     try:
@@ -716,7 +716,7 @@ def CheckForm(form, TheThing):
     except:
         return False
 
-def UserString(UserID: int):
+def user_string(UserID: int):
     """Returns a user string."""
     mycursor.execute("SELECT userName, extID FROM users WHERE userID = %s", (UserID,))
     Data = mycursor.fetchall()
@@ -731,7 +731,7 @@ def UserString(UserID: int):
     
     return f"{UserID}:{Data[0]}:{Data[1]}"
 
-def GenMulti(LevelMultiString):
+def gen_multi(LevelMultiString):
     """
     Ported from GMDPrivateServer by Cvolton
     /incl/lib/generateHash.php
@@ -749,7 +749,7 @@ def GenMulti(LevelMultiString):
     
     return Sha1It(Hash + "xI25fpAapCQg")
 
-def GenSongString(SongID: int):
+def gen_song_string(SongID: int):
     """Generates a song string."""
     mycursor.execute("SELECT ID, name, authorID, authorName, size, isDisabled, download FROM songs WHERE ID = %s", (SongID,))
     SongData = mycursor.fetchall()
@@ -771,7 +771,7 @@ def GenSongString(SongID: int):
     
     return f"1~|~{SongData[0]}~|~2~|~{SongName}~|~3~|~{SongData[2]}~|~4~|~{AuthorName}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~~|~8~|~0"
 
-def IsInt(TheThing):
+def is_int(TheThing):
     """Checks if the thing passed is a valid integer."""
     try:
         int(TheThing)
@@ -780,7 +780,7 @@ def IsInt(TheThing):
         return False
 
 
-def GetLevels(request):
+def get_levels(request):
     """As the function states, this gets (get ready for it) levels!"""
     Log("Beginning to fetch levels!")
     #BRUH I HATE THIS SO MUCH SO SO SO MUCH
@@ -953,7 +953,7 @@ def GetLevels(request):
     Success("Level list served!")
     return TheFinalStr
 
-def SoloGen(LevelString: str):
+def solo_gen(LevelString: str):
     """Port of genSolo from Cvolton's GMDPrivateServer."""
     Return = ""
     StrLen = len(LevelString) // 40
@@ -961,11 +961,11 @@ def SoloGen(LevelString: str):
         Return += LevelString[i * StrLen]
     return Sha1It(Return + "xI25fpAapCQg")
 
-def SoloGen2(LevelString: str):
+def solo_gen2(LevelString: str):
     """Port of genSolo2 from Cvolton's GMDPrivateServer."""
     return Sha1It(LevelString + "xI25fpAapCQg")
 
-def CheckBcryptPw(dbpassword, painpassword):
+def check_bcrypt_pw(dbpassword, painpassword):
     """
     Checks Bcrypt passwords. Taken from RealistikPanel (made by me)
     By: kotypey
@@ -982,12 +982,12 @@ def CheckBcryptPw(dbpassword, painpassword):
 
     return check
 
-def CreateBcrypt(Password: str):
+def create_bcrypt(Password: str):
     """Creates hashed password."""
     BHashed = bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt(10))
     return BHashed.decode()
 
-def GetSong(request):
+def get_song(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
     SongID = int(request.form["songID"])
     Log(f"Getting song {SongID}.")
@@ -1018,7 +1018,7 @@ def GetSong(request):
     Success("Song served!")
     return f"1~|~{SongData[0]}~|~2~|~{SongData[1]}~|~3~|~{SongData[2]}~|~4~|~{SongData[3]}~|~5~|~{SongData[4]}~|~6~|~~|~10~|~{SongURL}~|~7~|~"
 
-def GetComments(request):
+def get_comments(request):
     """Gets comments for a level."""
     Data = {}
     #ok this is prob stupid but yolo
@@ -1074,7 +1074,7 @@ def GetComments(request):
     return f"{ReturnString[:-1]}#{CommentCount}:{Data['page']}:{Data['count']}"
 
 
-def AddSongToDB(Response: str):
+def add_song_to_db(Response: str):
     """Adds song to database."""
     if Response == "-1" or Response == "" or Response == "-2":
         return
@@ -1090,7 +1090,7 @@ def AddSongToDB(Response: str):
     mycursor.execute("INSERT INTO songs (ID, name, authorID, authorName, size, download) VALUES (%s, %s, %s, %s, %s, %s)", (SongID, SongName, AuthorID, AuthorName, SongSize, SongURL))
     mydb.commit()
 
-def GetRoleForUser(AccountID):
+def get_role_for_user(AccountID):
     """Gets role data for account id."""
     Default = {
         "RoleID" : 0,
@@ -1124,7 +1124,7 @@ def GetRoleForUser(AccountID):
         "Colour" : PrivRole[2]
     }
 
-def DeleteAccComment(request):
+def delete_acc_comment(request):
     """Handler for deleting a comment"""
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
@@ -1141,7 +1141,7 @@ def DeleteAccComment(request):
     mydb.commit()
     return "1"
 
-def CommentCommand(Comment: str, Extra: dict) -> bool:
+def comment_command(Comment: str, Extra: dict) -> bool:
     """Handles comment commands."""
     #Example extra dict
     #{
@@ -1172,7 +1172,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         return True
     return False
 
-def PostComment(request):
+def post_comment(request):
     """Posts a level comment."""
     Username = request.form["userName"] #why is this passed? idk... ill still use it
     Log(f"{Username} tries to post a comment...")
@@ -1197,7 +1197,7 @@ def PostComment(request):
     Success("Comment posted!")
     return "1"
 
-def HasPrivilege(AccountID: int, Privilege):
+def has_privilege(AccountID: int, Privilege):
     """Checks if the given account has privilege."""
     #checking if the privilege has been cached
     if str(AccountID) in list(PrivilegeCache.keys()):
@@ -1224,7 +1224,7 @@ def HasPrivilege(AccountID: int, Privilege):
     #and now alas we check if they have it
     return bool(DBPriv & Privilege)
 
-def RandomString(Lenght=8):
+def random_string(Lenght=8):
     Chars = string.ascii_lowercase
     return ''.join(random.choice(Chars) for i in range(Lenght))
 
@@ -1236,7 +1236,7 @@ class GDPySBot:
         self.BotID = 0
         self.BotUserId = 0
 
-    def _CheckBot(self):
+    def _check_bot(self):
         """Checks if the bot account exists."""
         mycursor.execute("SELECT COUNT(*) FROM accounts WHERE isBot = 1")
         BotCount = mycursor.fetchone()[0]
@@ -1244,17 +1244,17 @@ class GDPySBot:
             return False
         return True
 
-    def _FetchID(self):
+    def _fetch_id(self):
         """Gets the bots accountID."""
         mycursor.execute("SELECT accountID FROM accounts WHERE isBot = 1 LIMIT 1")
         return mycursor.fetchone()[0]
     
-    def _SetUserId(self):
+    def _set_user_id(self):
         """Sets the user id for bot."""
         mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (self.BotID,))
         self.BotUserId = mycursor.fetchone()[0]
 
-    def _RegitsterBot(self, BotName="GDPySBot"):
+    def _register_bot(self, BotName="GDPySBot"):
         """Creates the bot account."""
         Timestamp = round(time.time())
         Password = HashPassword(RandomString(16)) #no one ever ever ever should access the bot account. if they do, you messed up big time
@@ -1264,7 +1264,7 @@ class GDPySBot:
         mydb.commit()
         Success(f"Created bot user ({BotName})!")
     
-    def Connect(self):
+    def connect(self):
         """Sets up the bot to be able to be used."""
         if not self._CheckBot():
             Log("Bot not found! Creating new account for it!")
@@ -1274,11 +1274,11 @@ class GDPySBot:
         self.Connected = True
         self._SetUserId()
     
-    def GetID(self):
+    def get_id(self):
         """Returns the bot's account ID."""
         return self.BotID
     
-    def SendMessage(self, Target: int, Body: str, Subject: str):
+    def send_message(self, Target: int, Body: str, Subject: str):
         """Sends a message from the bot."""
         #first we base64 encode the body and subject
         Subject = base64.b64encode(Subject.encode()).decode("ascii")
@@ -1344,14 +1344,14 @@ def CheatlessScoreCheck(Score: dict) -> bool:
         
     return True
 
-def CheatlessBan(AccountID: int, Offence: str):
+def cheatless_ban(AccountID: int, Offence: str):
     """Initiates and official CheatlessAC ban!"""
     CLBan(f"User {AccountID} has been banned by CheatlessAC for {Offence}.")
     Bot.SendMessage(AccountID, Subject="[CheatlessAC] You have been banned!", Body=f"You have been by the Cheatless AntiCheat! The reason for your ban is {Offence}. Please contact the staff team for more info and stop cheating.")
     mycursor.execute("UPDATE users SET isBanned = 1 WHERE extID = %s LIMIT 1", (AccountID,))
     mydb.commit()
 
-def LevelSuggest(request):
+def level_suggest(request):
     """Suggests/rates a level and handles the route."""
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
@@ -1468,7 +1468,7 @@ def LevelSuggest(request):
         return "1"
     return "-1"
 
-def DebugManualAddSong(Source, SongID):
+def debug_manual_add_song(Source, SongID):
     """[DEBUG] Manually add a custom song from a custom source."""
     SongInfo = requests.post(Source, data={
         "secret" : "Wmfd2893gb7",
@@ -1476,7 +1476,7 @@ def DebugManualAddSong(Source, SongID):
     })
     AddSongToDB(SongInfo.text)
 
-def DebugReupload(Source, LevelID):
+def debug_reupload(Source, LevelID):
     """[DEBUG] Reuploads level from source to GDPyS server."""
     Level = requests.post(Source, data = {
         "secret" : "Wmfd2893gb7",
@@ -1496,7 +1496,7 @@ def DebugReupload(Source, LevelID):
     
     # TODO FINISH THIS
 
-def MessagePost(request):
+def message_post(request):
     """Posts a message to user."""
     Log("Message send attempt!")
     AccountID = request.form["accountID"]
@@ -1599,7 +1599,7 @@ def UserSearchHandler(request):
         }) + "|"
     return ReturnString[:-1] + f"#{UserCount}:{Offset}:10"
 
-def APIGetLevel(LevelID):
+def api_get_level(LevelID):
     """API handler that returns json for level info."""
     #ok here we get the level data from db
     mycursor.execute("SELECT userName, levelID, extID, userID, levelName, levelDesc, levelLength, audioTrack, songID, coins, starDifficulty, downloads, likes, starStars, uploadDate, awarded, magic, starDemon, starAuto, starFeatured, starEpic FROM levels WHERE isDeleted = 0 and levelID = %s LIMIT 1",
@@ -1672,7 +1672,7 @@ def APIGetLevel(LevelID):
         "message" : "Success!"
     }
 
-def GetMessages(request):
+def get_messages(request):
     """Gets messages for user."""
     GJP = request.form["gjp"]
     AccountID = request.form["accountID"]
@@ -1714,7 +1714,7 @@ def GetMessages(request):
     
     return f"{MessageString[:-1]}#{Count}:{Offset}:10" #the 10 is the limit
 
-def GetMessage(request):
+def get_message(request):
     """Returns message to client."""
     AccountID = request.form["accountID"]
     GJP = request.form["gjp"]
@@ -1753,7 +1753,7 @@ def GetMessage(request):
         "9" : int(GetSent)
     })
 
-def DeleteCommentHandler(request):
+def delete_comment_handler(request):
     """Handles the comment deleting."""
     AccountID = request.form["accountID"]
     GJP = request.form["gjp"]
@@ -1766,7 +1766,7 @@ def DeleteCommentHandler(request):
     mydb.commit()
     return "1"
 
-def MapPackHandelr(request):
+def map_pack_handler(request):
     """Fetches the map packs and returns them to the gd client."""
     Log("Getting mappacks.")
     Offset = 10 * int(request.form.get("page", 0)) #turning page to an offset to be used in query below
@@ -1796,7 +1796,7 @@ def MapPackHandelr(request):
     PackHash = Sha1It(PackHash + "xI25fpAapCQg")
     return f"{PackStr[:-1]}#{PackCount}:{Offset}:10#{PackHash}"
 
-def GetGauntletsHandler():
+def get_gauntlets_handler():
     """Returns all the gauntlet things to the gd client."""
     mycursor.execute("SELECT * FROM gauntlets")
     Gauntlets = mycursor.fetchall()
@@ -1813,7 +1813,7 @@ def GetGauntletsHandler():
     
     return f"{GauntletReturn[:-1]}#{SoloGen2(HashReturn)}"
 
-def CalculateCP():
+def calculate_cp():
     """Cron job that calculates CP for the whole server."""
     StartTime = time.time()
     logger.info("Beginning to calculate CP... ")
@@ -1828,7 +1828,7 @@ def CalculateCP():
     Finished = round((time.time() - StartTime) * 1000, 2)
     logger.info(f"Done! {Finished}ms")
 
-def UserCalcCP(UserID : int):
+def user_calc_cp(UserID : int):
     """Calculates CP for specified user id."""
     UserCP = 0
     #count rated levels
@@ -1853,7 +1853,7 @@ def UserCalcCP(UserID : int):
     mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
     mydb.commit()
 
-def ScoreSubmitHandler(request):
+def score_submit_handler(request):
     """Handles the score submission request by the client."""
     # NOTE this will be slower but it will be better in a lot of ways
     #also this is used for submitting the score AND getting all of the scores
@@ -1979,7 +1979,7 @@ def MaxStarCountBan() -> None:
 
         logger.info(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
 
-def Select(TheList: list, Position: int, Thing):
+def select(TheList: list, Position: int, Thing):
     """An SQL-like select thing.
     
     TheList: List to search through.
@@ -2005,15 +2005,15 @@ def Select(TheList: list, Position: int, Thing):
     del ReturnList #so we dont wait for garbage collection????
     return TheReturn
 
-def DropCachedLevel(LevelID : int) -> None:
+def drop_cached_level(LevelID : int) -> None:
     """Removes level from cache."""
     del LevelDLCache[LevelID]
 
-def LevelInCache(LevelID) -> bool:
+def level_in_cache(LevelID) -> bool:
     """Checks if level is already in cache."""
     return LevelID in list(LevelDLCache.keys())
 
-def CacheLevel(LevelID: int) -> bool:
+def cache_level(LevelID: int) -> bool:
     """Caches level file. Stores in dict if level not already in cache. Returns bool based on whether successful or not."""
     if not os.path.exists(f"Data/Levels/{LevelID}"):
         #it may be levelString
@@ -2034,19 +2034,19 @@ def CacheLevel(LevelID: int) -> bool:
     Log(f"Cached level {LevelID}.")
     return True
 
-def GetLevelDL(LevelID: int) -> str:
+def get_level_dl(LevelID: int) -> str:
     """Gets level file from cache or loads it."""
     if not LevelInCache(LevelID):
         CacheLevel(LevelID) #cache it if not cached
     return LevelDLCache[LevelID] 
 
-def GetUserString(UID):
+def get_user_string(UID):
     """Returns user string."""
     mycursor.execute("SELECT userName, extID, userID FROM users WHERE userID = %s LIMIT 1", (UID,))
     User = mycursor.fetchone() #assume it exist
     return f"{User[2]}:{User[0]}:{User[1]}"
 
-def DLLevel(request):
+def dl_level(request):
     """Returns a stored level."""
 
     LevelID = int(request.form["levelID"])
@@ -2142,7 +2142,7 @@ def DLLevel(request):
     Success(f"Served level {LevelID}!")
     return ReturnStr
 
-def RemoveMessageHandler(request):
+def remove_message_handler(request):
     """Handles message remove request."""
     AccountID = request.form["accountID"]
 
@@ -2150,14 +2150,14 @@ def RemoveMessageHandler(request):
         return "-1"
     # TODO: Finish
 
-def ListToCommaString(TheList: list):
+def list_to_comma_string(TheList: list):
     """Converts a Python list to a comma separated string."""
     Res = ""
     for Elem in TheList:
         Res += f"{Elem},"
     return Res[:-1]
 
-def GetFriendsList(AccountID: int):
+def get_friends_list(AccountID: int):
     """Returns a list of account ids of the users friends."""
     mycursor.execute("SELECT accountID FROM friendreqs WHERE toAccountID = %s", (AccountID,))
     Friends = mycursor.fetchall()
@@ -2169,7 +2169,7 @@ def GetFriendsList(AccountID: int):
         FriendsRetrun.append(Friend[0])
     return FriendsRetrun
 
-def SendFriendReq(request):
+def send_friend_req(request):
     """Handles the send friend req action."""
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
@@ -2194,7 +2194,7 @@ def SendFriendReq(request):
     mydb.commit()
     return "1"
 
-def DeleteFriendRequest(request):
+def delete_friend_request(request):
     """Handles friend request deletion."""
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
@@ -2204,7 +2204,7 @@ def DeleteFriendRequest(request):
     mydb.commit()
     return "1"
 
-def GetFriendReqList(request):
+def get_friend_req_list(request):
     """Handles the friend req list request by the client."""
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
@@ -2252,7 +2252,7 @@ def GetFriendReqList(request):
     return f"{ReturnStr[:-1]}#{Count}:{Offset}:10"
 
 # TODO: MOVE TO OWN FILE
-def ToolLoginCheck(request) -> bool:
+def tool_login_check(request) -> bool:
     """Handles the login checks for user tools. Returns new session if true"""
     #Return struct is (T/F based on result, Message)
     Username = request.form["username"]
@@ -2283,7 +2283,7 @@ def ToolLoginCheck(request) -> bool:
         "LoggedIn" : True
     })
 
-def GetDaily(request):
+def get_daily(request):
     """Responds with a daily or weekly level. Using Cvolton's system."""
     Weekly = int(request.form.get("weekly", 0))
     Timestamp = round(time.time())

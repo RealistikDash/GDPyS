@@ -4,7 +4,7 @@ import re
 from mysql.connector import Error
 from os import path
 
-def ExecuteSQLFile(cursor, sql_file):
+def execute_sql_file(cursor, sql_file):
     """Executes an SQL file.
     
     Credit: https://stackoverflow.com/a/19159041"""
@@ -26,7 +26,7 @@ def ExecuteSQLFile(cursor, sql_file):
 
             statement = ""
 
-def ImportGDPySDatabase(cursor):
+def import_gdpys_database(cursor):
     """Imports the GDPyS MySQL database."""
     if path.exists("GDPyS.sql"):
         Log("Importing GDPyS database!")

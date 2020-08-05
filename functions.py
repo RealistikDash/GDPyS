@@ -41,7 +41,7 @@ LevelDLCache = {} #the level data will be stored here so it doesnt have to be re
 BrcyptCache = {} #so we dont call mysql in gjpchecks
 UserIDCache = {} #caches user ids (1 less query!)
 
-def CacheUserIDs():
+def cache_user_ids():
     """Caches all UserIDs from table. Used to remove the query from AIDToUID."""
     Log("Caching UserIDs.")
     mycursor.execute("SELECT extID, userID FROM users")
@@ -49,7 +49,7 @@ def CacheUserIDs():
     for a in UserIDs:
         UserIDCache[int(a[0])] = a[1]
 
-def GetUIDFromCache(AccID: int) -> int:
+def get_uid_from_cache(AccID: int) -> int:
     """Returns UID from cache if there. Caches it if not there."""
     AccID = int(AccID)
     try:
@@ -61,7 +61,7 @@ def GetUIDFromCache(AccID: int) -> int:
         return UserIDCache[AccID]
         
 
-def GetBcryptPassword(AccountID):
+def get_bcrypt_password(AccountID):
     """Gets a users password from cache or gets it from db and caches it."""
     if AccountID not in list(BrcyptCache.keys()):
         mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (AccountID,))
@@ -69,7 +69,7 @@ def GetBcryptPassword(AccountID):
         Log(f"Cached Bcrypt for {AccountID}")
     return BrcyptCache[AccountID]
 
-def DecodeGJP(GJP) -> str:
+def decode_gjp(GJP) -> str:
     """Decodes the GJP sent by the client.
     
     NOTE: 
@@ -84,11 +84,11 @@ def DecodeGJP(GJP) -> str:
     GJP = base64.b64decode(GJP)
     return Xor(GJP.decode(), 37526)
 
-def VerifyGJP(AccountID: int, GJP: str):
+def verify_gjp(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
     return CheckBcryptPw(GetBcryptPassword(AccountID), DecodeGJP(GJP))
 
-def FixUserInput(String):
+def fix_user_input(String):
     """[DEPRECATED] Gets rid of potentially problematic user input."""
     String = String.replace(r"\0", "")
     String = String.replace("#", "")
@@ -98,7 +98,7 @@ def FixUserInput(String):
     String = String.replace("--", "")
     return String
 
-def GetServerIP():
+def get_server_ip():
     """Gets the server IP."""
     if UserConfig["LocalServer"]:
         CurrentIP = "127.0.0.1"
@@ -107,7 +107,7 @@ def GetServerIP():
         CurrentIP = Request.json()["ip"]
     return CurrentIP
 
-def LoginCheck(Udid, Username, Password, request):
+def login_check(Udid, Username, Password, request):
     """Checks login and password"""
     mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (Username,))
     Accounts = mycursor.fetchall()
@@ -117,7 +117,7 @@ def LoginCheck(Udid, Username, Password, request):
         return "-1" #idk the error codes
     AccountID = Accounts[0][0] #choosing the closes one
 
-    #User ID
+    # User ID
     mycursor.execute("SELECT userID, isBanned FROM users WHERE extID = %s", (AccountID,))
     UIDFetch = mycursor.fetchone()
     if UIDFetch == None:
@@ -143,13 +143,13 @@ def LoginCheck(Udid, Username, Password, request):
     Success(f"Authentication for {Username} was successfull!")
     return f"{AccountID},{UserID}"
 
-def HashPassword(PlainPassword: str):
+def hash_password(PlainPassword: str):
     """Creates a hashed password to be used in database."""
     if not UserConfig["LegacyPasswords"]:
         return CreateBcrypt(PlainPassword)
     return PlainPassword #havent done legacy passwords
 
-def CheckPassword(AccountID: int, Password: str):
+def check_password(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
     #getting password from db
     DBPassword = GetBcryptPassword(AccountID)
@@ -157,7 +157,7 @@ def CheckPassword(AccountID: int, Password: str):
         return CheckBcryptPw(DBPassword, Password)
     return True
 
-def RegisterFunction(request):
+def register_function(request):
     """Registers a user."""
     Log(f"Register attempt started for {request.form['userName']}")
     #check if username is taken
@@ -177,7 +177,7 @@ def RegisterFunction(request):
     Success(f"User {Username} successfully registered!")
     return "1"
 
-def GetRank(AccountID):
+def get_rank(AccountID):
     """Gets rank for user."""
     try:
         Rank = Ranks[str(AccountID)]
@@ -185,13 +185,13 @@ def GetRank(AccountID):
         Rank = 0
     return Rank
 
-def Xor(data, key):
+def xor(data, key):
     data = str(data)
     key = str(key)
     xored = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in zip(data, cycle(key)))
     return xored
 
-def GetUserDataFunction(request):
+def get_user_data_fsunction(request):
     """Gets the user data."""
     TargetAccid = request.form["targetAccountID"]
     FromAccid = request.form["accountID"]
@@ -241,17 +241,17 @@ def GetUserDataFunction(request):
     Success(f"Got user data for {Userdata[3]} successfully!A")
     return TheStupidString
 
-def AIDToUID(AccountID: int):
+def aid_to_uid(AccountID: int):
     """Gets user ID from Account ID."""
     return GetUIDFromCache(AccountID) #calls this function now
 
-def TimeAgoFromNow(Timestamp):
+def time_ago_from_now(Timestamp):
     """Returns a string of how long ago from now was a timestamp."""
     Time = datetime.fromtimestamp(int(Timestamp))
     Now = datetime.now()
     return timeago.format(Time, Now)
 
-def GetAccComments(request):
+def get_acc_comments(request):
     """Gets account comments for person."""
     Page = int(request.form["page"])
     Offset = 10 * Page
@@ -280,7 +280,7 @@ def GetAccComments(request):
 
     return CommentStr
 
-def InsertAccComment(request):
+def insert_acc_comment(request):
     """Adds an account comment."""
     Username = request.form["userName"]
     CommentContent = request.form["comment"]
@@ -296,7 +296,7 @@ def InsertAccComment(request):
     mydb.commit()
     return "1"
 
-def UpdateAccSettings(request):
+def update_acc_Settings(request):
     """Updates the account settings for user."""
     AccountID = request.form["accountID"]
     Ms = request.form["mS"]
@@ -316,7 +316,7 @@ def UpdateAccSettings(request):
     Success(f"Settings updated successfully for {AccountID}!")
     return "1"
 
-def UpdateUserScore(request):
+def update_user_score(request):
     """Updates the user page."""
     #ill do it this way as i can't be asked to write out a billion if statements
     #getting accid from name
@@ -350,7 +350,7 @@ def UpdateUserScore(request):
     Success(f"Successfully updated the user profile for {request.form['userName']}!")
     return str(UserID)
 
-def JointStringBuilder(Content: dict):
+def joint_string_builder(Content: dict):
     """Builds a joint string out of a dict."""
     ReturnString = ""
     #iterating through dict
@@ -358,7 +358,7 @@ def JointStringBuilder(Content: dict):
         ReturnString += f":{key}:{Content[key]}"
     return ReturnString[1:]
 
-def GetLeaderboards(request):
+def get_leaderboards(request):
     """Gets the leaderboards."""
     AccID = request.form["accountID"]
     LeaderboardType = request.form["type"] #4 leaderboard types, realitive, creator, friends and top
@@ -399,7 +399,7 @@ def GetLeaderboards(request):
     Success("Leaderboards served!")
     return ReturnStr[:-1]
 
-def GetModBadge(AccountID):
+def get_mod_badge(AccountID):
     """Gets mod badge level"""
     HasElderMod = HasPrivilege(AccountID, ModElderBadge)
     if HasElderMod:
@@ -409,7 +409,7 @@ def GetModBadge(AccountID):
         return 1
     return 0
 
-def IsMod(request):
+def is_mod(request):
     """Returns whether the user is a mod (has badge)."""
     Log(f"User {request.form['accountID']} is checking mod status.")
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
@@ -422,7 +422,7 @@ def IsMod(request):
     else:
         return "-1"
 
-def Rewards(request):
+def rewards(request):
     """Responsible for the chest rewards."""
     Log(f"Started getting chest data for {request.form['accountID']}")
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]):
@@ -482,11 +482,11 @@ def Rewards(request):
     Success("Boom chest data done.")
     return f"bruhh{EncodedReturn}|{ShaReturn}"
 
-def Sha1It(Text: str):
+def sha_1_It(Text: str):
     """Hashes text in SHA1."""
     return hashlib.sha1(Text.encode()).hexdigest()
 
-def CacheRanks():
+def cache_ranks():
     StartTime = time.time()
     logger.info("Caching ranks... ")
     mycursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
@@ -501,7 +501,7 @@ def CacheRanks():
         Ranks[str(User[0])] = UserRank
     logger.info(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
 
-def CronThread():
+def cron_thread():
     Log("Cron thread started!")
     while True:
         Log("Running cron!")
@@ -513,7 +513,7 @@ def CronThread():
         Log(f"Cron done! Took {round(time.time() - StartTime, 2)}s")
         time.sleep(UserConfig["CronThreadDelay"])
 
-def GetAccountUrl(request):
+def get_account_url(request):
     """Returns something for the account url?"""
     return request.url_root
 

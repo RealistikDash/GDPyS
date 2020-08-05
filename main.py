@@ -16,12 +16,12 @@ app.config['JSON_SORT_KEYS'] = False
 app.config['SECRET_KEY'] = os.urandom(24).hex()
 
 @app.route("/")
-def Home():
+def home():
     return redirect("/tools")
 
 @app.route("/database///accounts/loginGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/loginGJAccount.php", methods=["GET", "POST"])
-def LoginHandler():
+def login_handler():
     """Handles login requests"""
     Udid = request.form["udid"]
     Username = request.form["userName"]
@@ -33,33 +33,33 @@ def LoginHandler():
 
 @app.route("/database///accounts/registerGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/registerGJAccount.php", methods=["GET", "POST"])
-def RegisterHandler():
+def register_handler():
     bridge.register(request.form['userName'], FixUserInput(request.form["email"]))
     return RegisterFunction(request)
 
 
 @app.route("/database///getGJUserInfo20.php", methods=["GET", "POST"])
 @app.route("/database/getGJUserInfo20.php", methods=["GET", "POST"])
-def GetUserData():
+def get_user_data():
     Userdata = GetUserDataFunction(request)
     return Userdata
 
 @app.route("/database///getGJAccountComments20.php", methods=["GET", "POST"])
 @app.route("/database/getGJAccountComments20.php", methods=["GET", "POST"])
-def AccountComments():
+def account_comments():
     Comments = GetAccComments(request)
     return Comments
 
 @app.route("/database///uploadGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJAccComment20.php", methods=["GET", "POST"])
-def UploadAccComment():
+def upload_acc_comment():
     bridge.upload_account_comment(request.form["userName"], request.form["comment"])
     Result = InsertAccComment(request)
     return Result
 
 @app.route("/database///updateGJAccSettings20.php", methods=["GET", "POST"])
 @app.route("/database/updateGJAccSettings20.php", methods=["GET", "POST"])
-def UpdateAccountSettings():
+def update_account_settings():
     return UpdateAccSettings(request)
 
 @app.route("/database/updateGJUserScore22.php", methods=["GET", "POST"])
@@ -69,33 +69,33 @@ def UpdateAccountSettings():
 @app.route("/database///updateGJUserScore20.php", methods=["GET", "POST"])
 @app.route("/database/updateGJUserScore201php", methods=["GET", "POST"])
 @app.route("/database///updateGJUserScore21.php", methods=["GET", "POST"])
-def UpdateScore():
+def update_score():
     return UpdateUserScore(request)
 
 @app.route("/database///getGJScores20.php", methods=["GET", "POST"])
 @app.route("/database/getGJScores20.php", methods=["GET", "POST"])
-def GetScores():
+def get_scores():
     return GetLeaderboards(request)
 
 @app.route("/database///requestUserAccess.php", methods=["GET", "POST"])
 @app.route("/database/requestUserAccess.php", methods=["GET", "POST"])
-def GetMod():
+def get_mod():
     bridge.request_mod(request.form["accountID"])
     return IsMod(request)
 
 @app.route("/database///getGJRewards.php", methods=["GET", "POST"])
 @app.route("/database/getGJRewards.php", methods=["GET", "POST"])
-def GetRewards():
+def get_rewards():
     return Rewards(request)
 
 @app.route("/database///getAccountURL.php", methods=["GET", "POST"])
 @app.route("/database/getAccountURL.php", methods=["GET", "POST"])
-def GetAccUrl():
+def get_acc_url():
     return GetAccountUrl(request)
 
 @app.route("//database/accounts/backupGJAccountNew.php", methods=["GET", "POST"])
 @app.route("/database/accounts/backupGJAccountNew.php", methods=["GET", "POST"])
-def SaveRoune():
+def save_route():
     return SaveUserData(request)
 
 #this is a bit of routes dont you think?
@@ -105,142 +105,142 @@ def SaveRoune():
 @app.route("/database/accounts/syncGJAccount20.php", methods=["GET", "POST"])
 @app.route("//database/accounts/syncGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/syncGJAccount.php", methods=["GET", "POST"])
-def LoadRoute():
+def load_route():
     return LoadUserData(request)
 
 @app.route("//database/likeGJItem211.php", methods=["GET", "POST"])
 @app.route("/database/likeGJItem211.php", methods=["GET", "POST"])
-def LikeRoute():
+def like_route():
     bridge.like(bool(request.form["like"]))
     return LikeFunction(request)
 
 @app.route("//database/uploadGJLevel21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJLevel21.php", methods=["GET", "POST"])
-def LevelUploadRoute():
+def level_upload_route():
     bridge.level_upload(request.form["userName"], request.form["levelID"])
     return UploadLevel(request)
 
 @app.route("//database/getGJLevels21.php", methods=["GET", "POST"])
 @app.route("/database/getGJLevels21.php", methods=["GET", "POST"])
-def GetLevelsRoute():
+def get_levels_route():
     return GetLevels(request)
 
 @app.route("//database/downloadGJLevel22.php", methods=["GET", "POST"])
 @app.route("/database/downloadGJLevel22.php", methods=["GET", "POST"])
-def DLLevelRoute():
+def dl_level_route():
     return DLLevel(request)
 
 @app.route("//database/getGJSongInfo.php", methods=["GET", "POST"])
 @app.route("/database/getGJSongInfo.php", methods=["GET", "POST"])
-def SongRoute():
+def song_route():
     return GetSong(request)
 
 @app.route("//database/getGJComments21.php", methods=["GET", "POST"])
 @app.route("/database/getGJComments21.php", methods=["GET", "POST"])
 @app.route("/database/getGJCommentHistory.php", methods=["GET", "POST"])
-def CommentGetRoute():
+def comment_get_route():
     return GetComments(request)
 
 @app.route("//database/deleteGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/deleteGJAccComment20.php", methods=["GET", "POST"])
-def DeleteAccCommentRoute():
+def delete_acc_comment_route():
     bridge.delete_account_comment(request.form["accountID"], request.form["commentID"])
     return DeleteAccComment(request)
 
 @app.route("//database/uploadGJComment21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJComment21.php", methods=["GET", "POST"])
-def PostCommentRoute():
+def post_comment_route():
     bridge.upload_comment(request.form["userName"], request.form["comment"])
     return PostComment(request)
 
 @app.route("//database/suggestGJStars20.php", methods=["GET", "POST"])
 @app.route("/database/suggestGJStars20.php", methods=["GET", "POST"])
-def LevelSuggestRoute():
+def level_suggest_route():
     bridge.suggest_stars(request.form["levelID"], int(request.form["stars"]), request.form["feature"])
     return LevelSuggest(request)
 
 @app.route("//database/uploadGJMessage20.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJMessage20.php", methods=["GET", "POST"])
-def PostMessageRoute():
+def post_message_route():
     return MessagePost(request)
 
 @app.route("//database/getGJUsers20.php", methods=["GET", "POST"])
 @app.route("/database/getGJUsers20.php", methods=["GET", "POST"])
-def UserSearchRoute():
+def user_search_route():
     return UserSearchHandler(request)
 
 @app.route("//database/getGJMessages20.php", methods=["GET", "POST"])
 @app.route("/database/getGJMessages20.php", methods=["GET", "POST"])
-def GetMessagesRoute():
+def get_messages_route():
     return GetMessages(request)
 
 @app.route("//database/downloadGJMessage20.php", methods=["GET", "POST"])
 @app.route("/database/downloadGJMessage20.php", methods=["GET", "POST"])
-def DownloadMessageRoute():
+def download_message_route():
     return GetMessage(request)
 
 @app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
-def DeleteCommentRoute():
+def delete_comment_route():
     bridge.delete_comment(request.form["accountID"], request.form["commentID"])
     return DeleteCommentHandler(request)
 
 @app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
-def GetMapPacksRoute():
+def get_map_packs_route():
     return MapPackHandelr(request)
 
 @app.route("/database/getGJGauntlets21.php", methods=["GET", "POST"])
-def GauntletRoute():
+def gauntlet_route():
     return GetGauntletsHandler()
 
 @app.route("/database/getGJLevelScores211.php", methods=["GET", "POST"])
-def LevelLBsRoute():
+def level_lbs_route():
     return ScoreSubmitHandler(request)
 
 @app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
-def FriendReqRoute():
+def friend_req_route():
     bridge.send_friend_request(request.form["accountID"], request.form["toAccountID"], request.form["comment"])
     return SendFriendReq(request)
 
 @app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
-def DeleteFriendReqRoute():
+def delete_friend_req_route():
     return DeleteFriendRequest(request)
 
 @app.route("/database/getGJFriendRequests20.php", methods=["GET", "POST"])
-def GetFriendReqRoute():
+def get_friend_req_route():
     return GetFriendReqList(request)
 
 @app.route("/database/getGJDailyLevel.php", methods=["GET", "POST"])
-def GetDailyRoute():
+def get_daily_route():
     return GetDaily(request)
 
-##API ROUTES##
+## API ROUTES ##
 @APIBlueprint.route("/getlevel/<LevelID>")
-def APILevelRount(LevelID):
+def api_level_route(LevelID):
     return jsonify(APIGetLevel(LevelID))
 
 @app.route("/database/")
-def DatabaseRoute():
+def database_route():
     Log("Someone just got ricked!")
     return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 @app.errorhandler(500)
-def BadCodeError(error):
+def bad_code_error(error):
     return "-1"
 
 @APIBlueprint.errorhandler(500)
-def APIBadCodeError(error):
+def api_bad_code_error(error):
     return jsonify({
         "status" : 500,
         "message" : "An internal server error has occured! Please report this to the owner or developer."
     })
 
 @APIBlueprint.errorhandler(404)
-def APINotFoundError(error):
+def api_not_found_error(error):
     return jsonify({
         "status" : 404,
         "message" : "What you're looking for is not here."
     })
-###########TOOLS
+########### TOOLS
 # TODO : Make separate file
 ExampleSession = {
     "AccountID" : 0,
@@ -249,7 +249,7 @@ ExampleSession = {
     "LoggedIn" : False
 }
 
-def SetSession(NewSession: dict) -> None:
+def set_session(NewSession: dict) -> None:
     """Sets the session to something new."""
     session.clear()
     for a in list(NewSession.keys()):
@@ -257,17 +257,17 @@ def SetSession(NewSession: dict) -> None:
 
 #fill session
 @ToolBlueprint.before_request
-def BeforeRequest(): 
+def before_request(): 
     if "LoggedIn" not in list(dict(session).keys()): #we checking if the session doesnt already exist
         for x in list(ExampleSession.keys()):
             session[x] = ExampleSession[x]
 
 @ToolBlueprint.route("/")
-def HomeToolRoute():
+def home_tool_route():
     return render_template("home.html", session=session, title = "Home", ver=__version__)
 
 @ToolBlueprint.route("/login", methods=["GET", "POST"])
-def ToolsLoginRoute():
+def tools_login_route():
     if request.method == "GET":
         return render_template("login.html", session=session, title = "Login")
     #POST REQUEST
@@ -279,11 +279,11 @@ def ToolsLoginRoute():
     return redirect("/")
 
 @ToolBlueprint.errorhandler(500)
-def Tool500():
+def tool_500():
     return render_template("500.html", session=session, title = "Code Broke")
 
 @ToolBlueprint.errorhandler(404)
-def Tool404():
+def tool_404():
     return render_template("404.html", session=session, title = "Page Missing")
 
 app.register_blueprint(APIBlueprint, url_prefix='/api')

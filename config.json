@@ -1,0 +1,23 @@
+{
+    "Port": 80,
+    "SQLHost": "localhost",
+    "SQLUser": "root",
+    "SQLDatabase": "GDPyS",
+    "SQLPassword": "",
+    "Chest1Wait": 60,
+    "Chest2Wait": 240,
+    "CronThreadDelay": 3600,
+    "LocalServer": false,
+    "LegacyPasswords": false,
+    "MaxAccsPerIP": 4,
+    "MagicGivesCP": true,
+    "AwardGivesCP": true,
+    "BannedLevelsHidden": true,
+    "LevelCacheSize": 200,
+    "CommandPrefix": "/",
+    "CheatlessAC": true,
+    "CheatlessExtremeDemonMinAttempts": 100,
+    "CheatlessScoreCheck": true,
+    "CheatlessCronChecks": true,
+    "CheatlessMaxStars": 5000
+}

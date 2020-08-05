@@ -5,6 +5,7 @@ from console import *
 import threading
 from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
+import os
 from migrations import ImportGDPySDatabase
 from constants import __version__
 import os

@@ -1,9 +1,12 @@
 import threading
 import os
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
     
 dir_path = os.path.dirname(os.path.realpath(__file__))
    
 def add_plugins():
+    print("adding plugins")
     def exec_plugin(code, name):
         exec(code)
         print(f"Loaded plugin {name}!")

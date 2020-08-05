@@ -30,7 +30,7 @@ DefaultConfig = {
     "CommandPrefix": "/",
     "CheatlessAC": True,  # global switch
     "CheatlessExtremeDemonMinAttempts": 100,  # if a user submits an extreme demon score under this att count, they will be banned
-    "cheatless_score_check": True,
+    "CheatlessScoreCheck": True,
     "CheatlessCronChecks": True,
     "CheatlessMaxStars": 5000,
 }

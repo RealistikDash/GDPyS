@@ -1,5 +1,7 @@
-from listeners import listener
+from listeners import Listener
 import asyncio
+
+listener = Listener()
 
 class Commands:
     def __init__(self, prefix):
@@ -15,7 +17,10 @@ class Commands:
     def on_upload_comment(self, username, comment):
         for name, func in self.commands.items():
             if comment.startswith(self.prefix + name):
-                func["func"](func["args"])
+                func["func"](*func["args"])
                 # add delete comment
                 
 # fix listeners and add arguments for this to be complete
+
+def test(arg1, arg2):
+    print(arg1, arg2)

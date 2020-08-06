@@ -23,9 +23,7 @@ try:
         host=UserConfig["SQLHost"],
         user=UserConfig["SQLUser"],
         passwd=UserConfig["SQLPassword"],
-        database=UserConfig['SQLDatabase'],
-        auth_plugin="caching_sha2_password",
-        port=3307
+        database=UserConfig['SQLDatabase']
     ) #connects to database
     logger.info(f"{Fore.GREEN}[GDPyS] Successfully connected to MySQL!{Fore.RESET}")
 except Exception as e:

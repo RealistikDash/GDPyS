@@ -6,16 +6,16 @@ class Commands:
         self.commands = {}
         self.prefix = prefix
     
-    def command(self, coro):
+    def command(self, func):
         def wrapper():
-            self.commands[coro.__name__] = coro
+            self.commands[func.__name__] = func
         return wrapper
   
     @listener.event
     async def on_upload_comment(self, username, comment):
-        for name, coro in self.commands.items():
+        for name, func in self.commands.items():
             if comment.startswith(self.prefix + name):
-                asyncio.run(coro)
+                func()
                 # add delete comment
                 
 # fix listeners and add arguments for this to be complete

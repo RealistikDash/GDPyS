@@ -6,16 +6,16 @@ class Commands:
         self.commands = {}
         self.prefix = prefix
     
-    def command(self, func):
+    def command(self, func, *args):
         def wrapper():
-            self.commands[func.__name__] = func
+            self.commands[func.__name__] = {"func": func, "args": args}
         return wrapper
   
     @listener.event
-    async def on_upload_comment(self, username, comment):
+    def on_upload_comment(self, username, comment):
         for name, func in self.commands.items():
             if comment.startswith(self.prefix + name):
-                func()
+                func["func"](func["args"])
                 # add delete comment
                 
 # fix listeners and add arguments for this to be complete

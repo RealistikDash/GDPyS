@@ -633,7 +633,7 @@ def rewards(request):
     return f"bruhh{EncodedReturn}|{ShaReturn}"
 
 
-def sha1_It(Text: str):
+def sha1_it(Text: str):
     """Hashes text in SHA1."""
     return hashlib.sha1(Text.encode()).hexdigest()
 

@@ -15,8 +15,9 @@ def bridge(type, params=None):
             requests.get(f"http://localhost:75/{type}/")
         else:
             requests.get(f"http://localhost:75/{type}/", params=params)
-    except requests.ConnectionError:
-        print("failed to connect")
+        print("posted")
+    except requests.ConnectionError as e:
+        print("failed to connect " + str(e))
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
 ToolBlueprint = Blueprint("tools", __name__)

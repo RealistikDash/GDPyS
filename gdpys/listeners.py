@@ -2,6 +2,7 @@ import asyncio
 from flask import Flask, request
 import logging
 import os
+from threading import Thread
 app = Flask(__name__)
 logging.getLogger("werkzeug").disabled = True
 os.environ["WERKZEUG_RUN_MAIN"] = "true"
@@ -13,9 +14,6 @@ class Listener: # this has taken many nights of sleep deprivation ~spook
     def event(self, func):
         setattr(self, func.__name__, func)
         return func
-    
-    def run(self):
-        app.run(host="0.0.0.0", port=75)
     
     @app.route("/login")
     def login(self):
@@ -99,3 +97,4 @@ class Listener: # this has taken many nights of sleep deprivation ~spook
         for name, func in self.funcs.items():
            if name=="on_ready":
                 func()
+Thread(target=app.run, kwargs={"host": "0.0.0.0", "port": 75}).start()

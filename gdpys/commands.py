@@ -1,4 +1,4 @@
-from listeners import Listener
+from .listeners import Listener
 import asyncio
 
 listener = Listener()
@@ -21,6 +21,3 @@ class Commands:
                 # add delete comment
                 
 # fix listeners and add arguments for this to be complete
-
-def test(arg1, arg2):
-    print(arg1, arg2)

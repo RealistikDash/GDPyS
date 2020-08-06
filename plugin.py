@@ -8,7 +8,7 @@ def add_plugins():
     def exec_plugin(name):
         if name == "__init__.py":
             return
-        name.strip(".py")
+        name = name.strip(".py")
         __import__("plugins." + name)
         print(f"Loaded plugin {name}!")
 

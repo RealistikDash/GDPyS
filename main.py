@@ -9,15 +9,6 @@ from migrations import ImportGDPySDatabase
 from constants import __version__
 import requests
 
-def bridge(type, params=None):
-    try:
-        if params == None:
-            requests.get(f"http://localhost:75/{type}/")
-        else:
-            requests.get(f"http://localhost:75/{type}/", params=params)
-        print("posted")
-    except requests.ConnectionError as e:
-        print("failed to connect " + str(e))
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
 ToolBlueprint = Blueprint("tools", __name__)

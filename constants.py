@@ -2,8 +2,8 @@
 # rather than what cvolton does now, GDPyS will use bitwise privileges similar to RealistikOsu
 
 UserLogIn = 2 << 0
-UserPostAccComment = 2 << 1
-UserPostComment = 2 << 2
+UserPostAccComment =  2 << 1
+UserPostComment = 2<<2
 UserUploadLevel = 2 << 3
 ModRateLevel = 2 << 4
 ModRateDemon = 2 << 5

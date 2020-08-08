@@ -27,14 +27,12 @@ def LoginHandler():
     Username = request.form["userName"]
     Password = request.form["password"]
     Log(f"{Username} attempts login...")
-    bridge("login", {"username": Username})
     answer = LoginCheck(Udid, Username, Password, request)
     return answer
 
 @app.route("/database///accounts/registerGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/registerGJAccount.php", methods=["GET", "POST"])
 def RegisterHandler():
-    bridge("register", {"username": request.form['userName'], "email": FixUserInput(request.form["email"])})
     return RegisterFunction(request)
 
 
@@ -53,7 +51,6 @@ def AccountComments():
 @app.route("/database///uploadGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJAccComment20.php", methods=["GET", "POST"])
 def UploadAccComment():
-    bridge("upload_account_comment", {"username": request.form["userName"], "comment": request.form["comment"]})
     Result = InsertAccComment(request)
     return Result
 
@@ -80,7 +77,6 @@ def GetScores():
 @app.route("/database///requestUserAccess.php", methods=["GET", "POST"])
 @app.route("/database/requestUserAccess.php", methods=["GET", "POST"])
 def GetMod():
-    bridge.request_mod(request.form["accountID"])
     return IsMod(request)
 
 @app.route("/database///getGJRewards.php", methods=["GET", "POST"])
@@ -111,13 +107,11 @@ def LoadRoute():
 @app.route("//database/likeGJItem211.php", methods=["GET", "POST"])
 @app.route("/database/likeGJItem211.php", methods=["GET", "POST"])
 def LikeRoute():
-    bridge("like", {"like": bool(request.form["like"])})
     return LikeFunction(request)
 
 @app.route("//database/uploadGJLevel21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJLevel21.php", methods=["GET", "POST"])
 def LevelUploadRoute():
-    bridge("level_upload", {"username": request.form["userName"], "levelid": request.form["levelID"]})
     return UploadLevel(request)
 
 @app.route("//database/getGJLevels21.php", methods=["GET", "POST"])
@@ -144,19 +138,16 @@ def CommentGetRoute():
 @app.route("//database/deleteGJAccComment20.php", methods=["GET", "POST"])
 @app.route("/database/deleteGJAccComment20.php", methods=["GET", "POST"])
 def DeleteAccCommentRoute():
-    bridge("delete_account_comment", {"accountid": request.form["accountID"], "commentid": request.form["commentID"]})
     return DeleteAccComment(request)
 
 @app.route("//database/uploadGJComment21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJComment21.php", methods=["GET", "POST"])
 def PostCommentRoute():
-    bridge("upload_comment", {"username": request.form["userName"], "comment": request.form["comment"]})
     return PostComment(request)
 
 @app.route("//database/suggestGJStars20.php", methods=["GET", "POST"])
 @app.route("/database/suggestGJStars20.php", methods=["GET", "POST"])
 def LevelSuggestRoute():
-    bridge.suggest_stars(request.form["levelID"], int(request.form["stars"]), request.form["feature"])
     return LevelSuggest(request)
 
 @app.route("//database/uploadGJMessage20.php", methods=["GET", "POST"])
@@ -181,7 +172,6 @@ def DownloadMessageRoute():
 
 @app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
 def DeleteCommentRoute():
-    bridge("delete_comment", {"accountid": request.form["accountID"], "commentid": request.form["commentID"]})
     return DeleteCommentHandler(request)
 
 @app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
@@ -198,7 +188,6 @@ def LevelLBsRoute():
 
 @app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
 def FriendReqRoute():
-    bridge("send_friend_request", {"accountid": request.form["accountID"], "toaccountid": request.form["toAccountID"], "comment": request.form["comment"]})
     return SendFriendReq(request)
 
 @app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
@@ -302,6 +291,5 @@ if __name__ == "__main__":
  {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
     """)
     add_plugins()
-    bridge("ready")
     threading.Thread(target=CronThread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

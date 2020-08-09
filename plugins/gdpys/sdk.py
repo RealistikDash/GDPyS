@@ -27,3 +27,7 @@ class SDK():
         """Gets the userID from the accountID"""
         return AIDToUID(account_id)
 
+    def message_user(self, account_id: int, title:str, message: str) -> None:
+        """Sends a message to the user via the GDPyS bot."""
+        Bot.SendMessage(account_id, message, title)
+

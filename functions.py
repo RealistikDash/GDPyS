@@ -43,7 +43,7 @@ def GetUIDFromCache(AccID: int) -> int:
     AccID = int(AccID)
     try:
         return UserIDCache[AccID]
-    except IndexError:
+    except Exception:
         mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (AccID,))
         UserIDCache[AccID] = mycursor.fetchone()[0]
         Log(f"Cached UserID for {AccID}")
@@ -354,17 +354,24 @@ def JointStringBuilder(Content: dict):
 
 def GetLeaderboards(request):
     """Gets the leaderboards."""
-    AccID = request.form["accountID"]
+    AccID = int(request.form.get("accountID", 0)) #it isnt alwaays passed
     LeaderboardType = request.form["type"] #4 leaderboard types, realitive, creator, friends and top
     Log(f"Serving {LeaderboardType} leaderboards to {AccID}")
 
     #leaderboard data
     if LeaderboardType == "top":
         #probably the simplest one
-        mycursor.execute("SELECT * FROM users WHERE isBanned = '0' AND stars > 0 ORDER BY stars DESC LIMIT 100")
+        mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND stars > 0 ORDER BY stars DESC LIMIT 100")
 
     elif LeaderboardType == "creators":
-        mycursor.execute("SELECT * FROM users WHERE isCreatorBanned = '0' AND isBanned = '0' ORDER BY creatorPoints DESC LIMIT 100")
+        mycursor.execute("SELECT * FROM users WHERE isCreatorBanned = 0 AND isBanned = 0 ORDER BY creatorPoints DESC LIMIT 100")
+    
+    elif LeaderboardType == "friends":
+        #gjp check
+        if not VerifyGJP(AccID, request.form["gjp"]):
+            return "-1"
+        FriendsList = ListToCommaString(GetFriendsList(AccID))
+        mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND extID in (%s)", (FriendsList,))
 
     TheData = mycursor.fetchall()
     

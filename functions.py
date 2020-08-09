@@ -1388,26 +1388,6 @@ def DebugManualAddSong(Source, SongID):
     })
     AddSongToDB(SongInfo.text)
 
-def DebugReupload(Source, LevelID):
-    """[DEBUG] Reuploads level from source to GDPyS server."""
-    Level = requests.post(Source, data = {
-        "secret" : "Wmfd2893gb7",
-        "gameVersion" : 22,
-        "levelID" : LevelID,
-        "binaryVersion" : 33,
-        "gdw" : 0,
-        "inc" : 1,
-        "extras" : 0
-    })
-
-    Result = Level.text
-    
-    if Result == "" or Result == "-1" or Result == "No no no":
-        Fail(f"Server error with response {Result}!")
-        return
-    
-    # TODO FINISH THIS
-
 def MessagePost(request):
     """Posts a message to user."""
     Log("Message send attempt!")

@@ -28,6 +28,7 @@ DefaultConfig = {
     "BannedLevelsHidden" : True,
     "LevelCacheSize" : 200, #will store levels in memory. CAN BE EXPENSIVE
     "CommandPrefix" : "/",
+    "MaxReuploadedLevels24h" : 10, #max allowed levels to be reuploaded per 24h
     "CheatlessAC" : True, #global switch
     "CheatlessExtremeDemonMinAttempts" : 100, #if a user submits an extreme demon score under this att count, they will be banned
     "CheatlessScoreCheck" : True,

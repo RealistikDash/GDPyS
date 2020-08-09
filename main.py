@@ -8,6 +8,7 @@ from plugins.gdpys.bridge import Bridge
 from migrations import ImportGDPySDatabase
 from constants import __version__
 from core.tools import *
+from core.cron import cron_thread
 
 bridge = Bridge()
 app = Flask(__name__)
@@ -306,5 +307,5 @@ if __name__ == "__main__":
     """)
     add_plugins()
     bridge.ready()
-    threading.Thread(target=CronThread).start()
+    threading.Thread(target=cron_thread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

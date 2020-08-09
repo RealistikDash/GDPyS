@@ -112,4 +112,7 @@ def max_star_count_ban(cron_cursor) -> None:
         logger.info(f"Done with {BannedCount} users banned! {time.ms_return()}ms")
 
 if __name__ == "__main__":
-    cron_thread()
+    Log("Would you like to start the cron job? (y/N)")
+    a = input("")
+    if a.lower() == "y":
+        cron_thread()

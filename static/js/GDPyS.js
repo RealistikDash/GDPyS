@@ -51,7 +51,10 @@ function ReuploadLevel(LevelID, server) {
             IziFail(out["message"])
         }
     })
-    .catch(err => { IziFail("Error!", "Misc reupload error!") }); 
+    .catch(err => {
+        IziFail("Error!", `Misc reupload error!`);
+        console.log(err);
+    }); 
 }
 
 function ReuploadButton() {

@@ -289,7 +289,7 @@ def ToolsLoginRoute():
 # Realistik you can do the magic stuff
 @ToolBlueprint.route("/reupload/level")
 def tools_level_reupload_route():
-    return render_template("levelreupload.html", title="Level Reupload")
+    return render_template("levelreupload.html", title="Level Reupload", left=levels_reuploaded_left())
 
 @ToolBlueprint.route("/reupload/song")
 def tools_song_reupload_route():

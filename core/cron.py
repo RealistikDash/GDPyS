@@ -8,9 +8,9 @@ from helpers.timer import Timer
 
 def cron_thread():
     Log("Cron thread started!")
+    time = Timer()
     while True:
         Log("Running cron!")
-        time = Timer()
         time.start()
         cron_cursor = mydb.cursor() #create cursor specifically for cron jobs
         cache_user_ids(cron_cursor)
@@ -18,8 +18,7 @@ def cron_thread():
         calculate_cp(cron_cursor)
         max_star_count_ban(cron_cursor)
         cron_cursor.close() #close it after all is done
-        time.end()
-        Log(f"Cron done! Took {time.ms_return()}s")
+        Log(f"Cron done! Took {time.end()}s")
         pytime.sleep(UserConfig["CronThreadDelay"])
 
 def cache_user_ids(cron_cursor):

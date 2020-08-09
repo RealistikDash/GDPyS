@@ -17,6 +17,7 @@ import string
 from logger import logger
 from datetime import datetime, timedelta
 from core.mysqlconn import mydb
+from helpers.filters import *
 
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
@@ -155,10 +156,15 @@ def RegisterFunction(request):
         Fail(f"Cound not register {request.form['userName']}! (username taken)")
         return "-2"
     #aight lets go register them
-    Username = FixUserInput(request.form["userName"])
+    Username = request.form["userName"]
     Password = HashPassword(request.form["password"])
-    Email = FixUserInput(request.form["email"])
+    Email = request.form["email"]
     RegisterTime = round(time.time())
+
+    #check for bad usernames
+    if not check_username(Username):
+        Fail("Username has invalid characters!")
+        return "-1"
     #Query Time
     mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (Username, Password, Email, RegisterTime))
     mydb.commit()

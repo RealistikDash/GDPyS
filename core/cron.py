@@ -1,23 +1,26 @@
-import time
+import time as pytime
 #gdpys things
 from console import logger, Log, Success, Fail
 from functions import UserIDCache, Ranks
 from core.mysqlconn import mydb
 from config import UserConfig
+from helpers.timer import Timer
 
 def cron_thread():
     Log("Cron thread started!")
     while True:
         Log("Running cron!")
-        StartTime = time.time()
+        time = Timer()
+        time.start()
         cron_cursor = mydb.cursor() #create cursor specifically for cron jobs
         cache_user_ids(cron_cursor)
         cache_ranks(cron_cursor)
         calculate_cp(cron_cursor)
         max_star_count_ban(cron_cursor)
         cron_cursor.close() #close it after all is done
-        Log(f"Cron done! Took {round(time.time() - StartTime, 2)}s")
-        time.sleep(UserConfig["CronThreadDelay"])
+        time.end()
+        Log(f"Cron done! Took {time.ms_return()}s")
+        pytime.sleep(UserConfig["CronThreadDelay"])
 
 def cache_user_ids(cron_cursor):
     """Caches all UserIDs from table. Used to remove the query from AIDToUID."""
@@ -28,7 +31,8 @@ def cache_user_ids(cron_cursor):
         UserIDCache[int(a[0])] = a[1]
 
 def cache_ranks(cron_cursor):
-    StartTime = time.time()
+    time = Timer()
+    time.start()
     logger.info("Caching ranks... ")
     cron_cursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
     Leaderboards = cron_cursor.fetchall()
@@ -40,11 +44,13 @@ def cache_ranks(cron_cursor):
     for User in Leaderboards:
         UserRank += 1
         Ranks[str(User[0])] = UserRank
-    logger.info(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
+    time.end()
+    logger.info(f"Done! {time.ms_return()}ms")
 
 def calculate_cp(cron_cursor):
     """Cron job that calculates CP for the whole server."""
-    StartTime = time.time()
+    time = Timer()
+    time.start()
     logger.info("Beginning to calculate CP... ")
     #first we get all user ids
     cron_cursor.execute("SELECT userID FROM users")
@@ -54,8 +60,8 @@ def calculate_cp(cron_cursor):
     for UserID in UserIDs:
         calc_user_cp(cron_cursor, UserID[0])
     mydb.commit()
-    Finished = round((time.time() - StartTime) * 1000, 2)
-    logger.info(f"Done! {Finished}ms")
+    time.end()
+    logger.info(f"Done! {time.ms_return()}ms")
 
 def calc_user_cp(cron_cursor, UserID : int):
     """Calculates CP for specified user id."""
@@ -86,7 +92,8 @@ def max_star_count_ban(cron_cursor) -> None:
     """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
     # TODO : Make the same thing for usercoins and regular coins
     if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
-        StartTime = time.time()
+        time = Timer()
+        time.start()
         logger.info("Running CheatlessAC Cron Starcount Check... ")
         TotalStars = 187 #from RobTop levels
         #get all star rated levels
@@ -103,5 +110,5 @@ def max_star_count_ban(cron_cursor) -> None:
         #ban em
         cron_cursor.execute("UPDATE users SET isBanned = 1 WHERE stars > %s", (TotalStars,))
         mydb.commit()
-
-        logger.info(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
+        time.end()
+        logger.info(f"Done with {BannedCount} users banned! {time.ms_return()}ms")

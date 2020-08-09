@@ -7,6 +7,7 @@ from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
 from migrations import ImportGDPySDatabase
 from constants import __version__
+from core.tools import *
 
 bridge = Bridge()
 app = Flask(__name__)

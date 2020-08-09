@@ -1,5 +1,7 @@
 from config import UserConfig
 from logger import logger
+import mysql.connector
+from colorama import Fore
 
 try:
     mydb = mysql.connector.connect(

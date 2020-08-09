@@ -215,15 +215,19 @@ def GetFriendReqRoute():
 def GetDailyRoute():
     return GetDaily(request)
 
+@app.route("/database/")
+def DatabaseRoute():
+    Log("Someone just got ricked!")
+    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):
     return jsonify(APIGetLevel(LevelID))
 
-@app.route("/database/")
-def DatabaseRoute():
-    Log("Someone just got ricked!")
-    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+@APIBlueprint.route("/api/reuploadapi/<levelid>/<server>")
+def APIReuploadTool(levelid,server):
+    return jsonify(reupload_level_api(levelid, server, session))
 
 @app.errorhandler(500)
 def BadCodeError(error):

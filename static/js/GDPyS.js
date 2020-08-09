@@ -32,8 +32,9 @@ function IziFail(MainText, OtherText) {
     });
 }
 
-function ReuploadLevel(LevelID) {
-    fetch(`/tools/reuploadapi/${LevelID}`)
+function ReuploadLevel(LevelID, server) {
+    server = encodeURIComponent(server); //urlencode it
+    fetch(`/api/reuploadapi/${LevelID}/${server}`)
 	.then(res => res.json())
 	.then((out) => {
         if (out["status"] == 404) {
@@ -42,8 +43,11 @@ function ReuploadLevel(LevelID) {
         else if (out["status"] == 500) {
             IziFail("Error!", "Something behind the scenes went terribly wrong.")
         }
-        else {
+        else if (out["status"] == 200) {
             IziSuccess("Level Reuploaded!", `The level ID is ${out["levelID"]}!`)
+        }
+        else {
+            IziFail(out["message"])
         }
     })
     .catch(err => { IziFail("Error!", "Misc reupload error!") }); 

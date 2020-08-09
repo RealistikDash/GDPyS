@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from core.mysqlconn import mydb
 from helpers.filters import *
 from core.bot import GDPySBot
+from helpers.passwordhelper import CreateBcrypt, RandomString
 
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
@@ -135,9 +136,7 @@ def LoginCheck(Udid, Username, Password, request):
 
 def HashPassword(PlainPassword: str):
     """Creates a hashed password to be used in database."""
-    if not UserConfig["LegacyPasswords"]:
-        return CreateBcrypt(PlainPassword)
-    return PlainPassword #havent done legacy passwords
+    return CreateBcrypt(PlainPassword)
 
 def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
@@ -967,11 +966,6 @@ def CheckBcryptPw(dbpassword, painpassword):
 
     return check
 
-def CreateBcrypt(Password: str):
-    """Creates hashed password."""
-    BHashed = bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt(10))
-    return BHashed.decode()
-
 def GetSong(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
     SongID = int(request.form["songID"])
@@ -1208,10 +1202,6 @@ def HasPrivilege(AccountID: int, Privilege):
 
     #and now alas we check if they have it
     return bool(DBPriv & Privilege)
-
-def RandomString(Lenght=8):
-    Chars = string.ascii_lowercase
-    return ''.join(random.choice(Chars) for i in range(Lenght))
 
 #for now ill place the bot defenition her
 Bot = GDPySBot()

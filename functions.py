@@ -370,8 +370,11 @@ def GetLeaderboards(request):
         #gjp check
         if not VerifyGJP(AccID, request.form["gjp"]):
             return "-1"
-        FriendsList = ListToCommaString(GetFriendsList(AccID))
+        FriendsList = ListToCommaString(GetFriendsList(AccID)+[AccID])
         mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND extID in (%s)", (FriendsList,))
+    
+    #elif LeaderboardType == "relative":
+        #global
 
     TheData = mycursor.fetchall()
     
@@ -593,23 +596,30 @@ def LikeFunction(request):
     Like = int(request.form["like"])
     ItemID = request.form["itemID"]
 
-    if Type == 1:
-        #level
-        Table = "levels"
-        Column = "levelID"
-    if Type == 2:
-        Table = "comments"
-        Column = "commentID"
-    if Type == 3:
-        Table = "acccomments"
-        Column = "commentID"
+    Types = {
+        1 : {
+            "Table" : "levels",
+            "Column" : "levelID"
+        },
+        2 : {
+            "Table" : "comments",
+            "Column" : "commentID"
+        },
+        3 : {
+            "Table" : "acccomments",
+            "Column" : "commentID"
+        }
+    }[Type]
+    Table = Types["Table"]
+    Column = Types["Column"]
 
     #ok so i usually dont do formats in sql queries because sql injection, but here we can trust variables
     mycursor.execute(f"SELECT likes FROM {Table} WHERE {Column} = %s LIMIT 1", (ItemID,))
-    Likes = mycursor.fetchall()
-    if len(Likes) == 0:
+    Likes = mycursor.fetchone()
+    if Likes == None:
+        Fail(f"Could not find matching {Table} to like!")
         return "-1"
-    Likes = Likes[0][0]
+    Likes = Likes[0]
 
     if Like == 1:
         Likes += 1

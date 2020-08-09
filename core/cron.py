@@ -80,9 +80,9 @@ def calc_cp_for_level(level_response: tuple) -> int:
         cp_given += 1
     if level_response[3]:
         cp_given += 1
-    if level_response[4]:
+    if level_response[4] and UserConfig["AwardGivesCP"]:
         cp_given += 1
-    if level_response[5]:
+    if level_response[5] and UserConfig["MagicGivesCP"]:
         cp_given += 1
     return cp_given
 

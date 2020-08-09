@@ -2079,9 +2079,9 @@ def ListToCommaString(TheList: list):
 
 def GetFriendsList(AccountID: int):
     """Returns a list of account ids of the users friends."""
-    mycursor.execute("SELECT accountID FROM friendreqs WHERE toAccountID = %s", (AccountID,))
+    mycursor.execute("SELECT person2 FROM friendships WHERE person1 = %s", (AccountID,))
     Friends = mycursor.fetchall()
-    mycursor.execute("SELECT toAccountID FROM friendreqs WHERE accountID = %s", (AccountID,))
+    mycursor.execute("SELECT person1 FROM friendships WHERE person2 = %s", (AccountID,))
     Friends1 = mycursor.fetchall()
     FriendsRetrun = []
 

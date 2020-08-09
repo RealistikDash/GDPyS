@@ -38,7 +38,7 @@ def ToolLoginCheck(request) -> bool:
 
 def levels_reuploaded_left() -> int:
     """Gets the percentage of reupload taken a day. Yeah that was worded weird."""
-    return round((glob.reuploaded_levels/UserConfig["MaxReuploadedLevels24h"])*100, 2)
+    return int(round((glob.reuploaded_levels/UserConfig["MaxReuploadedLevels24h"])*100, 2))
 
 def reupload_level_api(level_id: str, server: str, session):
     """[NOT RESTFUL] Reuploads a level from an external source."""

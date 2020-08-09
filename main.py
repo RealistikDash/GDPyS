@@ -269,7 +269,9 @@ def HomeToolRoute():
 @ToolBlueprint.route("/login", methods=["GET", "POST"])
 def ToolsLoginRoute():
     if request.method == "GET":
-        return render_template("login.html", session=session, title = "Login")
+        if not session["LoggedIn"]:
+            return render_template("login.html", session=session, title = "Login")
+        return redirect("/tools")
     #POST REQUEST
     A = ToolLoginCheck(request)
     if not A[0]: #login failed

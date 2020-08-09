@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block image %}https://images.unsplash.com/photo-1527086983597-b4d44c4a66d0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60{% endblock %}
+{% block text %}Song Reupload{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        Song reupload
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm">
+                Reupload a song to the GDPS.
+            </div>
+            <div class="col-sm">
+                <form action="/tools/reupload/song" method="post">
+                    <div class="form-group">
+                        <label>Link</label>
+                        <input type="text" class="form-control" name="username">
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="">Reupload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

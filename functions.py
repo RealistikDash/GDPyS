@@ -1,4 +1,3 @@
-import mysql.connector
 from config import *
 from console import *
 import time
@@ -17,7 +16,7 @@ from constants import *
 import string
 from logger import logger
 from datetime import datetime, timedelta
-from core.mysql import mydb
+from core.mysqlconn import mydb
 
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 

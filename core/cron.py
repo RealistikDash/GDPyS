@@ -50,6 +50,7 @@ def calculate_cp(cron_cursor):
     """Cron job that calculates CP for the whole server."""
     time = Timer()
     time.start()
+    logger.info("Beginning to calculate CP... ")
     
     #Cronjob code
     cp_values = {}

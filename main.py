@@ -225,7 +225,7 @@ def DatabaseRoute():
 def APILevelRount(LevelID):
     return jsonify(APIGetLevel(LevelID))
 
-@APIBlueprint.route("/api/reuploadapi/<levelid>/<server>")
+@APIBlueprint.route("/reuploadapi/<levelid>/<server>")
 def APIReuploadTool(levelid,server):
     return jsonify(reupload_level_api(levelid, server, session))
 

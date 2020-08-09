@@ -33,6 +33,7 @@ function IziFail(MainText, OtherText) {
 }
 
 function ReuploadLevel(LevelID, server) {
+    //Why did I make it like this??
     server = encodeURIComponent(server); //urlencode it
     fetch(`/api/reuploadapi/${LevelID}/${server}`)
 	.then(res => res.json())
@@ -51,4 +52,10 @@ function ReuploadLevel(LevelID, server) {
         }
     })
     .catch(err => { IziFail("Error!", "Misc reupload error!") }); 
+}
+
+function ReuploadButton() {
+    const LevelID = document.getElementById("levelid").value 
+    const Server = document.getElementById("server").value 
+    ReuploadLevel(LeveID, Server)
 }

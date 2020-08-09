@@ -57,5 +57,5 @@ function ReuploadLevel(LevelID, server) {
 function ReuploadButton() {
     const LevelID = document.getElementById("levelid").value 
     const Server = document.getElementById("server").value 
-    ReuploadLevel(LeveID, Server)
+    ReuploadLevel(LevelID, Server)
 }

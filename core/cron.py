@@ -50,42 +50,40 @@ def calculate_cp(cron_cursor):
     """Cron job that calculates CP for the whole server."""
     time = Timer()
     time.start()
-    logger.info("Beginning to calculate CP... ")
-    #first we get all user ids
-    cron_cursor.execute("SELECT userID FROM users")
-    UserIDs = cron_cursor.fetchall()
-
-    #fetching the counts and calculation total pp
-    for UserID in UserIDs:
-        calc_user_cp(cron_cursor, UserID[0])
+    
+    #Cronjob code
+    cp_values = {}
+    cron_cursor.execute("UPDATE users SET creatorPoints = 0") #set everyones cp to 0 as we wont be calculating everyone
+    #now we get specific levels that match our criteria
+    cron_cursor.execute("SELECT userID, starStars, starFeatured, starEpic, awarded, magic FROM levels WHERE starStars > 0 OR starFeatured > 0 OR starEpic > 0 OR awarded > 0 OR magic > 0")
+    rated_levels = cron_cursor.fetchall()
+    for level in rated_levels:
+        if level[0] not in list(cp_values.keys()):
+            cp_values[level[0]] = 0
+        cp_values[level[0]] += calc_cp_for_level(level)
+    
+    #finally apply calcs
+    for cp in list(cp_values.keys()):
+        cron_cursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (cp_values[cp], cp))
     mydb.commit()
+
     time.end()
     logger.info(f"Done! {time.ms_return()}ms")
 
-def calc_user_cp(cron_cursor, UserID : int):
-    """Calculates CP for specified user id."""
-    UserCP = 0
-    #count rated levels
-    cron_cursor.execute("SELECT COUNT(*) FROM levels WHERE starStars > 0 AND userID = %s", (UserID,))
-    UserCP += cron_cursor.fetchone()[0]
-    #count featured levels
-    cron_cursor.execute("SELECT COUNT(*) FROM levels WHERE starFeatured > 0 AND userID = %s", (UserID,))
-    UserCP += cron_cursor.fetchone()[0]
-    #count epic levels
-    cron_cursor.execute("SELECT COUNT(*) FROM levels WHERE starEpic > 0 AND userID = %s", (UserID,))
-    UserCP += cron_cursor.fetchone()[0]
-    #count magic levels
-    if UserConfig["MagicGivesCP"]:
-        cron_cursor.execute("SELECT COUNT(*) FROM levels WHERE magic > 0 AND userID = %s", (UserID,))
-        UserCP += cron_cursor.fetchone()[0]
-    #count awarded levels
-    if UserConfig["AwardGivesCP"]:
-        cron_cursor.execute("SELECT COUNT(*) FROM levels WHERE awarded > 0 AND userID = %s", (UserID,))
-        UserCP += cron_cursor.fetchone()[0]
-    
-    #lastly we give the cp to them
-    cron_cursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
-    mydb.commit()
+def calc_cp_for_level(level_response: tuple) -> int:
+    """Calculates cp given for level."""
+    cp_given = 0
+    if level_response[1]:
+        cp_given += 1
+    if level_response[2]:
+        cp_given += 1
+    if level_response[3]:
+        cp_given += 1
+    if level_response[4]:
+        cp_given += 1
+    if level_response[5]:
+        cp_given += 1
+    return cp_given
 
 def max_star_count_ban(cron_cursor) -> None:
     """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
@@ -111,3 +109,6 @@ def max_star_count_ban(cron_cursor) -> None:
         mydb.commit()
         time.end()
         logger.info(f"Done with {BannedCount} users banned! {time.ms_return()}ms")
+
+if __name__ == "__main__":
+    cron_thread()

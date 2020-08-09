@@ -1053,7 +1053,7 @@ def GetComments(request):
         except:
             AccountID = 0
         RoleData = GetRoleForUser(AccountID)
-        ReturnString += f"2~{Comment[3]}~3~{Comment[4]}~4~{Comment[5]}~5~0~7~{Comment[6]}~9~{UploadAgo}~6~{Comment[1]}~10~{Comment[8]}~11~{RoleData['Badge']}~12~{RoleData['Colour']}:1~{UserData[1]}~7~1~9~{UserData[2]}~10~{UserData[3]}~11~{UserData[4]}~14~{UserData[5]}~15~{UserData[6]}~16~{UserData[7]}|"
+        ReturnString += f"2~{Comment[3]}~3~{Comment[4]}~4~{Comment[5]}~5~0~7~{Comment[6]}~9~{UploadAgo}~6~{Comment[1]}~10~{Comment[7]}~11~{RoleData['Badge']}~12~{RoleData['Colour']}:1~{UserData[1]}~7~1~9~{UserData[2]}~10~{UserData[3]}~11~{UserData[4]}~14~{UserData[5]}~15~{UserData[6]}~16~{UserData[7]}|"
     
     return f"{ReturnString[:-1]}#{CommentCount}:{Data['page']}:{Data['count']}"
 

@@ -474,33 +474,6 @@ def Sha1It(Text: str):
     """Hashes text in SHA1."""
     return hashlib.sha1(Text.encode()).hexdigest()
 
-def CacheRanks():
-    StartTime = time.time()
-    logger.info("Caching ranks... ")
-    mycursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
-    Leaderboards = mycursor.fetchall()
-    Leaderboards.reverse()
-    Ranks.clear()
-
-    UserRank = 0
-
-    for User in Leaderboards:
-        UserRank += 1
-        Ranks[str(User[0])] = UserRank
-    logger.info(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
-
-def CronThread():
-    Log("Cron thread started!")
-    while True:
-        Log("Running cron!")
-        StartTime = time.time()
-        CacheUserIDs()
-        CacheRanks()
-        CalculateCP()
-        MaxStarCountBan()
-        Log(f"Cron done! Took {round(time.time() - StartTime, 2)}s")
-        time.sleep(UserConfig["CronThreadDelay"])
-
 def GetAccountUrl(request):
     """Returns something for the account url?"""
     return request.url_root
@@ -1801,46 +1774,6 @@ def GetGauntletsHandler():
     
     return f"{GauntletReturn[:-1]}#{SoloGen2(HashReturn)}"
 
-def CalculateCP():
-    """Cron job that calculates CP for the whole server."""
-    StartTime = time.time()
-    logger.info("Beginning to calculate CP... ")
-    #first we get all user ids
-    mycursor.execute("SELECT userID FROM users")
-    UserIDs = mycursor.fetchall()
-
-    #fetching the counts and calculation total pp
-    for UserID in UserIDs:
-        UserCalcCP(UserID[0])
-    mydb.commit()
-    Finished = round((time.time() - StartTime) * 1000, 2)
-    logger.info(f"Done! {Finished}ms")
-
-def UserCalcCP(UserID : int):
-    """Calculates CP for specified user id."""
-    UserCP = 0
-    #count rated levels
-    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starStars > 0 AND userID = %s", (UserID,))
-    UserCP += mycursor.fetchone()[0]
-    #count featured levels
-    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starFeatured > 0 AND userID = %s", (UserID,))
-    UserCP += mycursor.fetchone()[0]
-    #count epic levels
-    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starEpic > 0 AND userID = %s", (UserID,))
-    UserCP += mycursor.fetchone()[0]
-    #count magic levels
-    if UserConfig["MagicGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE magic > 0 AND userID = %s", (UserID,))
-        UserCP += mycursor.fetchone()[0]
-    #count awarded levels
-    if UserConfig["AwardGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE awarded > 0 AND userID = %s", (UserID,))
-        UserCP += mycursor.fetchone()[0]
-    
-    #lastly we give the cp to them
-    mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
-    mydb.commit()
-
 def ScoreSubmitHandler(request):
     """Handles the score submission request by the client."""
     # NOTE this will be slower but it will be better in a lot of ways
@@ -1942,30 +1875,6 @@ def ScoreSubmitHandler(request):
     if len(ReturnStr) == 0:
         return ""
     return ReturnStr[:-1]
-
-def MaxStarCountBan() -> None:
-    """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
-    # TODO : Make the same thing for usercoins and regular coins
-    if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
-        StartTime = time.time()
-        logger.info("Running CheatlessAC Cron Starcount Check... ")
-        TotalStars = 187 #from RobTop levels
-        #get all star rated levels
-        mycursor.execute("SELECT starStars FROM levels WHERE starStars > 0")
-        StarredLevels = mycursor.fetchall()
-
-        #add em all up
-        for Level in StarredLevels:
-            TotalStars += Level[0]
-        
-        #count query
-        mycursor.execute("SELECT COUNT(*) FROM users WHERE stars > %s", (TotalStars,))
-        BannedCount = mycursor.fetchone()[0]
-        #ban em
-        mycursor.execute("UPDATE users SET isBanned = 1 WHERE stars > %s", (TotalStars,))
-        mydb.commit()
-
-        logger.info(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
 
 def Select(TheList: list, Position: int, Thing):
     """An SQL-like select thing.

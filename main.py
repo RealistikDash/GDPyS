@@ -226,7 +226,7 @@ def APILevelRount(LevelID):
     return jsonify(APIGetLevel(LevelID))
 
 @APIBlueprint.route("/reuploadapi")
-def APIReuploadTool(levelid,server):
+def APIReuploadTool():
     return jsonify(reupload_level_api(request.args.get('levelid'), request.args.get('server'), session))
 
 @app.errorhandler(500)

@@ -5,7 +5,7 @@ from console import *
 import threading
 from plugin import add_plugins
 from plugins.gdpys.bridge import Bridge
-from migrations import ImportGDPySDatabase
+from helpers.migrations import ImportGDPySDatabase, CheckForEmptyDb
 from constants import __version__
 from core.tools import *
 from core.cron import cron_thread
@@ -318,6 +318,14 @@ if __name__ == "__main__":
                       |___/
  {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
     """)
+    if CheckForEmptyDb(mycursor):
+        Log("Empty database detected!")
+        a = input("Would you like to import the GDPyS database? (y/N) ")
+        if a.lower() == "y":
+            ImportGDPySDatabase(mycursor)
+        else:
+            Fail("Cannot proceed without a database!")
+            raise SystemExit
     add_plugins()
     bridge.ready()
     threading.Thread(target=cron_thread).start()

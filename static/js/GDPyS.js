@@ -35,7 +35,7 @@ function IziFail(MainText, OtherText) {
 function ReuploadLevel(LevelID, server) {
     //Why did I make it like this??
     server = encodeURIComponent(server); //urlencode it
-    fetch("http://"+ location.host +`/api/reuploadapi/${LevelID}/${server}`)
+    fetch("http://"+ location.host +`/api/reuploadapi?levelid=${LevelID}&server=${server}`)
 	.then(res => res.json())
 	.then((out) => {
         if (out["status"] == 404) {

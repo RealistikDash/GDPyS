@@ -2053,7 +2053,10 @@ def GetFriendReqList(request):
         #mark em as read
         # I HATE EVERYTHING ABOUT THIS... SUBQUERIES DONT WORK AS THIS REQUIRES LIMIT AND OFFSETEHIO GFNWERIGUOWLHRWEFQUEHJFGRWOIJGRWIG
         mycursor.execute(f"SELECT id FROM friendreqs WHERE {Col} = %s LIMIT 10 OFFSET %s", (AccountID, Offset))
-        mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE ID in (%s)", (list(mycursor.fetchall()),))
+        AList = ""
+        for x in mycursor.fetchall():
+            AList+=f"{x[0]},"
+        mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE ID in (%s)", (AList[:-1],))
         mydb.commit()
     ReturnStr = ""
     for Request in FriendReqs:

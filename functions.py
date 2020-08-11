@@ -1207,7 +1207,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mydb.commit()
         return True
     elif Command[0] == "epic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
-        mycursor.execute("UPDATE levels SET starFeatured = 1 AND starEpic =1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
+        mycursor.execute("UPDATE levels SET starFeatured = 1, starEpic =1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
         return True
     elif Command[0] == "feature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
@@ -1215,7 +1215,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mydb.commit()
         return True
     elif Command[0] == "unepic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
-        mycursor.execute("UPDATE levels SET starFeatured = 0 AND starEpic = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
+        mycursor.execute("UPDATE levels SET starFeatured = 0, starEpic = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
         return True
     elif Command[0] == "unfeature" and HasPrivilege(Extra["AccountID"], ModRateLevel):

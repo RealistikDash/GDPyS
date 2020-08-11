@@ -1185,6 +1185,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     #}
     Command = Comment[len(UserConfig["CommandPrefix"]):].split(" ")
     ###I WANT SWITCH STATEMENTS
+    Log(f"Command {Command[0]} is being executed.")
     if Command[0] == "setacc" and HasPrivilege(Extra["AccountID"], CommandSetAcc):
         mycursor.execute("SELECT userID, extID FROM users WHERE isRegistered = 1 AND userName LIKE %s LIMIT 1", (Command[1],))
         User = mycursor.fetchone()
@@ -1217,6 +1218,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     elif Command[0] == "unfeature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET starFeatured = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
+    Fail("Command not found.")
     return False
 
 def PostComment(request):

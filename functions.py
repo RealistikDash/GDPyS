@@ -655,7 +655,7 @@ def UploadLevel(request):
     for Thing in ToGet:
         try:
             if Thing == "levelDesc" and GameVersion < 20:
-                #encode it for the old folks (still debating whether to maintain compatibillity with the older versions or not)
+                #encode it for the old folks (still debating whether to maintain compatibillity with the older versions or not) UPDATE: I prob wont
                 DataDict[Thing] = base64.b64encode(request.form[Thing]).decode("ascii")
             DataDict[Thing] = request.form[Thing]
         except:
@@ -668,8 +668,63 @@ def UploadLevel(request):
                 DataDict[Thing] = 0
 
     #getting UserID
-    mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
-    UserID = mycursor.fetchall()[0][0]
+    UserID = AIDToUID(AccountID)
+    #check whether to update da level
+    mycursor.execute("SELECT levelID FROM levels WHERE levelName = %s AND userID = %s", (DataDict["levelName"]))
+    LevelCount = mycursor.fetchone()
+    if LevelCount != None:
+        #update the level
+        LevelId = LevelCount[0]
+        Log(f"Updating level {LevelId}...")
+        os.remove(f"./Data/Levels/{LevelId}") #delete old one
+        with open(f"./Data/Levels/{LevelId}", "w+") as File: #write new level
+            File.write(DataDict["levelString"])
+            File.close()
+        Timestamp = round(time.time())
+        #oh god i hate that i have to write some long query again
+        mycursor.execute("""UPDATE levels SET
+                                gameVersion = %s,
+                                binaryVersion = %s,
+                                levelDesc = %s,
+                                levelVersion = %s,
+                                levelLength = %s,
+                                audioTrack = %s,
+                                auto = %s,
+                                password = %s,
+                                original = %s,
+                                twoPlayer = %s,
+                                objects = %s,
+                                coins = %s,
+                                requestedStars = %s,
+                                extraString = %s,
+                                levelString = %s,
+                                levelInfo = %s,
+                                songID = %s,
+                                updateDate = %s
+                            WHERE
+                                levelID = %s""",
+                            (
+                                GameVersion,
+                                DataDict["binaryVersion"],
+                                DataDict["levelDesc"],
+                                DataDict["levelVersion"],
+                                DataDict["levelLenght"],
+                                DataDict["audioTrack"],
+                                DataDict["auto"],
+                                DataDict["password"],
+                                DataDict["original"],
+                                DataDict["twoPlayer"],
+                                DataDict["objects"],
+                                DataDict["coins"],
+                                DataDict["extraString"],
+                                DataDict["levelString"],
+                                DataDict["levelInfo"],
+                                DataDict["songID"],
+                                Timestamp,
+                                LevelId
+                            ))
+        mydb.commit()
+        return str(LevelId)
 
     #database stuff
     if DataDict["levelString"] != "" and DataDict["levelName"] != "":

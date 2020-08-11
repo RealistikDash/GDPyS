@@ -670,7 +670,7 @@ def UploadLevel(request):
     #getting UserID
     UserID = AIDToUID(AccountID)
     #check whether to update da level
-    mycursor.execute("SELECT levelID FROM levels WHERE levelName = %s AND userID = %s", (DataDict["levelName"]))
+    mycursor.execute("SELECT levelID FROM levels WHERE levelName = %s AND userID = %s", (DataDict["levelName"], UserID))
     LevelCount = mycursor.fetchone()
     if LevelCount != None:
         #update the level

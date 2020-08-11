@@ -181,37 +181,37 @@ def GetMessagesRoute():
 def DownloadMessageRoute():
     return GetMessage(request)
 
-@app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
+@app.route("/database/deleteGJComment20.php", methods=["POST"])
 def DeleteCommentRoute():
     bridge.delete_comment(request.form["accountID"], request.form["commentID"])
     return DeleteCommentHandler(request)
 
-@app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
+@app.route("/database/getGJMapPacks21.php", methods=["POST"])
 def GetMapPacksRoute():
     return MapPackHandelr(request)
 
-@app.route("/database/getGJGauntlets21.php", methods=["GET", "POST"])
+@app.route("/database/getGJGauntlets21.php", methods=["POST"])
 def GauntletRoute():
     return GetGauntletsHandler()
 
-@app.route("/database/getGJLevelScores211.php", methods=["GET", "POST"])
+@app.route("/database/getGJLevelScores211.php", methods=["POST"])
 def LevelLBsRoute():
     return ScoreSubmitHandler(request)
 
-@app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
+@app.route("/database/uploadFriendRequest20.php", methods=["POST"])
 def FriendReqRoute():
     bridge.send_friend_request(request.form["accountID"], request.form["toAccountID"], request.form["comment"])
     return SendFriendReq(request)
 
-@app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
+@app.route("/database/deleteGJFriendRequests20.php", methods=["POST"])
 def DeleteFriendReqRoute():
     return DeleteFriendRequest(request)
 
-@app.route("/database/getGJFriendRequests20.php", methods=["GET", "POST"])
+@app.route("/database/getGJFriendRequests20.php", methods=["POST"])
 def GetFriendReqRoute():
     return GetFriendReqList(request)
 
-@app.route("/database/getGJDailyLevel.php", methods=["GET", "POST"])
+@app.route("/database/getGJDailyLevel.php", methods=["POST"])
 def GetDailyRoute():
     return GetDaily(request)
 

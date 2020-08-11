@@ -21,7 +21,6 @@ DefaultConfig = {
     "Chest2Wait" : 240,
     "CronThreadDelay" : 3600,
     "LocalServer" : False,
-    "LegacyPasswords" : False, #cvolton gmdprivateserver passwords if true, bcrypt if false
     "MaxAccsPerIP" : 4,
     "MagicGivesCP" : True, #makes magic levels give cp
     "AwardGivesCP" : True, #makes awarded levels give cp

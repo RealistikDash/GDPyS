@@ -716,6 +716,7 @@ def UploadLevel(request):
                                 DataDict["twoPlayer"],
                                 DataDict["objects"],
                                 DataDict["coins"],
+                                DataDict["requestedStars"],
                                 DataDict["extraString"],
                                 DataDict["levelString"],
                                 DataDict["levelInfo"],

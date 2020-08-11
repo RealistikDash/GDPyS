@@ -708,7 +708,7 @@ def UploadLevel(request):
                                 DataDict["binaryVersion"],
                                 DataDict["levelDesc"],
                                 DataDict["levelVersion"],
-                                DataDict["levelLenght"],
+                                DataDict["levelLength"],
                                 DataDict["audioTrack"],
                                 DataDict["auto"],
                                 DataDict["password"],
@@ -860,7 +860,7 @@ def GetLevels(request):
     if CheckForm(Form, "noStar"):
         SQLParams.append("starStars = 0")
     if CheckForm(Form, "len"):
-        SQLParams.append(f"levelLenght IN ({Form['len']})")
+        SQLParams.append(f"levelLength IN ({Form['len']})")
 
     if Type == 0 or Type == 15:
         Order = "likes"

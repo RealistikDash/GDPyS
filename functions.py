@@ -2103,3 +2103,23 @@ def GetDaily(request):
         TimeToChange = time.mktime(EndTime.timetuple())
         LevelID += 100001 #idk what he was thinking either
     return f"{LevelID}|{round(TimeToChange)}"
+
+def AcceptFriendRequestHandler(request):
+    """Handles the accepting friend request request. Name explains it."""
+    AccountID = int(request.form["accountID"])
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    RequestID = int(request.form["requestID"])
+    #get the friend req from db
+    mycursor.execute("SELECT accountID, toAccountID, ID FROM friendreqs WHERE ID = %s LIMIT 1", (RequestID,))
+    Request = mycursor.fetchone()
+    if Request == None:
+        return "-1"
+    if not Request[0] == AccountID or Request[1] == AccountID: #prevent fake req accepts
+        Fail("Someone tried to accept the friend request as someone else...") #owner might want to know
+        return "-1"
+    #they friends
+    mycursor.execute("INSERT INTO friendships (person1, person2, isNew1, isNew2) VALUES (%s, %s, 1, 1)", (Request[0], Request[1]))
+    mycursor.execute("DELETE FROM friendreqs WHERE ID = %s LIMIT 1", (RequestID,))
+    mydb.commit()
+    return "1"

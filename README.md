@@ -9,38 +9,6 @@ Here are a list of some changes server owners and operators may not be familiar 
 - There is a custom Awarded and Magic section. Rather than being randomly selected by an arbitrary value, levels now have to be nominated by moderators.
 - There is a completely new bitwise-based permission system. While it is more complex, it is faster and allows more to be done with it.
 
-# What works?
-GDPyS is still in **very** early development. This means that most things aren't completed and some things may not work as intended. So here is what is currently done:
-- Registering
-- Logging in
-- Loading user data
-- Updating user data
-- Loading account comments
-- Creating account comments
-- Updating account settings
-- Leaderboards (only top and creators)
-- Saving user data
-- Loading user data
-- Likes
-- Level searching (most filters done)
-- Online level download
-- Custom songs
-- Comment posting
-- Comment viewing
-- Rating levels
-- Permissions
-- Sending messages
-- Viewing messages
-- Reading messages
-- Searching users
-- Mappacks
-- Gauntlets
-- Comment history
-- Level leaderboards
-- Friend requests
-- Friend request list
-- Daily and weekly levels
-
 # Why GDPyS?
 GDPyS is made with convenience and performance in mind. It provides performance benefits over existing alternatives while convenient features (such as error logs for easier debugging and automatic cron). Additionally, it is designed to be directly swappable with Cvolton's GMDPrivateServer, meaning you will able to reuse your existing database, save and level files.
 

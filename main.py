@@ -215,6 +215,10 @@ def GetFriendReqRoute():
 def GetDailyRoute():
     return GetDaily(request)
 
+@app.route("/database/acceptGJFriendRequest20.php", methods=["POST"]):
+def AcceptFriendRequestRoute():
+    return AcceptFriendRequestHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

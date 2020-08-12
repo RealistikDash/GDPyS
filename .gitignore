@@ -133,4 +133,3 @@ config.json
 Data/
 test.py
 .vscode/
-config.json

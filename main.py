@@ -7,8 +7,11 @@ from plugin import add_plugins
 import os
 from migrations import ImportGDPySDatabase
 from constants import __version__
-import requests
 from gdpys.commands import commands
+from helpers.migrations import ImportGDPySDatabase, CheckForEmptyDb
+from constants import __version__
+from core.tools import *
+from core.cron import cron_thread
 
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
@@ -172,47 +175,55 @@ def GetMessagesRoute():
 def DownloadMessageRoute():
     return GetMessage(request)
 
-@app.route("/database/deleteGJComment20.php", methods=["GET", "POST"])
+@app.route("/database/deleteGJComment20.php", methods=["POST"])
 def DeleteCommentRoute():
     return DeleteCommentHandler(request)
 
-@app.route("/database/getGJMapPacks21.php", methods=["GET", "POST"])
+@app.route("/database/getGJMapPacks21.php", methods=["POST"])
 def GetMapPacksRoute():
     return MapPackHandelr(request)
 
-@app.route("/database/getGJGauntlets21.php", methods=["GET", "POST"])
+@app.route("/database/getGJGauntlets21.php", methods=["POST"])
 def GauntletRoute():
     return GetGauntletsHandler()
 
-@app.route("/database/getGJLevelScores211.php", methods=["GET", "POST"])
+@app.route("/database/getGJLevelScores211.php", methods=["POST"])
 def LevelLBsRoute():
     return ScoreSubmitHandler(request)
 
-@app.route("/database/uploadFriendRequest20.php", methods=["GET", "POST"])
+@app.route("/database/uploadFriendRequest20.php", methods=["POST"])
 def FriendReqRoute():
     return SendFriendReq(request)
 
-@app.route("/database/deleteGJFriendRequests20.php", methods=["GET", "POST"])
+@app.route("/database/deleteGJFriendRequests20.php", methods=["POST"])
 def DeleteFriendReqRoute():
     return DeleteFriendRequest(request)
 
-@app.route("/database/getGJFriendRequests20.php", methods=["GET", "POST"])
+@app.route("/database/getGJFriendRequests20.php", methods=["POST"])
 def GetFriendReqRoute():
     return GetFriendReqList(request)
 
-@app.route("/database/getGJDailyLevel.php", methods=["GET", "POST"])
+@app.route("/database/getGJDailyLevel.php", methods=["POST"])
 def GetDailyRoute():
     return GetDaily(request)
+
+@app.route("/database/acceptGJFriendRequest20.php", methods=["POST"])
+def AcceptFriendRequestRoute():
+    return AcceptFriendRequestHandler(request)
+
+@app.route("/database/")
+def DatabaseRoute():
+    Log("Someone just got ricked!")
+    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 ##API ROUTES##
 @APIBlueprint.route("/getlevel/<LevelID>")
 def APILevelRount(LevelID):
     return jsonify(APIGetLevel(LevelID))
 
-@app.route("/database/")
-def DatabaseRoute():
-    Log("Someone just got ricked!")
-    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+@APIBlueprint.route("/reuploadapi")
+def APIReuploadTool():
+    return jsonify(reupload_level_api(request.args.get('levelid'), request.args.get('server'), session))
 
 @app.errorhandler(500)
 def BadCodeError(error):
@@ -260,7 +271,9 @@ def HomeToolRoute():
 @ToolBlueprint.route("/login", methods=["GET", "POST"])
 def ToolsLoginRoute():
     if request.method == "GET":
-        return render_template("login.html", session=session, title = "Login")
+        if not session["LoggedIn"]:
+            return render_template("login.html", session=session, title = "Login")
+        return redirect("/tools")
     #POST REQUEST
     A = ToolLoginCheck(request)
     if not A[0]: #login failed
@@ -268,6 +281,15 @@ def ToolsLoginRoute():
     #login success
     SetSession(A[1])
     return redirect("/")
+
+# Realistik you can do the magic stuff
+@ToolBlueprint.route("/reupload/level")
+def tools_level_reupload_route():
+    return render_template("levelreupload.html", title="Level Reupload", left=levels_reuploaded_left())
+
+@ToolBlueprint.route("/reupload/song")
+def tools_song_reupload_route():
+    return render_template("songreupload.html", title="Song Reupload")
 
 @ToolBlueprint.errorhandler(500)
 def Tool500():
@@ -292,6 +314,14 @@ if __name__ == "__main__":
                       |___/
  {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
     """)
+    if CheckForEmptyDb(mycursor):
+        Log("Empty database detected!")
+        a = input("Would you like to import the GDPyS database? (y/N) ")
+        if a.lower() == "y":
+            ImportGDPySDatabase(mycursor)
+        else:
+            Fail("Cannot proceed without a database!")
+            raise SystemExit
     add_plugins()
     threading.Thread(target=CronThread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

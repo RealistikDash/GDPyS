@@ -8,6 +8,7 @@ import os
 from migrations import ImportGDPySDatabase
 from constants import __version__
 import requests
+from gdpys.commands import commands
 
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
@@ -143,6 +144,7 @@ def DeleteAccCommentRoute():
 @app.route("//database/uploadGJComment21.php", methods=["GET", "POST"])
 @app.route("/database/uploadGJComment21.php", methods=["GET", "POST"])
 def PostCommentRoute():
+    commands.on_upload_comment(request.form.get("accountID"), request.form["comment"])
     return PostComment(request)
 
 @app.route("//database/suggestGJStars20.php", methods=["GET", "POST"])

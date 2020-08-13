@@ -1,4 +1,5 @@
 import asyncio
+from config import UserConfig
 
 class _Commands:
     def __init__(self, prefix):
@@ -16,4 +17,4 @@ class _Commands:
                 func["func"](*func["args"])
                 # add delete comment
 
-commands = _Commands()
+commands = _Commands(UserConfig["CommandPrefix"])

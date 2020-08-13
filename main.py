@@ -4,11 +4,13 @@ from config import *
 from console import *
 import threading
 from plugin import add_plugins
+ 
 import os
 from migrations import ImportGDPySDatabase
 from constants import __version__
 from gdpys.commands import commands
 from helpers.migrations import ImportGDPySDatabase, CheckForEmptyDb
+from plugins.gdpys.bridge import Bridge
 from constants import __version__
 from core.tools import *
 from core.cron import cron_thread
@@ -211,6 +213,10 @@ def GetDailyRoute():
 def AcceptFriendRequestRoute():
     return AcceptFriendRequestHandler(request)
 
+@app.route("/database/getGJUserList20.php", methods=["POST"])
+def FriendsListRoute():
+    return CurrentFriendsHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")
@@ -323,5 +329,7 @@ if __name__ == "__main__":
             Fail("Cannot proceed without a database!")
             raise SystemExit
     add_plugins()
-    threading.Thread(target=CronThread).start()
+
+    bridge.ready()
+    threading.Thread(target=cron_thread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

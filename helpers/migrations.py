@@ -35,3 +35,12 @@ def ImportGDPySDatabase(cursor):
     else:
         Fail("SQL file is missing! Make sure GDPyS.sql exists!")
         raise FileNotFoundError
+
+def CheckForEmptyDb(cursor) -> bool:
+    """Checks if the selected database is empty. If it is empty, returns true."""
+    cursor.execute("show tables")
+    TableCount = cursor.fetchall()
+    if len(TableCount) == 0:
+        return True
+    return False
+

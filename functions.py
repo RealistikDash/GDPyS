@@ -963,7 +963,7 @@ def GetLevels(request):
             "35" : Level[13]
         }) + "|"
 
-        UserStr += UserString(Level[36]) + "|"
+        UserStr += UserString(Level[35]) + "|"
         LevelMultiStr += str(Level[3]) + "|"
 
         if Level[13] != 0:

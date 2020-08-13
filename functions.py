@@ -98,7 +98,7 @@ def LoginCheck(Udid, Username, Password, request):
         return "-1"
     AccountID = AccData[1]
     UserID = AIDToUID(AccountID)
-    if not CheckPassword(AccountID, AccData[0]):
+    if not CheckPassword(AccountID, Password):
         Fail("Incorrect password!")
         return "-1"
     #lastly we check if they are allowed to log in

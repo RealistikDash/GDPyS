@@ -4,13 +4,12 @@ from config import *
 from console import *
 import threading
 from plugin import add_plugins
- 
 import os
 from helpers.migrations import ImportGDPySDatabase
 from constants import __version__
 from gdpys.commands import commands
 from helpers.migrations import ImportGDPySDatabase, CheckForEmptyDb
-from plugins.gdpys.bridge import Bridge
+import gdpys
 from constants import __version__
 from core.tools import *
 from core.cron import cron_thread
@@ -330,6 +329,5 @@ if __name__ == "__main__":
             raise SystemExit
     add_plugins()
 
-    bridge.ready()
     threading.Thread(target=cron_thread).start()
     app.run("0.0.0.0", port=UserConfig["Port"])

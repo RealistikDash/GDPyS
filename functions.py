@@ -94,13 +94,16 @@ def LoginCheck(Udid, Username, Password, request):
     AccData = mycursor.fetchone()
     if AccData == None:
         #not found
+        Fail("User not found!")
         return "-1"
     AccountID = AccData[1]
     UserID = AIDToUID(AccountID)
     if not CheckPassword(AccountID, AccData[0]):
+        Fail("Incorrect password!")
         return "-1"
     #lastly we check if they are allowed to log in
     if not HasPrivilege(AccountID, UserLogIn):
+        Fail("Missing perms")
         return "-12"
     Success(f"Authentication for {Username} was successfull!")
     return f"{AccountID},{UserID}"

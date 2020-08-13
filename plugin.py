@@ -1,11 +1,15 @@
 import threading
 import os
-    
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
    
 def add_plugins():
-    def exec_plugin(code, name):
-        exec(code)
+    print("adding plugins")
+    def exec_plugin(name):
+        if name == "__init__.py":
+            return
+        name = name.strip(".py")
+        __import__("plugins." + name)
         print(f"Loaded plugin {name}!")
 
     if not os.path.exists(dir_path + "/plugins"):
@@ -15,4 +19,4 @@ def add_plugins():
             continue
         print(f"Loading plugin {plugin}")
         f = open(dir_path + "/plugins/" + plugin, "r")
-        threading.Thread(target=exec_plugin, args=[f.read(), plugin]).start()
+        threading.Thread(target=exec_plugin, args=[plugin]).start()

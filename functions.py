@@ -2182,3 +2182,56 @@ def AcceptFriendRequestHandler(request):
     mycursor.execute("DELETE FROM friendreqs WHERE ID = %s LIMIT 1", (RequestID,))
     mydb.commit()
     return "1"
+
+def CurrentFriendsHandler(request):
+    """Friends list for client."""
+    AccountID = int(request.form["accountID"])
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    IsBlocked = request.form["type"]
+    Query = { # no pages, no limits
+        "0" : {
+            "q" : "SELECT person1, person2, isNew1, isNew2 FROM friendships WHERE person1 = %s OR person2 = %s",
+            "a" : (AccountID, AccountID)
+        },
+        "1" : {
+            "q" : "SELECT person1, person2 FROM blocks WHERE person1 = %s",
+            "a" : (AccountID,)
+        }
+    }[IsBlocked]
+    mycursor.execute(Query["q"], Query["a"])
+    Friends = mycursor.fetchall()
+    if len(Friends) == 0:
+        return "-2" #haha lonely
+    
+    #is new is client sided so we can do this
+    PeopleList = [] ### TRUSTED INPUT
+    for x in Friends:
+        if x[0] != AccountID:
+            PeopleList.append(x[0])
+        else:
+            PeopleList.append(x[1])
+    
+    PeopleSQLArray = ListToCommaString(PeopleList)
+    mycursor.execute(f"SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID IN ({PeopleSQLArray}) ORDER BY userName")
+    People = mycursor.fetchall()
+    Resp = ""
+    for Person in People:
+        Resp += JointStringBuilder({
+            "1" : Person[0],
+            "2" : Person[1],
+            "9" : Person[3],
+            "10" : Person[4],
+            "11" : Person[5],
+            "14" : Person[6],
+            "15" : Person[7],
+            "16" : Person[8],
+            "18" : 0,
+            "41" : 0
+        }) + "|"
+    Resp = Resp[:-1]
+    #mark as viewed
+    mycursor.execute("UPDATE friendships SET isNew1 = 0 WHERE person2 = %s", (AccountID,))
+    mycursor.execute("UPDATE friendships SET isNew2 = 0 WHERE person1 = %s", (AccountID,))
+    mydb.commit()
+    return Resp

@@ -79,16 +79,6 @@ def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
     return CheckBcryptPw(GetBcryptPassword(AccountID), DecodeGJP(GJP))
 
-def FixUserInput(String):
-    """[DEPRECATED] Gets rid of potentially problematic user input."""
-    String = String.replace(r"\0", "")
-    String = String.replace("#", "")
-    String = String.replace("|", "")
-    String = String.replace("#", "")
-    String = String.replace(":", "")
-    String = String.replace("--", "")
-    return String
-
 def GetServerIP():
     """Gets the server IP."""
     if UserConfig["LocalServer"]:
@@ -140,11 +130,7 @@ def HashPassword(PlainPassword: str):
 
 def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
-    #getting password from db
-    DBPassword = GetBcryptPassword(AccountID)
-    if not UserConfig["LegacyPasswords"]:
-        return CheckBcryptPw(DBPassword, Password)
-    return True
+    return CheckBcryptPw(DBPassword, Password)
 
 def RegisterFunction(request):
     """Registers a user."""
@@ -819,7 +805,6 @@ def IsInt(TheThing):
     except:
         return False
 
-
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""
     Log("Beginning to fetch levels!")
@@ -978,7 +963,7 @@ def GetLevels(request):
             "35" : Level[13]
         }) + "|"
 
-        UserStr += UserString(Level[-8]) + "|"
+        UserStr += UserString(Level[36]) + "|"
         LevelMultiStr += str(Level[3]) + "|"
 
         if Level[13] != 0:

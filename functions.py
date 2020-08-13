@@ -2174,7 +2174,7 @@ def AcceptFriendRequestHandler(request):
     Request = mycursor.fetchone()
     if Request == None:
         return "-1"
-    if not Request[0] == AccountID or Request[1] == AccountID: #prevent fake req accepts
+    if Request[0] != AccountID and Request[1] != AccountID: #prevent fake req accepts
         Fail("Someone tried to accept the friend request as someone else...") #owner might want to know
         return "-1"
     #they friends

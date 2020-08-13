@@ -130,6 +130,7 @@ def HashPassword(PlainPassword: str):
 
 def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
+    DBPassword = GetBcryptPassword(AccountID)
     return CheckBcryptPw(DBPassword, Password)
 
 def RegisterFunction(request):

@@ -4,4 +4,3 @@ colorama
 timeago 
 requests
 bcrypt
-blowfish

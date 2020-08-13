@@ -1,4 +1,3 @@
-import mysql.connector
 from config import *
 from console import *
 import time
@@ -17,20 +16,12 @@ from constants import *
 import string
 from logger import logger
 from datetime import datetime, timedelta
+from core.mysqlconn import mydb
+from helpers.filters import *
+from core.bot import GDPySBot
+from helpers.passwordhelper import CreateBcrypt, RandomString
 
-try:
-    mydb = mysql.connector.connect(
-        host=UserConfig["SQLHost"],
-        user=UserConfig["SQLUser"],
-        passwd=UserConfig["SQLPassword"],
-        database=UserConfig['SQLDatabase']
-    ) #connects to database
-    logger.info(f"{Fore.GREEN}[GDPyS] Successfully connected to MySQL!{Fore.RESET}")
-except Exception as e:
-    logger.error(f"{Fore.RED}[GDPyS] Failed connecting to MySQL! Aborting!\nError: {e}{Fore.RESET}")
-    exit()
-
-mycursor = mydb.cursor(buffered=True) #creates a thing to allow us to run mysql commands
+mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
 # TODO: Add SQL index creation
 
@@ -54,7 +45,7 @@ def GetUIDFromCache(AccID: int) -> int:
     AccID = int(AccID)
     try:
         return UserIDCache[AccID]
-    except IndexError:
+    except Exception:
         mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (AccID,))
         UserIDCache[AccID] = mycursor.fetchone()[0]
         Log(f"Cached UserID for {AccID}")
@@ -87,16 +78,6 @@ def DecodeGJP(GJP) -> str:
 def VerifyGJP(AccountID: int, GJP: str):
     """Returns true if GJP is correct."""
     return CheckBcryptPw(GetBcryptPassword(AccountID), DecodeGJP(GJP))
-
-def FixUserInput(String):
-    """[DEPRECATED] Gets rid of potentially problematic user input."""
-    String = String.replace(r"\0", "")
-    String = String.replace("#", "")
-    String = String.replace("|", "")
-    String = String.replace("#", "")
-    String = String.replace(":", "")
-    String = String.replace("--", "")
-    return String
 
 def GetServerIP():
     """Gets the server IP."""
@@ -145,17 +126,11 @@ def LoginCheck(Udid, Username, Password, request):
 
 def HashPassword(PlainPassword: str):
     """Creates a hashed password to be used in database."""
-    if not UserConfig["LegacyPasswords"]:
-        return CreateBcrypt(PlainPassword)
-    return PlainPassword #havent done legacy passwords
+    return CreateBcrypt(PlainPassword)
 
 def CheckPassword(AccountID: int, Password: str):
     """Checks if the password passed matches the one in the database."""
-    #getting password from db
-    DBPassword = GetBcryptPassword(AccountID)
-    if not UserConfig["LegacyPasswords"]:
-        return CheckBcryptPw(DBPassword, Password)
-    return True
+    return CheckBcryptPw(DBPassword, Password)
 
 def RegisterFunction(request):
     """Registers a user."""
@@ -167,10 +142,15 @@ def RegisterFunction(request):
         Fail(f"Cound not register {request.form['userName']}! (username taken)")
         return "-2"
     #aight lets go register them
-    Username = FixUserInput(request.form["userName"])
+    Username = request.form["userName"]
     Password = HashPassword(request.form["password"])
-    Email = FixUserInput(request.form["email"])
+    Email = request.form["email"]
     RegisterTime = round(time.time())
+
+    #check for bad usernames
+    if not check_username(Username):
+        Fail("Username has invalid characters!")
+        return "-1"
     #Query Time
     mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (Username, Password, Email, RegisterTime))
     mydb.commit()
@@ -360,17 +340,27 @@ def JointStringBuilder(Content: dict):
 
 def GetLeaderboards(request):
     """Gets the leaderboards."""
-    AccID = request.form["accountID"]
+    AccID = int(request.form.get("accountID", 0)) #it isnt alwaays passed
     LeaderboardType = request.form["type"] #4 leaderboard types, realitive, creator, friends and top
     Log(f"Serving {LeaderboardType} leaderboards to {AccID}")
 
     #leaderboard data
     if LeaderboardType == "top":
         #probably the simplest one
-        mycursor.execute("SELECT * FROM users WHERE isBanned = '0' AND stars > 0 ORDER BY stars DESC LIMIT 100")
+        mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND stars > 0 ORDER BY stars DESC LIMIT 100")
 
     elif LeaderboardType == "creators":
-        mycursor.execute("SELECT * FROM users WHERE isCreatorBanned = '0' AND isBanned = '0' ORDER BY creatorPoints DESC LIMIT 100")
+        mycursor.execute("SELECT * FROM users WHERE isCreatorBanned = 0 AND isBanned = 0 ORDER BY creatorPoints DESC LIMIT 100")
+    
+    elif LeaderboardType == "friends":
+        #gjp check
+        if not VerifyGJP(AccID, request.form["gjp"]):
+            return "-1"
+        FriendsList = ListToCommaString(GetFriendsList(AccID)+[AccID])
+        mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND extID in (%s) LIMIT 100", (FriendsList,))
+    
+    #elif LeaderboardType == "relative":
+        #global
 
     TheData = mycursor.fetchall()
     
@@ -486,33 +476,6 @@ def Sha1It(Text: str):
     """Hashes text in SHA1."""
     return hashlib.sha1(Text.encode()).hexdigest()
 
-def CacheRanks():
-    StartTime = time.time()
-    logger.info("Caching ranks... ")
-    mycursor.execute("SELECT extID FROM users WHERE isBanned = 0 ORDER BY stars")
-    Leaderboards = mycursor.fetchall()
-    Leaderboards.reverse()
-    Ranks.clear()
-
-    UserRank = 0
-
-    for User in Leaderboards:
-        UserRank += 1
-        Ranks[str(User[0])] = UserRank
-    logger.info(f"Done! {round((time.time() - StartTime) * 1000, 2)}ms")
-
-def CronThread():
-    Log("Cron thread started!")
-    while True:
-        Log("Running cron!")
-        StartTime = time.time()
-        CacheUserIDs()
-        CacheRanks()
-        CalculateCP()
-        MaxStarCountBan()
-        Log(f"Cron done! Took {round(time.time() - StartTime, 2)}s")
-        time.sleep(UserConfig["CronThreadDelay"])
-
 def GetAccountUrl(request):
     """Returns something for the account url?"""
     return request.url_root
@@ -619,23 +582,30 @@ def LikeFunction(request):
     Like = int(request.form["like"])
     ItemID = request.form["itemID"]
 
-    if Type == 1:
-        #level
-        Table = "levels"
-        Column = "levelID"
-    if Type == 2:
-        Table = "comments"
-        Column = "commentID"
-    if Type == 3:
-        Table = "acccomments"
-        Column = "commentID"
+    Types = {
+        1 : {
+            "Table" : "levels",
+            "Column" : "levelID"
+        },
+        2 : {
+            "Table" : "comments",
+            "Column" : "commentID"
+        },
+        3 : {
+            "Table" : "acccomments",
+            "Column" : "commentID"
+        }
+    }[Type]
+    Table = Types["Table"]
+    Column = Types["Column"]
 
     #ok so i usually dont do formats in sql queries because sql injection, but here we can trust variables
     mycursor.execute(f"SELECT likes FROM {Table} WHERE {Column} = %s LIMIT 1", (ItemID,))
-    Likes = mycursor.fetchall()
-    if len(Likes) == 0:
+    Likes = mycursor.fetchone()
+    if Likes == None:
+        Fail(f"Could not find matching {Table} to like!")
         return "-1"
-    Likes = Likes[0][0]
+    Likes = Likes[0]
 
     if Like == 1:
         Likes += 1
@@ -671,7 +641,7 @@ def UploadLevel(request):
     for Thing in ToGet:
         try:
             if Thing == "levelDesc" and GameVersion < 20:
-                #encode it for the old folks (still debating whether to maintain compatibillity with the older versions or not)
+                #encode it for the old folks (still debating whether to maintain compatibillity with the older versions or not) UPDATE: I prob wont
                 DataDict[Thing] = base64.b64encode(request.form[Thing]).decode("ascii")
             DataDict[Thing] = request.form[Thing]
         except:
@@ -684,8 +654,64 @@ def UploadLevel(request):
                 DataDict[Thing] = 0
 
     #getting UserID
-    mycursor.execute("SELECT userID FROM users WHERE extID = %s", (AccountID,))
-    UserID = mycursor.fetchall()[0][0]
+    UserID = AIDToUID(AccountID)
+    #check whether to update da level
+    mycursor.execute("SELECT levelID FROM levels WHERE levelName = %s AND userID = %s", (DataDict["levelName"], UserID))
+    LevelCount = mycursor.fetchone()
+    if LevelCount != None:
+        #update the level
+        LevelId = LevelCount[0]
+        Log(f"Updating level {LevelId}...")
+        os.remove(f"./Data/Levels/{LevelId}") #delete old one
+        with open(f"./Data/Levels/{LevelId}", "w+") as File: #write new level
+            File.write(DataDict["levelString"])
+            File.close()
+        Timestamp = round(time.time())
+        #oh god i hate that i have to write some long query again
+        mycursor.execute("""UPDATE levels SET
+                                gameVersion = %s,
+                                binaryVersion = %s,
+                                levelDesc = %s,
+                                levelVersion = %s,
+                                levelLength = %s,
+                                audioTrack = %s,
+                                auto = %s,
+                                password = %s,
+                                original = %s,
+                                twoPlayer = %s,
+                                objects = %s,
+                                coins = %s,
+                                requestedStars = %s,
+                                extraString = %s,
+                                levelString = %s,
+                                levelInfo = %s,
+                                songID = %s,
+                                updateDate = %s
+                            WHERE
+                                levelID = %s""",
+                            (
+                                GameVersion,
+                                DataDict["binaryVersion"],
+                                DataDict["levelDesc"],
+                                DataDict["levelVersion"],
+                                DataDict["levelLength"],
+                                DataDict["audioTrack"],
+                                DataDict["auto"],
+                                DataDict["password"],
+                                DataDict["original"],
+                                DataDict["twoPlayer"],
+                                DataDict["objects"],
+                                DataDict["coins"],
+                                DataDict["requestedStars"],
+                                DataDict["extraString"],
+                                DataDict["levelString"],
+                                DataDict["levelInfo"],
+                                DataDict["songID"],
+                                Timestamp,
+                                LevelId
+                            ))
+        mydb.commit()
+        return str(LevelId)
 
     #database stuff
     if DataDict["levelString"] != "" and DataDict["levelName"] != "":
@@ -779,7 +805,6 @@ def IsInt(TheThing):
     except:
         return False
 
-
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""
     Log("Beginning to fetch levels!")
@@ -821,7 +846,7 @@ def GetLevels(request):
     if CheckForm(Form, "noStar"):
         SQLParams.append("starStars = 0")
     if CheckForm(Form, "len"):
-        SQLParams.append(f"levelLenght IN ({Form['len']})")
+        SQLParams.append(f"levelLength IN ({Form['len']})")
 
     if Type == 0 or Type == 15:
         Order = "likes"
@@ -872,7 +897,7 @@ def GetLevels(request):
         SQLParams.append("levels.extID in (%s)")
         SQLFormats.append(ListToCommaString(GetFriendsList(AccountID)))
     elif Type == 16:
-        SQLParams.append("NOT starEpic = 0")
+        SQLParams.append("starEpic = 1")
         Order = "rateDate DESC, uploadDate"
 
     #converting dict to sql
@@ -938,7 +963,7 @@ def GetLevels(request):
             "35" : Level[13]
         }) + "|"
 
-        UserStr += UserString(Level[-8]) + "|"
+        UserStr += UserString(Level[35]) + "|"
         LevelMultiStr += str(Level[3]) + "|"
 
         if Level[13] != 0:
@@ -981,11 +1006,6 @@ def CheckBcryptPw(dbpassword, painpassword):
         return False
 
     return check
-
-def CreateBcrypt(Password: str):
-    """Creates hashed password."""
-    BHashed = bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt(10))
-    return BHashed.decode()
 
 def GetSong(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
@@ -1069,7 +1089,7 @@ def GetComments(request):
         except:
             AccountID = 0
         RoleData = GetRoleForUser(AccountID)
-        ReturnString += f"2~{Comment[3]}~3~{Comment[4]}~5~0~7~{Comment[6]}~9~{UploadAgo}~6~{Comment[1]}~10~{Comment[7]}~11~{RoleData['Badge']}~12~{RoleData['Colour']}:1~{UserData[1]}~7~1~9~{UserData[2]}~10~{UserData[3]}~11~{UserData[4]}~14~{UserData[5]}~15~{UserData[6]}~16~{UserData[7]}|"
+        ReturnString += f"2~{Comment[3]}~3~{Comment[4]}~4~{Comment[5]}~5~0~7~{Comment[6]}~9~{UploadAgo}~6~{Comment[1]}~10~{Comment[7]}~11~{RoleData['Badge']}~12~{RoleData['Colour']}:1~{UserData[1]}~7~1~9~{UserData[2]}~10~{UserData[3]}~11~{UserData[4]}~14~{UserData[5]}~15~{UserData[6]}~16~{UserData[7]}|"
     
     return f"{ReturnString[:-1]}#{CommentCount}:{Data['page']}:{Data['count']}"
 
@@ -1150,6 +1170,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     #}
     Command = Comment[len(UserConfig["CommandPrefix"]):].split(" ")
     ###I WANT SWITCH STATEMENTS
+    Log(f"Command {Command[0]} is being executed.")
     if Command[0] == "setacc" and HasPrivilege(Extra["AccountID"], CommandSetAcc):
         mycursor.execute("SELECT userID, extID FROM users WHERE isRegistered = 1 AND userName LIKE %s LIMIT 1", (Command[1],))
         User = mycursor.fetchone()
@@ -1170,6 +1191,23 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp) VALUES (%s, %s)", (Extra["LevelID"], NewTimestamp))
         mydb.commit()
         return True
+    elif Command[0] == "epic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+        mycursor.execute("UPDATE levels SET starFeatured = 1, starEpic =1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
+        mydb.commit()
+        return True
+    elif Command[0] == "feature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+        mycursor.execute("UPDATE levels SET starFeatured = 1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
+        mydb.commit()
+        return True
+    elif Command[0] == "unepic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+        mycursor.execute("UPDATE levels SET starFeatured = 0, starEpic = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
+        mydb.commit()
+        return True
+    elif Command[0] == "unfeature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+        mycursor.execute("UPDATE levels SET starFeatured = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
+        mydb.commit()
+        return True
+    Fail("Command not found.")
     return False
 
 def PostComment(request):
@@ -1223,73 +1261,6 @@ def HasPrivilege(AccountID: int, Privilege):
 
     #and now alas we check if they have it
     return bool(DBPriv & Privilege)
-
-def RandomString(Lenght=8):
-    Chars = string.ascii_lowercase
-    return ''.join(random.choice(Chars) for i in range(Lenght))
-
-class GDPySBot:
-    """This is the bot class for GDPyS. It is responsible for everything GDPyS related ranging from connecting and creating the bot to sending messages."""
-    def __init__(self):
-        """Sets up the GDPyS bot class for connection etc."""
-        self.Connected = False
-        self.BotID = 0
-        self.BotUserId = 0
-
-    def _CheckBot(self):
-        """Checks if the bot account exists."""
-        mycursor.execute("SELECT COUNT(*) FROM accounts WHERE isBot = 1")
-        BotCount = mycursor.fetchone()[0]
-        if BotCount == 0:
-            return False
-        return True
-
-    def _FetchID(self):
-        """Gets the bots accountID."""
-        mycursor.execute("SELECT accountID FROM accounts WHERE isBot = 1 LIMIT 1")
-        return mycursor.fetchone()[0]
-    
-    def _SetUserId(self):
-        """Sets the user id for bot."""
-        mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (self.BotID,))
-        self.BotUserId = mycursor.fetchone()[0]
-
-    def _RegitsterBot(self, BotName="GDPySBot"):
-        """Creates the bot account."""
-        Timestamp = round(time.time())
-        Password = HashPassword(RandomString(16)) #no one ever ever ever should access the bot account. if they do, you messed up big time
-        mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, isBot) VALUES (%s, %s, 'rel@es.to', '', '', %s, 1)", (BotName, Password, Timestamp))
-        mydb.commit() #so the fetchid before works???
-        mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, '1.1.1.1')", (self._FetchID(), BotName,))
-        mydb.commit()
-        Success(f"Created bot user ({BotName})!")
-    
-    def Connect(self):
-        """Sets up the bot to be able to be used."""
-        if not self._CheckBot():
-            Log("Bot not found! Creating new account for it!")
-            self._RegitsterBot()
-        
-        self.BotID = self._FetchID()
-        self.Connected = True
-        self._SetUserId()
-    
-    def GetID(self):
-        """Returns the bot's account ID."""
-        return self.BotID
-    
-    def SendMessage(self, Target: int, Body: str, Subject: str):
-        """Sends a message from the bot."""
-        #first we base64 encode the body and subject
-        Subject = base64.b64encode(Subject.encode()).decode("ascii")
-        Body = base64.b64encode(Body.encode()).decode("ascii")
-        Timestamp = round(time.time())
-
-        #and we create the message
-        mycursor.execute("INSERT INTO messages (accID, toAccountID, userName, userID, subject, body, timestamp, isNew) VALUES (%s, %s, 'GDPyS Bot', %s, %s, %s, %s, 0)",
-            (self.BotID, Target, self.BotUserId, Subject, Body, Timestamp)
-        )
-        mydb.commit()
 
 #for now ill place the bot defenition her
 Bot = GDPySBot()
@@ -1475,26 +1446,6 @@ def DebugManualAddSong(Source, SongID):
         "songID" : SongID
     })
     AddSongToDB(SongInfo.text)
-
-def DebugReupload(Source, LevelID):
-    """[DEBUG] Reuploads level from source to GDPyS server."""
-    Level = requests.post(Source, data = {
-        "secret" : "Wmfd2893gb7",
-        "gameVersion" : 22,
-        "levelID" : LevelID,
-        "binaryVersion" : 33,
-        "gdw" : 0,
-        "inc" : 1,
-        "extras" : 0
-    })
-
-    Result = Level.text
-    
-    if Result == "" or Result == "-1" or Result == "No no no":
-        Fail(f"Server error with response {Result}!")
-        return
-    
-    # TODO FINISH THIS
 
 def MessagePost(request):
     """Posts a message to user."""
@@ -1813,46 +1764,6 @@ def GetGauntletsHandler():
     
     return f"{GauntletReturn[:-1]}#{SoloGen2(HashReturn)}"
 
-def CalculateCP():
-    """Cron job that calculates CP for the whole server."""
-    StartTime = time.time()
-    logger.info("Beginning to calculate CP... ")
-    #first we get all user ids
-    mycursor.execute("SELECT userID FROM users")
-    UserIDs = mycursor.fetchall()
-
-    #fetching the counts and calculation total pp
-    for UserID in UserIDs:
-        UserCalcCP(UserID[0])
-    mydb.commit()
-    Finished = round((time.time() - StartTime) * 1000, 2)
-    logger.info(f"Done! {Finished}ms")
-
-def UserCalcCP(UserID : int):
-    """Calculates CP for specified user id."""
-    UserCP = 0
-    #count rated levels
-    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starStars > 0 AND userID = %s", (UserID,))
-    UserCP += mycursor.fetchone()[0]
-    #count featured levels
-    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starFeatured > 0 AND userID = %s", (UserID,))
-    UserCP += mycursor.fetchone()[0]
-    #count epic levels
-    mycursor.execute("SELECT COUNT(*) FROM levels WHERE starEpic > 0 AND userID = %s", (UserID,))
-    UserCP += mycursor.fetchone()[0]
-    #count magic levels
-    if UserConfig["MagicGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE magic > 0 AND userID = %s", (UserID,))
-        UserCP += mycursor.fetchone()[0]
-    #count awarded levels
-    if UserConfig["AwardGivesCP"]:
-        mycursor.execute("SELECT COUNT(*) FROM levels WHERE awarded > 0 AND userID = %s", (UserID,))
-        UserCP += mycursor.fetchone()[0]
-    
-    #lastly we give the cp to them
-    mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (UserCP, UserID))
-    mydb.commit()
-
 def ScoreSubmitHandler(request):
     """Handles the score submission request by the client."""
     # NOTE this will be slower but it will be better in a lot of ways
@@ -1954,30 +1865,6 @@ def ScoreSubmitHandler(request):
     if len(ReturnStr) == 0:
         return ""
     return ReturnStr[:-1]
-
-def MaxStarCountBan() -> None:
-    """[CheatlessAC Cron] Bans people who have a star count higher than the total starcount of the server."""
-    # TODO : Make the same thing for usercoins and regular coins
-    if UserConfig["CheatlessCronChecks"] and UserConfig["CheatlessAC"]:
-        StartTime = time.time()
-        logger.info("Running CheatlessAC Cron Starcount Check... ")
-        TotalStars = 187 #from RobTop levels
-        #get all star rated levels
-        mycursor.execute("SELECT starStars FROM levels WHERE starStars > 0")
-        StarredLevels = mycursor.fetchall()
-
-        #add em all up
-        for Level in StarredLevels:
-            TotalStars += Level[0]
-        
-        #count query
-        mycursor.execute("SELECT COUNT(*) FROM users WHERE stars > %s", (TotalStars,))
-        BannedCount = mycursor.fetchone()[0]
-        #ban em
-        mycursor.execute("UPDATE users SET isBanned = 1 WHERE stars > %s", (TotalStars,))
-        mydb.commit()
-
-        logger.info(f"Done with {BannedCount} users banned! {round((time.time() - StartTime) * 1000, 2)}ms")
 
 def Select(TheList: list, Position: int, Thing):
     """An SQL-like select thing.
@@ -2159,9 +2046,9 @@ def ListToCommaString(TheList: list):
 
 def GetFriendsList(AccountID: int):
     """Returns a list of account ids of the users friends."""
-    mycursor.execute("SELECT accountID FROM friendreqs WHERE toAccountID = %s", (AccountID,))
+    mycursor.execute("SELECT person2 FROM friendships WHERE person1 = %s", (AccountID,))
     Friends = mycursor.fetchall()
-    mycursor.execute("SELECT toAccountID FROM friendreqs WHERE accountID = %s", (AccountID,))
+    mycursor.execute("SELECT person1 FROM friendships WHERE person2 = %s", (AccountID,))
     Friends1 = mycursor.fetchall()
     FriendsRetrun = []
 
@@ -2228,7 +2115,7 @@ def GetFriendReqList(request):
         AList = ""
         for x in mycursor.fetchall():
             AList+=f"{x[0]},"
-        mycursor.execute("UPDATE friendreqs SET isNew = 0 WHERE id in (%s)", (AList[:-1],))
+        mycursor.execute(f"UPDATE friendreqs SET isNew = 0 WHERE ID IN ({AList[:-1]})")
         mydb.commit()
     ReturnStr = ""
     for Request in FriendReqs:
@@ -2250,38 +2137,6 @@ def GetFriendReqList(request):
         }) + "|"
     
     return f"{ReturnStr[:-1]}#{Count}:{Offset}:10"
-
-# TODO: MOVE TO OWN FILE
-def ToolLoginCheck(request) -> bool:
-    """Handles the login checks for user tools. Returns new session if true"""
-    #Return struct is (T/F based on result, Message)
-    Username = request.form["username"]
-    Password = request.form["password"]
-
-    mycursor.execute("SELECT userName, password, accountID, privileges FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
-    User = mycursor.fetchone()
-    if User == None:
-        return (False, "User not found!")
-    
-    UserID = AIDToUID(User[2])
-    #check if not banned
-    mycursor.execute("SELECT isBanned FROM users WHERE userID = %s LIMIT 1", (UserID,))
-    if mycursor.fetchone()[0]:
-        return (False, "You are banned!")
-    
-    if not HasPrivilege(User[2], UserLogIn):
-        return (False, "You do not have permission to log in!")
-
-    # password check
-    if not CheckBcryptPw(User[1], Password):
-        return (False, "Incorrect password!")
-    
-    return (True, {
-        "AccountID" : User[2],
-        "Username" : User[0],
-        "Privileges" : User[3],
-        "LoggedIn" : True
-    })
 
 def GetDaily(request):
     """Responds with a daily or weekly level. Using Cvolton's system."""
@@ -2307,3 +2162,76 @@ def GetDaily(request):
         TimeToChange = time.mktime(EndTime.timetuple())
         LevelID += 100001 #idk what he was thinking either
     return f"{LevelID}|{round(TimeToChange)}"
+
+def AcceptFriendRequestHandler(request):
+    """Handles the accepting friend request request. Name explains it."""
+    AccountID = int(request.form["accountID"])
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    RequestID = int(request.form["requestID"])
+    #get the friend req from db
+    mycursor.execute("SELECT accountID, toAccountID, ID FROM friendreqs WHERE ID = %s LIMIT 1", (RequestID,))
+    Request = mycursor.fetchone()
+    if Request == None:
+        return "-1"
+    if Request[0] != AccountID and Request[1] != AccountID: #prevent fake req accepts
+        Fail("Someone tried to accept the friend request as someone else...") #owner might want to know
+        return "-1"
+    #they friends
+    mycursor.execute("INSERT INTO friendships (person1, person2, isNew1, isNew2) VALUES (%s, %s, 1, 1)", (Request[0], Request[1]))
+    mycursor.execute("DELETE FROM friendreqs WHERE ID = %s LIMIT 1", (RequestID,))
+    mydb.commit()
+    return "1"
+
+def CurrentFriendsHandler(request):
+    """Friends list for client."""
+    AccountID = int(request.form["accountID"])
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    IsBlocked = request.form["type"]
+    Query = { # no pages, no limits
+        "0" : {
+            "q" : "SELECT person1, person2, isNew1, isNew2 FROM friendships WHERE person1 = %s OR person2 = %s",
+            "a" : (AccountID, AccountID)
+        },
+        "1" : {
+            "q" : "SELECT person1, person2 FROM blocks WHERE person1 = %s",
+            "a" : (AccountID,)
+        }
+    }[IsBlocked]
+    mycursor.execute(Query["q"], Query["a"])
+    Friends = mycursor.fetchall()
+    if len(Friends) == 0:
+        return "-2" #haha lonely
+    
+    #is new is client sided so we can do this
+    PeopleList = [] ### TRUSTED INPUT
+    for x in Friends:
+        if x[0] != AccountID:
+            PeopleList.append(x[0])
+        else:
+            PeopleList.append(x[1])
+    
+    PeopleSQLArray = ListToCommaString(PeopleList)
+    mycursor.execute(f"SELECT userName, userID, icon, color1, color2, iconType, special, extID FROM users WHERE extID IN ({PeopleSQLArray}) ORDER BY userName")
+    People = mycursor.fetchall()
+    Resp = ""
+    for Person in People:
+        Resp += JointStringBuilder({
+            "1" : Person[0],
+            "2" : Person[1],
+            "9" : Person[2],
+            "10" : Person[3],
+            "11" : Person[4],
+            "14" : Person[5],
+            "15" : Person[6],
+            "16" : Person[7],
+            "18" : 0,
+            "41" : 0
+        }) + "|"
+    Resp = Resp[:-1]
+    #mark as viewed
+    mycursor.execute("UPDATE friendships SET isNew1 = 0 WHERE person2 = %s", (AccountID,))
+    mycursor.execute("UPDATE friendships SET isNew2 = 0 WHERE person1 = %s", (AccountID,))
+    mydb.commit()
+    return Resp

@@ -32,8 +32,10 @@ function IziFail(MainText, OtherText) {
     });
 }
 
-function ReuploadLevel(LevelID) {
-    fetch(`/tools/reuploadapi/${LevelID}`)
+function ReuploadLevel(LevelID, server) {
+    //Why did I make it like this??
+    server = encodeURIComponent(server); //urlencode it
+    fetch("http://"+ location.host +`/api/reuploadapi?levelid=${LevelID}&server=${server}`)
 	.then(res => res.json())
 	.then((out) => {
         if (out["status"] == 404) {
@@ -42,9 +44,27 @@ function ReuploadLevel(LevelID) {
         else if (out["status"] == 500) {
             IziFail("Error!", "Something behind the scenes went terribly wrong.")
         }
-        else {
+        else if (out["status"] == 200) {
             IziSuccess("Level Reuploaded!", `The level ID is ${out["levelID"]}!`)
         }
+        else {
+            IziFail(out["message"])
+        }
     })
-    .catch(err => { IziFail("Error!", "Misc reupload error!") }); 
+    .catch(err => {
+        IziFail("Error!", `Misc reupload error!`);
+        console.log(err);
+    }); 
+}
+
+function ReuploadButton() {
+    const LevelID = document.getElementById("levelid");
+    const Server = document.getElementById("server");
+    if (!isNaN(LevelID)){
+        ReuploadLevel(LevelID.value, Server.value);
+        LevelID.value = ""
+    }
+    else {
+        IziFail("Enter a valid level ID!");
+    }
 }

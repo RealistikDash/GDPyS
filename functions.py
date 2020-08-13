@@ -2220,12 +2220,12 @@ def CurrentFriendsHandler(request):
         Resp += JointStringBuilder({
             "1" : Person[0],
             "2" : Person[1],
-            "9" : Person[3],
-            "10" : Person[4],
-            "11" : Person[5],
-            "14" : Person[6],
-            "15" : Person[7],
-            "16" : Person[8],
+            "9" : Person[2],
+            "10" : Person[3],
+            "11" : Person[4],
+            "14" : Person[5],
+            "15" : Person[6],
+            "16" : Person[7],
             "18" : 0,
             "41" : 0
         }) + "|"

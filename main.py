@@ -6,7 +6,7 @@ import threading
 from plugin import add_plugins
  
 import os
-from migrations import ImportGDPySDatabase
+from helpers.migrations import ImportGDPySDatabase
 from constants import __version__
 from gdpys.commands import commands
 from helpers.migrations import ImportGDPySDatabase, CheckForEmptyDb

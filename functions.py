@@ -90,37 +90,18 @@ def GetServerIP():
 
 def LoginCheck(Udid, Username, Password, request):
     """Checks login and password"""
-    mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (Username,))
-    Accounts = mycursor.fetchall()
-    if len(Accounts) == 0:
-        #no accounts found
-        Fail(f"Account {Username} not found!")
-        return "-1" #idk the error codes
-    AccountID = Accounts[0][0] #choosing the closes one
-
-    #User ID
-    mycursor.execute("SELECT userID, isBanned FROM users WHERE extID = %s", (AccountID,))
-    UIDFetch = mycursor.fetchone()
-    if UIDFetch == None:
-        TheIP = request.remote_addr
-        mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (AccountID, Username, TheIP))
-        mydb.commit()
-        #fetch again br uh
-        mycursor.execute("SELECT userID, isBanned FROM users WHERE extID = %s", (AccountID,))
-        UIDFetch = mycursor.fetchone()
-
-    UserID = UIDFetch[0]
-
-    #we dont allow banned people to log in, tell them its disabled
-    if UIDFetch[1]:
-        return "-12"
-
-    if not CheckPassword(AccountID, Password):
+    mycursor.execute("SELECT password, accountID FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
+    AccData = mycursor.fetchone()
+    if AccData == None:
+        #not found
         return "-1"
-
+    AccountID = AccData[1]
+    UserID = AIDToUID(AccountID)
+    if not CheckPassword(AccountID, AccData[0]):
+        return "-1"
     #lastly we check if they are allowed to log in
     if not HasPrivilege(AccountID, UserLogIn):
-        return "-1"
+        return "-12"
     Success(f"Authentication for {Username} was successfull!")
     return f"{AccountID},{UserID}"
 
@@ -154,6 +135,7 @@ def RegisterFunction(request):
         return "-1"
     #Query Time
     mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (Username, Password, Email, RegisterTime))
+    mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, Username, request.remote_addr))
     mydb.commit()
     Success(f"User {Username} successfully registered!")
     return "1"

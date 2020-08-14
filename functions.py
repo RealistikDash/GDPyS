@@ -2224,3 +2224,13 @@ def CurrentFriendsHandler(request):
     mycursor.execute("UPDATE friendships SET isNew2 = 0 WHERE person1 = %s", (AccountID,))
     mydb.commit()
     return Resp
+
+def RemoveFriendHandler(request):
+    """Handles removing friends."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    Target = request.form["targetAccountID"]
+    mycursor.execute("DELETE FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person1 = %s AND person2 = %s) LIMIT 1", (AccountID, Target, Target, AccountID))
+    mydb.commit()
+    return "-1"

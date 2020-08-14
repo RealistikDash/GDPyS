@@ -216,6 +216,10 @@ def AcceptFriendRequestRoute():
 def FriendsListRoute():
     return CurrentFriendsHandler(request)
 
+@app.route("/database/removeGJFriend20.php", methods=["POST"])
+def RemFriendRoute():
+    return RemoveFriendHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")
@@ -316,7 +320,7 @@ if __name__ == "__main__":
  | |__| | |__| | |   | |_| |____) |
   \_____|_____/|_|    \__, |_____/
                        __/ |
-                      |___/
+                      |___/  - {Fore.GREEN}{random.choice(quotes)}
  {Fore.MAGENTA}Created by RealistikDash{Fore.RESET}
     """)
     if CheckForEmptyDb(mycursor):

@@ -20,3 +20,19 @@ ModBanUser = 2 << 15
 ModSetDaily = 2 << 16
 
 __version__ = "InDev"
+
+quotes = [ #startup quotes
+    "You only die when you die",
+    "IM NINE",
+    "i g sleeo",
+    "running shoes are fake speed",
+    "Giraffes are heartless creatures",
+    "The Pope! How many divisions has he got?",
+    "Rust sounds like an overused glow level",
+    "Click the circles.... Oh wait wrong game...",
+    "Realistik is realistic",
+    "A wall is more then a wall, it's a peace of mind",
+    "STOP OFFERING ME CIGARETTES! IM TEN!",
+    "I need to become rich or else I'm not",
+    "c.ussr.pl for more info"
+]

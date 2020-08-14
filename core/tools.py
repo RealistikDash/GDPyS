@@ -164,7 +164,8 @@ def reupload_level_api(level_id: str, server: str, session):
             extID,
             unlisted,
             isLDM,
-            secret
+            secret,
+            hostname
             )
         VALUES      
             ( #hey mysql also uses hashtags for comments neat
@@ -194,7 +195,8 @@ def reupload_level_api(level_id: str, server: str, session):
             %s, #extID
             0,  #unlisted
             %s,  #is ldm
-            'blah its reupload'
+            'blah its reupload',
+            'MYSELF' #todo: change to users ip
             )  
     """, (
         level_dict["a2"], #level name

@@ -166,54 +166,55 @@ def reupload_level_api(level_id: str, server: str, session):
             isLDM
             )
         VALUES      
-            (
-            %s,
-            %s,
-            27,
-            'GDPyS Bot',
-            %s,
-            %s,
-            %s,
-            %s,
-            0,
-            %s,
-            %s,
-            %s,
-            %s,
-            0,
-            %s,
-            %s,
-            %s,
-            %s,
-            0,
-            %s,
-            %s,
-            %s,
-            %s,
-            0,
-            %s
+            ( #hey mysql also uses hashtags for comments neat
+            %s, #levelname
+            %s, #gameversion
+            27, #binary version
+            'GDPyS Bot', #username
+            %s, #description
+            %s, #level ver
+            %s, # length
+            %s, # audiotrack
+            0,  # auto
+            %s, #password
+            %s, #original
+            %s, #twoplayer
+            %s, #songid
+            0,  #objects
+            %s, #coins
+            %s, #requested stars
+            %s, #extra string
+            %s, #level string
+            0,  #level info
+            %s, #upload date
+            %s, #update date
+            %s, #orignal reup
+            %s, #userID
+            %s, #extID
+            0,  #unlisted
+            %s  #is ldm
             )  
     """, (
-        level_dict["a2"],
-        game_version,
-        level_dict["a3"],
-        level_dict["a5"],
-        level_dict["a15"],
-        level_dict["a12"],
-        password,
-        level_dict["a1"],
-        two_player,
-        song_id,
-        coins,
-        req_stars,
-        extra_str,
-        level_string,
-        timestamp,
-        timestamp,
-        level_dict["a1"],
-        Bot.BotUserId,
-        Bot.BotID,
-        ldm
+        level_dict["a2"], #level name
+        game_version, #game ver
+        level_dict["a3"], #description
+        level_dict["a5"], #level ver
+        level_dict["a15"], #length
+        level_dict["a12"], #audiotrack
+        password, #password
+        level_dict["a1"], #original
+        two_player,#twoplayer
+        song_id,#songid
+        coins,#coins
+        req_stars, #req stars
+        extra_str, #extra string
+        level_string, #level str
+        timestamp,#upload date
+        timestamp,#update date
+        level_dict["a1"], #original reup
+        Bot.BotUserId,#user id
+        Bot.BotID, #ext od
+        ldm#ldm
     ))
     mydb.commit()
     NewLevelID = mycursor.lastrowid

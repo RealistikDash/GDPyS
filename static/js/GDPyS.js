@@ -65,6 +65,6 @@ function ReuploadButton() {
         LevelID.value = ""
     }
     else {
-        IziFail("Enter a valid level ID!");
+        IziFail("Error!", "Enter a valid level ID!");
     }
 }

@@ -48,7 +48,7 @@ function ReuploadLevel(LevelID, server) {
             IziSuccess("Level Reuploaded!", `The level ID is ${out["levelID"]}!`)
         }
         else {
-            IziFail(out["message"])
+            IziFail(`Error code ${out["status"]}`, out["message"])
         }
     })
     .catch(err => {

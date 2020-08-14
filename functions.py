@@ -1061,7 +1061,6 @@ def GetComments(request):
         return "-2"
 
     ReturnString = ""
-    UserString = ""
     for Comment in Comments:
         if DisplayID:
             ReturnString += f"1~{Comment[0]}~"

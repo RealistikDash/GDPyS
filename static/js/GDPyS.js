@@ -60,11 +60,13 @@ function ReuploadLevel(LevelID, server) {
 function ReuploadButton() {
     const LevelID = document.getElementById("levelid");
     const Server = document.getElementById("server");
-    if (!isNaN(LevelID)){
-        ReuploadLevel(LevelID.value, Server.value);
-        LevelID.value = ""
+    /*if (!isNaN(LevelID)){
+        
     }
     else {
         IziFail("Error!", "Enter a valid level ID!");
-    }
+    }*/
+    //TODO: add those checks above
+    ReuploadLevel(LevelID.value, Server.value);
+    LevelID.value = ""
 }

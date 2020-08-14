@@ -187,13 +187,17 @@ def GetUserDataFunction(request):
             FriendState = 1
         else:
             mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (TargetAccid, FromAccid))
-            if len(mycursor.fetchall()):
+            Req = mycursor.fetchall()
+            if len(Req):
                 FriendState = 3
+                Append += f":32:{Req[0]}:35:{Req[1]}:37:{TimeAgoFromNow(Req[2])[:-4]}"
             else: #so other queries arent ran if we already found it
                 #outgoing reqs
                 mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (FromAccid, TargetAccid))
-                if len(mycursor.fetchall()):
+                Req = mycursor.fetchall()
+                if len(Req):
                     FriendState = 4
+                    Append += f":32:{Req[0]}:35:{Req[1]}:37:{TimeAgoFromNow(Req[2])[:-4]}"
 
     mycursor.execute("SELECT * FROM users WHERE extID = %s LIMIT 1", (TargetAccid,))
     Userdata = mycursor.fetchall()[0]

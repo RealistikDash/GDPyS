@@ -1,7 +1,7 @@
 from functions import AIDToUID, CheckBcryptPw, HasPrivilege, mycursor, Bot, Xor
 from constants import *
 from core.glob import glob
-from core.conn import mydb
+from core.mysqlconn import mydb
 from config import UserConfig
 import requests
 import urllib.parse

@@ -46,6 +46,8 @@ function ReuploadLevel(LevelID, server) {
         }
         else if (out["status"] == 200) {
             IziSuccess("Level Reuploaded!", `The level ID is ${out["levelID"]}!`)
+            //update bar
+            document.getElementById("reupbar").style = `width: ${out["percentage"]}%`;
         }
         else {
             IziFail(`Error code ${out["status"]}`, out["message"])

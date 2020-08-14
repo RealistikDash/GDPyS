@@ -187,15 +187,15 @@ def GetUserDataFunction(request):
             FriendState = 1
         else:
             mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (TargetAccid, FromAccid))
-            Req = mycursor.fetchall()
-            if len(Req):
+            Req = mycursor.fetchone()
+            if Req != None:
                 FriendState = 3
                 Append += f":32:{Req[0]}:35:{Req[1]}:37:{TimeAgoFromNow(Req[2])[:-4]}"
             else: #so other queries arent ran if we already found it
                 #outgoing reqs
                 mycursor.execute("SELECT ID, comment, uploadDate FROM friendreqs WHERE accountID = %s AND toAccountID = %s", (FromAccid, TargetAccid))
-                Req = mycursor.fetchall()
-                if len(Req):
+                Req = mycursor.fetchone()
+                if Req != None:
                     FriendState = 4
                     Append += f":32:{Req[0]}:35:{Req[1]}:37:{TimeAgoFromNow(Req[2])[:-4]}"
 

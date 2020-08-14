@@ -1668,11 +1668,11 @@ def GetMessage(request):
         return "-1" #if no message found and so other checks arent ran
 
     #we mark it as read if not already
-    if not Message[9]:
-        mycursor.execute("UPDATE messages SET isNew = 1 WHERE messageID = %s AND accID = %s LIMIT 1", (MessageID, AccountID))
+    if Message[9] == 0:
+        mycursor.execute("UPDATE messages SET isNew = 1 WHERE messageID = %s LIMIT 1", (MessageID,))
         mydb.commit()
     
-    GetSent = True if Message[4] else False
+    GetSent = True if Message[4] == int(AccountID) else False
     
     mycursor.execute("SELECT userName, userID, extID FROM users WHERE extID = %s LIMIT 1", (Message[6 if GetSent else 4],))
     ExtraUserData = mycursor.fetchone()

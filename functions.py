@@ -2233,4 +2233,4 @@ def RemoveFriendHandler(request):
     Target = request.form["targetAccountID"]
     mycursor.execute("DELETE FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person1 = %s AND person2 = %s) LIMIT 1", (AccountID, Target, Target, AccountID))
     mydb.commit()
-    return "-1"
+    return "1"

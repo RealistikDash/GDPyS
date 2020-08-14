@@ -95,7 +95,6 @@ def reupload_level_api(level_id: str, server: str, session):
     level_dict = {}
     for i in range(1, len(level) + 1):
         var = level[i-1]
-        arg_num = 0
         if i % 2 == 0:
             level_dict[f"a{arg_num}"] = var
         else:

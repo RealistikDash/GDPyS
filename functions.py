@@ -797,7 +797,7 @@ def IsInt(TheThing):
 
 def empty(variable) -> bool:
     """Python ver of empty php function"""
-    if not variable:
+    if not variable and variable != "-":
         return True
     return False
 

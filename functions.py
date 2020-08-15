@@ -956,7 +956,7 @@ def GetLevels(request):
             Conditions += f"{Condition} AND "
         Conditions = Conditions[:-5]
     else:
-        Conditions = "WHERE"
+        Conditions = ""
 
     Query = f"SELECT * FROM levels {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
     CountQuery = f"SELECT count(*) FROM levels {Conditions}"

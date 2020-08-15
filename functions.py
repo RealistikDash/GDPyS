@@ -828,7 +828,7 @@ def GetLevels(request):
         SQLParams.append("original = 0")
     
     if request.form.get("coins"):
-        SQLParams.append("starCoins = 1 AND level.coins > 0")
+        SQLParams.append("starCoins = 1 AND coins > 0")
     
     if request.form.get("epic"):
         SQLParams.append("starEpic = 1")
@@ -916,9 +916,7 @@ def GetLevels(request):
         Order = "likes"
     #no type 4 as it is already the default one
     elif Type == 5:
-        Param5 = "levels.userID = %s"
-        if not UserConfig["BannedLevelsHidden"]:
-            Param5 = "userID = %s"
+        Param5 = "userID = %s"
         SQLParams.append(Param5)
         SQLFormats.append(Form["str"])
     elif Type == 6:
@@ -949,20 +947,12 @@ def GetLevels(request):
         Conditions = "WHERE "
         for Condition in SQLParams:
             Conditions += f"{Condition} AND "
-        if not UserConfig["BannedLevelsHidden"]:
-            Conditions = Conditions[:-5]
+        Conditions = Conditions[:-5]
     else:
         Conditions = "WHERE"
-        if not UserConfig["BannedLevelsHidden"]:
-            Conditions = "" #ngl this is messy
 
-    Query = f"SELECT * FROM levels INNER JOIN users ON levels.userID = users.userID {Conditions} users.isBanned = 0 ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
-    CountQuery = f"SELECT count(*) FROM levels INNER JOIN users ON levels.userID = users.userID {Conditions} users.isBanned = 0"
-
-    #if the config for removing levels of banned people is disabled
-    if not UserConfig["BannedLevelsHidden"]:
-        Query = f"SELECT * FROM levels {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
-        CountQuery = f"SELECT count(*) FROM levels {Conditions}"
+    Query = f"SELECT * FROM levels {Conditions} ORDER BY {Order} DESC LIMIT 10 OFFSET {Offset}"
+    CountQuery = f"SELECT count(*) FROM levels {Conditions}"
 
     mycursor.execute(CountQuery, tuple(SQLFormats))
     LevelCount = mycursor.fetchall()[0][0]

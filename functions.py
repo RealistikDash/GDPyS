@@ -2292,12 +2292,12 @@ def DeleteLevelHandler(request):
     AccountID = request.form["accountID"]
     if not VerifyGJP(AccountID, request.form["gjp"]):
         return "-1"
-    mycursor.execute("SELECT levelID, levelName, levelDesc, extID, levelString, extraString, songID, audioTrack, objects, password WHERE levelID = %s AND extID = %s LIMIT 1", (request.form["levelID"], AccountID))
+    mycursor.execute("SELECT levelID, levelName, levelDesc, extID, levelString, extraString, songID, audioTrack, objects, password FROM levels WHERE levelID = %s AND extID = %s LIMIT 1", (request.form["levelID"], AccountID))
     data = mycursor.fetchone()
     if not data:
         return "-1"
     #add it to deleted levels
-    mycursor.execute("INSERT INTO deletedlevels (levelID, levelName, description, accountID, levelString, extraString, songID, audioTrack, objects, password) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"(
+    mycursor.execute("INSERT INTO deletedlevels (levelID, levelName, description, accountID, levelString, extraString, songID, audioTrack, objects, password) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(
         data[0],
         data[1],
         data[2],

@@ -948,9 +948,9 @@ def GetLevels(request):
     if len(SQLParams) != 0:
         Conditions = "WHERE "
         for Condition in SQLParams:
-            Conditions += f"{Condition} AND"
+            Conditions += f"{Condition} AND "
         if not UserConfig["BannedLevelsHidden"]:
-            Conditions = Conditions[:-4]
+            Conditions = Conditions[:-5]
     else:
         Conditions = "WHERE"
         if not UserConfig["BannedLevelsHidden"]:

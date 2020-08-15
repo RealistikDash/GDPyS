@@ -8,6 +8,7 @@ Here are a list of some changes server owners and operators may not be familiar 
 - Green users haave their abillities hugely cut down. For example, they can't upload levels, view leaderboards and more. While this may be bad in some cases, it overall makes your server more secure and makes it harder to bot.
 - There is a custom Awarded and Magic section. Rather than being randomly selected by an arbitrary value, levels now have to be nominated by moderators.
 - There is a completely new bitwise-based permission system. While it is more complex, it is faster and allows more to be done with it.
+- Deleting levels doesn't fully delete them. Some of the metadata (that I deemed necessary in case of raids or exploits) is moved to a new table (called `deletedlevels`) and the level file is left untouched.
 
 # Why GDPyS?
 GDPyS is made with convenience and performance in mind. It provides performance benefits over existing alternatives while convenient features (such as error logs for easier debugging and automatic cron). Additionally, it is designed to be directly swappable with Cvolton's GMDPrivateServer, meaning you will able to reuse your existing database, save and level files.

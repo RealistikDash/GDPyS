@@ -2286,3 +2286,28 @@ def RemoveFriendHandler(request):
     mycursor.execute("DELETE FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person1 = %s AND person2 = %s) LIMIT 1", (AccountID, Target, Target, AccountID))
     mydb.commit()
     return "1"
+
+def DeleteLevelHandler(request):
+    """Deletes a level (actually it moves it to the deleted levels table)."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    mycursor.execute("SELECT levelID, levelName, levelDesc, extID, levelString, extraString, songID, audioTrack, objects, password WHERE levelID = %s AND extID = %s LIMIT 1", (request.form["levelID"], AccountID))
+    data = mycursor.fetchone()
+    if not data:
+        return "-1"
+    #add it to deleted levels
+    mycursor.execute("INSERT INTO deletedlevels (levelID, levelName, description, accountID, levelString, extraString, songID, audioTrack, objects, password) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"(
+        data[0],
+        data[1],
+        data[2],
+        data[3],
+        data[4],
+        data[5],
+        data[6],
+        data[7],
+        data[8],
+        data[9]
+    ))
+    mycursor.execute("DELETE FROM levels WHERE levelID = %s LIMIT 1", (data[0],))
+    mydb.commit() #to delete the level save file use gdps restorer (https://github.com/VGDPS/GDPSRestorer)

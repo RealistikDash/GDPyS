@@ -853,10 +853,10 @@ def GetLevels(request):
         SQLFormats.append(request.form["len"])
     
     if empty(request.form.get("song")):
-        SongID = int(request.form.get("song"))
+        SongID = request.form.get("song")
         if request.form.get("customSong") == None: #default song
             SQLParams.append("audioTrack = %s")
-            SQLFormats.append(SongID - 1) #yes
+            SQLFormats.append(int(SongID) - 1) #yes
         else:
             SQLParams.append("songID = %s")
             SQLFormats.append(SongID)

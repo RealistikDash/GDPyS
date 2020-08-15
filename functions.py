@@ -827,6 +827,7 @@ def GetLevels(request):
             SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
     
     ################################### CLOSE YOUR EYES
+    """
     if not empty(request.form.get("featured")):
         SQLParams.append("starFeatured = 1")
     
@@ -879,7 +880,7 @@ def GetLevels(request):
         else:
             SQLParams.append("starDifficulty IN (%s)")
             SQLFormats.append(f"{diff.replace(',', '0,')}0")#multiply by 10 in the best way
-
+    """
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:
         SQLParams.append("starFeatured = 1")

@@ -828,7 +828,7 @@ def GetLevels(request):
         SQLParams.append("original = 0")
     
     if request.form.get("coins"):
-        SQLParams.append("starCoins = 1 AND coins > 0")
+        SQLParams.append("starCoins = 1 AND level.coins > 0")
     
     if request.form.get("epic"):
         SQLParams.append("starEpic = 1")

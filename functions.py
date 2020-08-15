@@ -827,32 +827,32 @@ def GetLevels(request):
             SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
     
     ################################### CLOSE YOUR EYES
-    if not empty(request.form.get("featured")):
+    if empty(request.form.get("featured")):
         SQLParams.append("starFeatured = 1")
     
-    if not empty(request.form.get("original")):
+    if empty(request.form.get("original")):
         SQLParams.append("original = 0")
     
-    if not empty(request.form.get("original")):
+    if empty(request.form.get("original")):
         SQLParams.append("starCoins = 1 AND coins > 0")
     
-    if not empty(request.form.get("epic")):
+    if empty(request.form.get("epic")):
         SQLParams.append("starEpic = 1")
     
-    if not empty(request.form.get("twoPlayer")):
+    if empty(request.form.get("twoPlayer")):
         SQLParams.append("twoPlayer = 1")
     
-    if not empty(request.form.get("star")):
+    if empty(request.form.get("star")):
         SQLParams.append("starStars > 0")
     
-    if not empty(request.form.get("noStar")):
+    if empty(request.form.get("noStar")):
         SQLParams.append("starStars = 0")
     
-    if not empty(request.form.get("len")):
+    if empty(request.form.get("len")):
         SQLParams.append("levelLength IN (%s)")
         SQLFormats.append(request.form["len"])
     
-    if not empty(request.form.get("song")):
+    if empty(request.form.get("song")):
         SongID = int(request.form.get("song"))
         if request.form.get("customSong") == None: #default song
             SQLParams.append("audioTrack = %s")
@@ -861,7 +861,7 @@ def GetLevels(request):
             SQLParams.append("songID = %s")
             SQLFormats.append(SongID)
         
-    if not empty(request.form.get("diff")):
+    if empty(request.form.get("diff")):
         diff = request.form["diff"]
         if diff == "-2": #demon faces wrr
             SQLParams.append({

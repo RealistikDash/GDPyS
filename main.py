@@ -220,6 +220,10 @@ def FriendsListRoute():
 def RemFriendRoute():
     return RemoveFriendHandler(request)
 
+@app.route("/database/deleteGJLevelUser20.php", methods=["POST"])
+def RemLevelRoute():
+    return DeleteLevelHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

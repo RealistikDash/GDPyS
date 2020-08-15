@@ -897,7 +897,8 @@ def GetLevels(request):
     if CheckForm(Form, "noStar"):
         SQLParams.append("starStars = 0")
     if CheckForm(Form, "len"):
-        SQLParams.append(f"levelLength IN ({Form['len']})")
+        SQLParams.append(f"levelLength IN (%s)")
+        SQLFormats.append(Form['len'])
 
     if Type == 0 or Type == 15:
         Order = "likes"

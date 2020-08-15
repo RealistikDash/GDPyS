@@ -827,33 +827,38 @@ def GetLevels(request):
             SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
     
     ################################### CLOSE YOUR EYES
-    if empty(request.form.get("featured")):
+    if not empty(request.form.get("featured")):
         SQLParams.append("starFeatured = 1")
     
-    if empty(request.form.get("original")):
+    if not empty(request.form.get("original")):
         SQLParams.append("original = 0")
     
-    if empty(request.form.get("original")):
+    if not empty(request.form.get("original")):
         SQLParams.append("starCoins = 1 AND coins > 0")
     
-    if empty(request.form.get("epic")):
+    if not empty(request.form.get("epic")):
         SQLParams.append("starEpic = 1")
     
-    if empty(request.form.get("twoPlayer")):
+    if not empty(request.form.get("twoPlayer")):
         SQLParams.append("twoPlayer = 1")
     
-    if empty(request.form.get("star")):
+    if not empty(request.form.get("star")):
         SQLParams.append("starStars > 0")
     
-    if empty(request.form.get("noStar")):
+    if not empty(request.form.get("noStar")):
         SQLParams.append("starStars = 0")
     
-    if empty(request.form.get("len")):
+    if not empty(request.form.get("len")):
         SQLParams.append("levelLength IN (%s)")
         SQLFormats.append(request.form["len"])
     
+<<<<<<< HEAD
     if empty(request.form.get("song")):
         SongID = request.form.get("song")
+=======
+    if not empty(request.form.get("song")):
+        SongID = int(request.form.get("song"))
+>>>>>>> parent of 4b552f1... why DID I INVERT IT (THIS IS A CRY FOR HELP)
         if request.form.get("customSong") == None: #default song
             SQLParams.append("audioTrack = %s")
             SQLFormats.append(int(SongID) - 1) #yes
@@ -861,7 +866,7 @@ def GetLevels(request):
             SQLParams.append("songID = %s")
             SQLFormats.append(SongID)
         
-    if empty(request.form.get("diff")):
+    if not empty(request.form.get("diff")):
         diff = request.form["diff"]
         if diff == "-2": #demon faces wrr
             SQLParams.append({

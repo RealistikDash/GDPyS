@@ -872,7 +872,7 @@ def GetLevels(request):
             SQLParams.append("starAuto = 1")
         else:
             SQLParams.append("starDifficulty IN (%s)")
-            SQLFormats.append(f"{diff.replace(",", "0,")}0")#multiply by 10 in the best way
+            SQLFormats.append(f"{diff.replace(',', '0,')}0")#multiply by 10 in the best way
 
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:

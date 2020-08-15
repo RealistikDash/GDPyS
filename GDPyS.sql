@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 25, 2020 at 07:29 PM
+-- Generation Time: Aug 15, 2020 at 09:56 PM
 -- Server version: 5.7.28-0ubuntu0.18.04.4
 -- PHP Version: 7.1.33-9+ubuntu18.04.1+deb.sury.org+1
 
@@ -67,7 +67,7 @@ CREATE TABLE `accounts` (
   `saveKey` blob,
   `discordID` bigint(20) NOT NULL DEFAULT '0',
   `discordLinkReq` bigint(20) NOT NULL DEFAULT '0',
-  `privileges` int(6) NOT NULL DEFAULT '30',
+  `privileges` int(6) NOT NULL DEFAULT '126',
   `isBot` int(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -160,6 +160,26 @@ CREATE TABLE `dailyfeatures` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `deletedlevels`
+--
+
+CREATE TABLE `deletedlevels` (
+  `id` int(11) NOT NULL,
+  `levelID` int(11) NOT NULL,
+  `levelName` varchar(16) NOT NULL,
+  `description` mediumtext NOT NULL,
+  `accountID` int(11) NOT NULL,
+  `levelString` longtext NOT NULL,
+  `extraString` mediumtext NOT NULL,
+  `songID` int(8) NOT NULL,
+  `audioTrack` int(2) NOT NULL,
+  `objects` int(6) NOT NULL,
+  `password` int(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `friendreqs`
 --
 
@@ -169,7 +189,7 @@ CREATE TABLE `friendreqs` (
   `comment` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
   `uploadDate` int(11) NOT NULL,
   `ID` int(11) NOT NULL,
-  `isNew` tinyint(1) NOT NULL DEFAULT '1'
+  `isNew` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -527,7 +547,7 @@ CREATE TABLE `suggest` (
 CREATE TABLE `users` (
   `isRegistered` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `extID` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `extID` int(100) NOT NULL,
   `userName` varchar(69) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'undefined',
   `stars` int(11) NOT NULL DEFAULT '0',
   `demons` int(11) NOT NULL DEFAULT '0',
@@ -620,6 +640,12 @@ ALTER TABLE `cpshares`
 --
 ALTER TABLE `dailyfeatures`
   ADD PRIMARY KEY (`feaID`);
+
+--
+-- Indexes for table `deletedlevels`
+--
+ALTER TABLE `deletedlevels`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `friendreqs`
@@ -785,17 +811,17 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `acccomments`
 --
 ALTER TABLE `acccomments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 --
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 --
 -- AUTO_INCREMENT for table `actions`
 --
 ALTER TABLE `actions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `bannedips`
 --
@@ -810,7 +836,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 --
 -- AUTO_INCREMENT for table `cpshares`
 --
@@ -820,32 +846,37 @@ ALTER TABLE `cpshares`
 -- AUTO_INCREMENT for table `dailyfeatures`
 --
 ALTER TABLE `dailyfeatures`
-  MODIFY `feaID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `feaID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT for table `deletedlevels`
+--
+ALTER TABLE `deletedlevels`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `friendreqs`
 --
 ALTER TABLE `friendreqs`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 --
 -- AUTO_INCREMENT for table `friendships`
 --
 ALTER TABLE `friendships`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `gauntlets`
 --
 ALTER TABLE `gauntlets`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `levels`
 --
 ALTER TABLE `levels`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 --
 -- AUTO_INCREMENT for table `levelscores`
 --
 ALTER TABLE `levelscores`
-  MODIFY `scoreID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `scoreID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 --
 -- AUTO_INCREMENT for table `links`
 --
@@ -855,12 +886,12 @@ ALTER TABLE `links`
 -- AUTO_INCREMENT for table `mappacks`
 --
 ALTER TABLE `mappacks`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `modactions`
 --
@@ -885,7 +916,7 @@ ALTER TABLE `poll`
 -- AUTO_INCREMENT for table `privilegegroups`
 --
 ALTER TABLE `privilegegroups`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `quests`
 --
@@ -910,7 +941,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `songs`
 --
 ALTER TABLE `songs`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=938116;
 --
 -- AUTO_INCREMENT for table `suggest`
 --
@@ -920,7 +951,7 @@ ALTER TABLE `suggest`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

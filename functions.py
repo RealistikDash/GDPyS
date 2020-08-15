@@ -819,6 +819,60 @@ def GetLevels(request):
         if GauntletLevels == None:
             SQLParams.append("levelID IN (%s)")
             SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
+    
+    ################################### CLOSE YOUR EYES
+    if request.form.get("featured"):
+        SQLParams.append("starFeatured = 1")
+    
+    if request.form.get("original"):
+        SQLParams.append("original = 0")
+    
+    if request.form.get("coins"):
+        SQLParams.append("starCoins = 1 AND coins > 0")
+    
+    if request.form.get("epic"):
+        SQLParams.append("starEpic = 1")
+    
+    if request.form.get("twoPlayer"):
+        SQLParams.append("twoPlayer = 1")
+    
+    if request.form.get("star"):
+        SQLParams.append("starStars > 0")
+    
+    if request.form.get("noStar"):
+        SQLParams.append("starStars = 0")
+    
+    if request.form.get("len"):
+        SQLParams.append("levelLength IN (%s)")
+        SQLFormats.append(request.form["len"])
+    
+    if request.form.get("song"):
+        SongID = int(request.form.get("song"))
+        if request.form.get("customSong") == None: #default song
+            SQLParams.append("audioTrack = %s")
+            SQLFormats.append(SongID - 1) #yes
+        else:
+            SQLParams.append("songID = %s")
+            SQLFormats.append(SongID)
+        
+    if request.form.get("diff"):
+        diff = request.form["diff"]
+        if diff == "-2": #demon faces wrr
+            SQLParams.append({
+                "1" : "starDemonDiff = 3",
+                "2" : "starDemonDiff = 4",
+                "3" : "starDemonDiff = 0",
+                "4" : "starDemonDiff = 5",
+                "5" : "starDemonDiff = 6",
+                None: ""
+            }[request.form.get("starDemonDiff")])
+        elif diff == "-1":
+            SQLParams.append("starDifficulty = 0")
+        elif diff == "-3":
+            SQLParams.append("starAuto = 1")
+        else:
+            SQLParams.append("starDifficulty IN (%s)")
+            SQLFormats.append(f"{diff.replace(",", "0,")}0")#multiply by 10 in the best way
 
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:

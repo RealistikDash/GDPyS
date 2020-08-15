@@ -852,13 +852,8 @@ def GetLevels(request):
         SQLParams.append("levelLength IN (%s)")
         SQLFormats.append(request.form["len"])
     
-<<<<<<< HEAD
-    if empty(request.form.get("song")):
-        SongID = request.form.get("song")
-=======
     if not empty(request.form.get("song")):
         SongID = int(request.form.get("song"))
->>>>>>> parent of 4b552f1... why DID I INVERT IT (THIS IS A CRY FOR HELP)
         if request.form.get("customSong") == None: #default song
             SQLParams.append("audioTrack = %s")
             SQLFormats.append(int(SongID) - 1) #yes

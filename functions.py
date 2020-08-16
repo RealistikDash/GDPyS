@@ -629,19 +629,7 @@ def UploadLevel(request):
     ToGet = ["levelID", "levelName", "levelDesc", "levelVersion", "levelLength", "audioTrack", "auto", "password", "original", "twoPlayer", "songID", "objects", "coins", "requestedStars", "extraString", "levelString", "levelInfo", "secret", "ldm", "udid", "binaryVersion", "unlisted"]
     DataDict = {}
     for Thing in ToGet:
-        try:
-            if Thing == "levelDesc" and GameVersion < 20:
-                #encode it for the old folks (still debating whether to maintain compatibillity with the older versions or not) UPDATE: I prob wont
-                DataDict[Thing] = base64.b64encode(request.form[Thing]).decode("ascii")
-            DataDict[Thing] = request.form[Thing]
-        except:
-            #special cases because YEAH
-            if Thing == "extraString":
-                DataDict[Thing] = "29_29_29_40_29_29_29_29_29_29_29_29_29_29_29_29"
-            elif Thing == "password":
-                DataDict[Thing] = 1
-            else:
-                DataDict[Thing] = 0
+        DataDict[Thing] = request.form.get(Thing, "0")
 
     #getting UserID
     UserID = AIDToUID(AccountID)
@@ -2311,3 +2299,4 @@ def DeleteLevelHandler(request):
     ))
     mycursor.execute("DELETE FROM levels WHERE levelID = %s LIMIT 1", (data[0],))
     mydb.commit() #to delete the level save file use gdps restorer (https://github.com/VGDPS/GDPSRestorer)
+    return "1"

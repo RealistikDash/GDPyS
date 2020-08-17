@@ -2321,14 +2321,10 @@ def QuestHandler(request):
     
 def RateDemonHandler(request):
     """Handles requesting demons."""
-    AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not VerifyGJP(request.form["accountID"], request.form["gjp"]) or not HasPrivilege(request.form["accountID"], ModRateDemon):
         return "-1"
-    if not HasPrivilege(AccountID, ModRateDemon):
-        return "-1"
-    DemonType = {
+    mycursor.execute("UPDATE levels SET starDemonDiff = %s WHERE levelID = %s LIMIT 1", ({
         1:3,2:4,3:0,4:5,5:6
-    }[int(request.form["rating"])]
-    mycursor.execute("UPDATE levels SET starDemonDiff = %s WHERE levelID = %s LIMIT 1", (DemonType, int(request.form["levelID"])))
+    }[int(request.form["rating"])], int(request.form["levelID"])))
     mydb.commit()
     return "1"

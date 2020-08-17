@@ -224,6 +224,10 @@ def RemFriendRoute():
 def RemLevelRoute():
     return DeleteLevelHandler(request)
 
+@app.route("/database/getGJChallenges.php", methods=["POST"])
+def GetQuestsRoute():
+    return QuestHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

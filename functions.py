@@ -2319,3 +2319,16 @@ def QuestHandler(request):
     Time = 1445385600
     InitID = round(time.time()) - Time
     
+def RateDemonHandler(request):
+    """Handles requesting demons."""
+    AccountID = request.form["accountID"]
+    if not VerifyGJP(AccountID, request.form["gjp"]):
+        return "-1"
+    if not HasPrivilege(AccountID, ModRateDemon):
+        return "-1"
+    DemonType = {
+        1:3,2:4,3:0,4:5,5:6
+    }[int(request.form["rating"])]
+    mycursor.execute("UPDATE levels SET starDemonDiff = %s WHERE levelID = %s LIMIT 1", (DemonType,))
+    mydb.commit()
+    return "1"

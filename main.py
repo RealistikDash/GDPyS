@@ -228,6 +228,10 @@ def RemLevelRoute():
 def GetQuestsRoute():
     return QuestHandler(request)
 
+@app.route("/database/rateGJDemon21.php", methods=["POST"])
+def RaateDemonRoute():
+    return RateDemonHandler(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

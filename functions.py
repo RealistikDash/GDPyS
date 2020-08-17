@@ -2300,3 +2300,22 @@ def DeleteLevelHandler(request):
     mycursor.execute("DELETE FROM levels WHERE levelID = %s LIMIT 1", (data[0],))
     mydb.commit() #to delete the level save file use gdps restorer (https://github.com/VGDPS/GDPSRestorer)
     return "1"
+
+def DecodeCHK(chk):
+    """Decodes chk"""
+    return Xor(base64.b64decode(chk[5:].encode()), 19847)
+
+def QuestHandler(request):
+    """Handles quest."""
+    #i just wanna finish this to make osu ps
+    AccountID = request.form["accountID"]
+    mycursor.execute("SELECT * FROM quests LIMIT 3")
+    Quests = mycursor.fetchall()
+    if len(Quests) == 0:
+        return "-1"
+    chk = DecodeCHK(request.form["chk"])
+    #using  time for different quest ids
+    # TODO: better quest system
+    Time = 1445385600
+    InitID = round(time.time()) - Time
+    

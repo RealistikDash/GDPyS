@@ -373,7 +373,7 @@ def GetLeaderboards(request):
                         LIMIT 25
                     )
                 ) as a
-            ORDER BY A.stars DESC""", (Stars,Stars))
+            ORDER BY a.stars DESC""", (Stars,Stars))
 
 
     TheData = mycursor.fetchall()

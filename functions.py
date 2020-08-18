@@ -349,8 +349,32 @@ def GetLeaderboards(request):
         FriendsList = ListToCommaString(GetFriendsList(AccID)+[AccID])
         mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND extID in (%s) LIMIT 100", (FriendsList,))
     
-    #elif LeaderboardType == "relative":
+    elif LeaderboardType == "relative":
         #global
+        #get current stars
+        mycursor.execute("SELECT stars FROM user WHERE extID = %s LIMIT 1", (AccID,))
+        Stars = mycursor.fetchone()[0]
+        mycursor.execute("""
+            SELECT	a.* FROM 
+                (
+                    (
+                        SELECT	*	FROM users
+                        WHERE stars <= %s
+                        AND isBanned = 0
+                        ORDER BY stars DESC
+                        LIMIT 25
+                    )
+                    UNION
+                    (
+                        SELECT * FROM users
+                        WHERE stars >= %s
+                        AND isBanned = 0
+                        ORDER BY stars
+                        LIMIT 25
+                    )
+                ) as a
+            ORDER BY A.stars DESC""" (Stars,Stars))
+
 
     TheData = mycursor.fetchall()
     

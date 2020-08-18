@@ -352,7 +352,7 @@ def GetLeaderboards(request):
     elif LeaderboardType == "relative":
         #global
         #get current stars
-        mycursor.execute("SELECT stars FROM user WHERE extID = %s LIMIT 1", (AccID,))
+        mycursor.execute("SELECT stars FROM users WHERE extID = %s LIMIT 1", (AccID,))
         Stars = mycursor.fetchone()[0]
         mycursor.execute("""
             SELECT	a.* FROM 

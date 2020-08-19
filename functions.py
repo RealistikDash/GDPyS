@@ -1271,7 +1271,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mydb.commit()
         LogAction(Extra["AccountID"], f"has unfeatured the level {Extra['LevelID']}")
         return True
-    elif Command[0] == "unfeature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+    elif Command[0] == "rate" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         #syntax /rate [diff] [stars] <feature/epic> <coin verification>
         if Command[1] not in ("demon", "auto"):
             DiffID = {"na":0,"easy":10,"normal":20,"hard":30,"harder":40,"insane":50}[Command[1]]
@@ -1301,10 +1301,11 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
                 CoinVerify = int(Command[4])
                 if CoinVerify not in (0,1):
                     CoinVerify = 0
-        mycursor.execute("UPDATE levels SET starDemon=%s,starAuto=%s,starStars=%s,starCoins=%s,starFeatured=%s,starEpic=%s WHERE levelID = %s LIMIT 1",
-        (StarDemon,StarAuto,Stars,CoinVerify,Featured,Epic,Extra['LevelID']))
+        mycursor.execute("UPDATE levels SET starDemon=%s,starAuto=%s,starStars=%s,starCoins=%s,starFeatured=%s,starEpic=%s,starDifficulty=%s WHERE levelID = %s LIMIT 1",
+        (StarDemon,StarAuto,Stars,CoinVerify,Featured,Epic,DiffID,Extra['LevelID']))
         mydb.commit()
         LogAction(Extra["AccountID"], f"has rated the level {Extra['LevelID']} {Stars} stars")
+        return True
 
     Fail("Command not found.")
     return False

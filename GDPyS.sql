@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 15, 2020 at 09:56 PM
+-- Generation Time: Aug 19, 2020 at 01:11 AM
 -- Server version: 5.7.28-0ubuntu0.18.04.4
 -- PHP Version: 7.1.33-9+ubuntu18.04.1+deb.sury.org+1
 
@@ -89,6 +89,19 @@ CREATE TABLE `actions` (
   `value6` int(11) NOT NULL DEFAULT '0',
   `account` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `adminlogs`
+--
+
+CREATE TABLE `adminlogs` (
+  `id` int(11) NOT NULL,
+  `fromID` int(11) NOT NULL,
+  `message` mediumtext NOT NULL,
+  `timestamp` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -610,6 +623,12 @@ ALTER TABLE `actions`
   ADD KEY `type` (`type`);
 
 --
+-- Indexes for table `adminlogs`
+--
+ALTER TABLE `adminlogs`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `bannedips`
 --
 ALTER TABLE `bannedips`
@@ -823,6 +842,11 @@ ALTER TABLE `accounts`
 ALTER TABLE `actions`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
+-- AUTO_INCREMENT for table `adminlogs`
+--
+ALTER TABLE `adminlogs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `bannedips`
 --
 ALTER TABLE `bannedips`
@@ -836,7 +860,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `commentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 --
 -- AUTO_INCREMENT for table `cpshares`
 --
@@ -851,7 +875,7 @@ ALTER TABLE `dailyfeatures`
 -- AUTO_INCREMENT for table `deletedlevels`
 --
 ALTER TABLE `deletedlevels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `friendreqs`
 --
@@ -871,12 +895,12 @@ ALTER TABLE `gauntlets`
 -- AUTO_INCREMENT for table `levels`
 --
 ALTER TABLE `levels`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 --
 -- AUTO_INCREMENT for table `levelscores`
 --
 ALTER TABLE `levelscores`
-  MODIFY `scoreID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `scoreID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 --
 -- AUTO_INCREMENT for table `links`
 --
@@ -921,7 +945,7 @@ ALTER TABLE `privilegegroups`
 -- AUTO_INCREMENT for table `quests`
 --
 ALTER TABLE `quests`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `reports`
 --

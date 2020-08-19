@@ -319,7 +319,7 @@ def tools_adminlogs_route(page):
     return render_template("adminlogs.html", session=session, title="Admin Logs", logs = get_logs(page), page=page)
 
 @ToolBlueprint.errorhandler(500)
-def Tool500():
+def Tool500(_):
     return render_template("500.html", session=session, title = "Code Broke")
 
 @ToolBlueprint.errorhandler(404)

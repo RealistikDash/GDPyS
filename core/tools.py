@@ -238,7 +238,7 @@ def reupload_level_api(level_id: str, server: str, session):
 def get_logs(page):
     """Fetches logs for a specific page."""
     offset = (int(page) - 1) * 100 #100 is the amount of logs to display
-    mycursor.execute("SELECT * FROM adminlogs ORDER BY id DESC OFFSET %s LIMIT 100", (offset,))
+    mycursor.execute("SELECT * FROM adminlogs ORDER BY id DESC LIMIT 100 OFFSET %s", (offset,))
     resp = []
     usernames = {}
     for log in mycursor.fetchall():

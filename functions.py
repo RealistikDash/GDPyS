@@ -157,6 +157,11 @@ def Xor(data, key):
     xored = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in zip(data, cycle(key)))
     return xored
 
+def LogAction(ActioneeID: int, Message: str):
+    """Adds a message to the admin logs."""
+    mycursor.execute("INSERT INTO adminlogs (fromID, message, timestamp) VALUES (%s,%s,%s)", (ActioneeID, Message, time.time()))
+    mydb.commit()
+
 def GetUserDataFunction(request):
     """Gets the user data."""
     TargetAccid = request.form["targetAccountID"]
@@ -1231,6 +1236,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
             return False
         mycursor.execute("UPDATE levels SET userName = %s, userID = %s, extID = %s WHERE levelID = %s LIMIT 1", (Command[1], User[0], User[1], Extra["LevelID"]))
         mydb.commit()
+        LogAction(Extra["AccountID"], f"has set the level {Extra['LevelID']} to the account {Command[1]}")
         return True
     elif Command[0] == "daily" and HasPrivilege(Extra["AccountID"], ModSetDaily):
         #port of cvoltons command as its his system
@@ -1243,22 +1249,27 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
             NewTimestamp = Timestamp + 86400 #add a day
         mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp) VALUES (%s, %s)", (Extra["LevelID"], NewTimestamp))
         mydb.commit()
+        LogAction(Extra["AccountID"], f"has queued the level {Extra['LevelID']} to be daily.")
         return True
     elif Command[0] == "epic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET starFeatured = 1, starEpic =1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
+        LogAction(Extra["AccountID"], f"has epiced the level {Extra['LevelID']}")
         return True
     elif Command[0] == "feature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET starFeatured = 1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
+        LogAction(Extra["AccountID"], f"has featured the level {Extra['LevelID']}")
         return True
     elif Command[0] == "unepic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET starFeatured = 0, starEpic = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
+        LogAction(Extra["AccountID"], f"has unepiced the level {Extra['LevelID']}")
         return True
     elif Command[0] == "unfeature" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET starFeatured = 0 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()
+        LogAction(Extra["AccountID"], f"has unfeatured the level {Extra['LevelID']}")
         return True
     Fail("Command not found.")
     return False
@@ -1488,6 +1499,7 @@ def LevelSuggest(request):
                 RateData["StarAuto"],
                 LevelID
             ))
+        LogAction(AccountID, f"has rated the level {LevelID} {Stars} stars.")
         mydb.commit()
         return "1"
     return "-1"
@@ -2347,8 +2359,7 @@ def RateDemonHandler(request):
     """Handles requesting demons."""
     if not VerifyGJP(request.form["accountID"], request.form["gjp"]) or not HasPrivilege(request.form["accountID"], ModRateDemon):
         return "-1"
-    mycursor.execute("UPDATE levels SET starDemonDiff = %s WHERE levelID = %s LIMIT 1", ({
-        1:3,2:4,3:0,4:5,5:6
-    }[int(request.form["rating"])], int(request.form["levelID"])))
+    mycursor.execute("UPDATE levels SET starDemonDiff = %s WHERE levelID = %s LIMIT 1", ({1:3,2:4,3:0,4:5,5:6}[int(request.form["rating"])], int(request.form["levelID"])))
     mydb.commit()
+    LogAction(request.form["accountID"], f"has changed the demon difficulty of the level {request.form['levelID']}")
     return "1"

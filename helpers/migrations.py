@@ -4,6 +4,9 @@ import re
 from mysql.connector import Error
 from os import path
 
+cv_update = """
+"""
+
 def ExecuteSQLFile(cursor, sql_file):
     """Executes an SQL file.
     

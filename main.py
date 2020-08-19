@@ -312,6 +312,12 @@ def tools_level_reupload_route():
 def tools_song_reupload_route():
     return render_template("songreupload.html", title="Song Reupload")
 
+@ToolBlueprint.route("/stats/admin-logs/<page>")
+def tools_adminlogs_route(page):
+    if not HasPrivilege(session["AccountID"], ModViewLogs):
+        return render_template("403.html", session=session, title = "Missing Permissions!")
+    return render_template("adminlogs.html", session=session, title="Admin Logs", logs = get_logs(page), page=page)
+
 @ToolBlueprint.errorhandler(500)
 def Tool500():
     return render_template("500.html", session=session, title = "Code Broke")

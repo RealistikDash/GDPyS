@@ -1,4 +1,4 @@
-from functions import AIDToUID, CheckBcryptPw, HasPrivilege, mycursor, Bot, Xor
+from functions import AIDToUID, CheckBcryptPw, HasPrivilege, mycursor, Bot, Xor, TimeAgoFromNow
 from constants import *
 from core.glob import glob
 from core.mysqlconn import mydb
@@ -234,3 +234,28 @@ def reupload_level_api(level_id: str, server: str, session):
         "levelID" : NewLevelID,
         "percentage" : levels_reuploaded_left()
     }
+
+def get_logs(page):
+    """Fetches logs for a specific page."""
+    offset = (int(page) - 1) * 100 #100 is the amount of logs to display
+    mycursor.execute("SELECT * FROM adminlogs ORDER BY id DESC OFFSET %s LIMIT 100", (offset,))
+    resp = []
+    usernames = {}
+    for log in mycursor.fetchall():
+        #get username for them
+        if log[1] not in list(usernames.keys()): #for speed so all usernames dont have to be fetched
+            mycursor.execute("SELECT userName FROM accounts WHERE accountID = %s LIMIT 1", (log[1]))
+            username = mycursor.fetchone()
+            if username == None:
+                username="Deleted Account"
+            else:
+                username = username[0]
+            usernames[log[1]] = username
+        resp.append({
+            "id" : log[0],
+            "from_id" : log[1],
+            "from_name" : usernames[log[1]],
+            "message" : log[2],
+            "timeago" : TimeAgoFromNow(log[3])
+        })
+    return resp

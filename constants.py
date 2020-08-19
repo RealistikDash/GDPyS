@@ -19,6 +19,7 @@ ModSuggestLevel = 2 << 14
 ModBanUser = 2 << 15
 ModSetDaily = 2 << 16
 ModDeleteLevel = 2<<17
+ModViewLogs = 2<<18
 
 __version__ = "InDev"
 

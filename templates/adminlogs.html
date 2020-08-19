@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block image %}https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?ixlib=rb-1.2.1&w=1000&q=80{% endblock %}
+{% block text %}Uh oh...{% endblock %}
+
+<nav aria-label="Log Browser">
+    <ul class="pagination">
+      <li class="page-item"><a class="page-link" href="/tools/stats/admin-logs/{{ page - 1 }}">Previous</a></li>
+      <li class="page-item"><a class="page-link" href="/tools/stats/admin-logs/{{ page + 1 }}">Next</a></li>
+    </ul>
+  </nav>
+
+{% block content %}
+<div class="card">
+    <div class="card-header">Admin Logs</div>
+    <div class="card-body">
+        View all actions made by the administritive team.
+    </div>
+</div>
+{% for log in logs %}
+<div class="card">
+    <div class="card-header">{{ log["from_name"] }}</div>
+    <div class="card-body">
+        <b>{{ log["from_name"] }}</b> {{ log["message"] }}.
+    </div>
+    <div class=card-footer>{{ log["timeago"] }}</div>
+</div>
+{% endfor %}
+{% endblock %}

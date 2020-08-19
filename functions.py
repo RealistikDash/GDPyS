@@ -1301,8 +1301,8 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
                 CoinVerify = int(Command[4])
                 if CoinVerify not in (0,1):
                     CoinVerify = 0
-        mycursor.execute("UPDATE levels SET starDemon=%s,starAuto=%s,starStars=%s,starCoins=%s,starFeatured=%s,starEpic=%s",
-        (StarDemon,StarAuto,Stars,CoinVerify,Featured,Epic))
+        mycursor.execute("UPDATE levels SET starDemon=%s,starAuto=%s,starStars=%s,starCoins=%s,starFeatured=%s,starEpic=%s WHERE levelID = %s LIMIT 1",
+        (StarDemon,StarAuto,Stars,CoinVerify,Featured,Epic,Extra['LevelID']))
         mydb.commit()
         LogAction(Extra["AccountID"], f"has rated the level {Extra['LevelID']} {Stars} stars")
 

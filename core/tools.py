@@ -244,7 +244,7 @@ def get_logs(page):
     for log in mycursor.fetchall():
         #get username for them
         if log[1] not in list(usernames.keys()): #for speed so all usernames dont have to be fetched
-            mycursor.execute("SELECT userName FROM accounts WHERE accountID = %s LIMIT 1", (log[1]))
+            mycursor.execute("SELECT userName FROM accounts WHERE accountID = %s LIMIT 1", (log[1],))
             username = mycursor.fetchone()
             if username == None:
                 username="Deleted Account"

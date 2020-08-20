@@ -1251,6 +1251,19 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mydb.commit()
         LogAction(Extra["AccountID"], f"has queued the level {Extra['LevelID']} to be daily.")
         return True
+    elif Command[0] == "weekly" and HasPrivilege(Extra["AccountID"], ModSetDaily):
+        #port of cvoltons command as its his system
+        Tmw = time.mktime(((datetime.date.today()+datetime.timedelta(days=-datetime.today.weekday(), weeks=1)).timetuple()))
+        mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
+        Timestamp = mycursor.fetchone()
+        if Timestamp == None:
+            NewTimestamp = Tmw #no prev up to date levels
+        else:
+            NewTimestamp = Timestamp + 604800 #add a week
+        mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp) VALUES (%s, %s)", (Extra["LevelID"], NewTimestamp))
+        mydb.commit()
+        LogAction(Extra["AccountID"], f"has queued the level {Extra['LevelID']} to be weekly.")
+        return True
     elif Command[0] == "epic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET starFeatured = 1, starEpic =1 WHERE levelID = %s LIMIT 1", (Extra["LevelID"],))
         mydb.commit()

@@ -60,6 +60,15 @@ def GetBcryptPassword(AccountID):
         Log(f"Cached Bcrypt for {AccountID}")
     return BrcyptCache[AccountID]
 
+def FetchIP(request):
+    """Fetches IP of request and takes into account proxypassed IPs."""
+    #TODO possibly redo
+    if not request.headers.getlist("X-Forwarded-For"):
+        ip = request.remote_addr
+    else:
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    return ip
+
 def DecodeGJP(GJP) -> str:
     """Decodes the GJP sent by the client.
     
@@ -138,7 +147,7 @@ def RegisterFunction(request):
         return "-1"
     #Query Time
     mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (Username, Password, Email, RegisterTime))
-    mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, Username, request.remote_addr))
+    mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, Username, FetchIP(FetchIP)))
     mydb.commit()
     Success(f"User {Username} successfully registered!")
     return "1"
@@ -725,7 +734,7 @@ def UploadLevel(request):
         UploadDate = round(time.time())
         mycursor.execute(
             """INSERT INTO levels (levelName, gameVersion, binaryVersion, userName, levelDesc, levelVersion, levelLength, audioTrack, auto, password, original, twoPlayer, songID, objects, coins, requestedStars, extraString, levelString, levelInfo, secret, uploadDate, userID, extID, updateDate, unlisted, hostname, isLDM) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (DataDict["levelName"], GameVersion, DataDict["binaryVersion"], Username, DataDict["levelDesc"], DataDict["levelVersion"], DataDict["levelLength"], DataDict["audioTrack"], DataDict["auto"], DataDict["password"], DataDict["original"], DataDict["twoPlayer"], DataDict["songID"], DataDict["objects"], DataDict["coins"], DataDict["requestedStars"], DataDict["extraString"], DataDict["levelString"], DataDict["levelInfo"], DataDict["secret"], UploadDate, UserID, AccountID, UploadDate, DataDict["unlisted"], request.remote_addr, DataDict["ldm"])
+            (DataDict["levelName"], GameVersion, DataDict["binaryVersion"], Username, DataDict["levelDesc"], DataDict["levelVersion"], DataDict["levelLength"], DataDict["audioTrack"], DataDict["auto"], DataDict["password"], DataDict["original"], DataDict["twoPlayer"], DataDict["songID"], DataDict["objects"], DataDict["coins"], DataDict["requestedStars"], DataDict["extraString"], DataDict["levelString"], DataDict["levelInfo"], DataDict["secret"], UploadDate, UserID, AccountID, UploadDate, DataDict["unlisted"], FetchIP(FetchIP), DataDict["ldm"])
         )
         mydb.commit()
         # TODO: Later add a case for updating the level like bruh

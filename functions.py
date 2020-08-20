@@ -843,7 +843,7 @@ def GetLevels(request):
             SQLParams.append("levelID IN (%s)")
             SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
     
-    ################################### CLOSE YOUR EYES
+    ################################### YandereDev tribute
     """
     if not empty(request.form.get("featured")):
         SQLParams.append("starFeatured = 1")
@@ -2243,7 +2243,7 @@ def GetDaily(request):
     """Responds with a daily or weekly level. Using Cvolton's system."""
     Weekly = int(request.form.get("weekly", 0))
     Timestamp = round(time.time())
-    mycursor.execute("SELECT levelID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
+    mycursor.execute("SELECT feaID FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1", (Timestamp, Weekly))
     LevelID = mycursor.fetchone()
     if LevelID == None:
         Fail("No daily level set!")

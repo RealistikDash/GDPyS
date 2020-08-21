@@ -50,6 +50,16 @@
                             <a class="dropdown-item" href="/tools/stats/admin-logs/1">Admin Logs</a>
                         </div>
                     </li>
+                    {% if session["LoggedIn"] %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Account
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/tools/account/change-password">Change Password</a>
+                        </div>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="https://github.com/RealistikDash/GDPyS" target="blank">Source Code</a>
                     </li>

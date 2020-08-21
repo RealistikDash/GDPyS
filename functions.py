@@ -269,10 +269,7 @@ def InsertAccComment(request):
     Username = request.form["userName"]
     CommentContent = request.form["comment"]
     AccountID = request.form["accountID"]
-    if not VerifyGJP(AccountID, request.form["gjp"]):
-        return "-1"
-    #checking if they are allowed
-    if not HasPrivilege(AccountID, UserPostAccComment):
+    if not VerifyGJP(AccountID, request.form["gjp"]) or not HasPrivilege(AccountID, UserPostAccComment):
         return "-1"
     USerID = AIDToUID(AccountID)
     Timestamp = round(time.time())
@@ -659,9 +656,7 @@ def UploadLevel(request):
         return "-1"
     AccountID = AccountID[0][0]
 
-    if not VerifyGJP(AccountID, GJP):
-        return "-1"
-    if not HasPrivilege(AccountID, UserUploadLevel):
+    if not VerifyGJP(AccountID, GJP) not HasPrivilege(AccountID, UserUploadLevel):
         return "-1"
 
     ToGet = ["levelID", "levelName", "levelDesc", "levelVersion", "levelLength", "audioTrack", "auto", "password", "original", "twoPlayer", "songID", "objects", "coins", "requestedStars", "extraString", "levelString", "levelInfo", "secret", "ldm", "udid", "binaryVersion", "unlisted"]
@@ -1337,7 +1332,7 @@ def PostComment(request):
     Username = request.form["userName"] #why is this passed? idk... ill still use it
     Log(f"{Username} tries to post a comment...")
     AccountID = request.form.get("accountID") # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
-    if not VerifyGJP(AccountID, request.form["gjp"]):
+    if not VerifyGJP(AccountID, request.form["gjp"]) or not HasPrivilege(AccountID, UserPostComment):
         return "-1"
     Percent = int(request.form.get("percent", 0))
     UserID = AIDToUID(AccountID)
@@ -2065,7 +2060,7 @@ def DLLevel(request):
     if LevelID == -1: #would make into dict switch-like statement but it would be slower
         mycursor.execute("SELECT levelID, feaID FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
         a=mycursor.fetchone()
-        LevelID = a[0] 
+        LevelID = a[0]
         FeaID = a[1]
         IsDaily = True
     elif LevelID == -2: #would make into dict switch-like statement but it would be slower

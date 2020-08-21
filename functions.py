@@ -1240,7 +1240,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         return True
     elif Command[0] == "weekly" and HasPrivilege(Extra["AccountID"], ModSetDaily):
         #port of cvoltons command as its his system
-        Tmw = time.mktime(((datetime.today()+timedelta(days=-datetime.today.weekday(), weeks=1)).timetuple()))
+        Tmw = time.mktime(((datetime.today()+timedelta(days=-datetime.today()weekday(), weeks=1)).timetuple()))
         mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 1 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
         Timestamp = mycursor.fetchone()
         if Timestamp == None:

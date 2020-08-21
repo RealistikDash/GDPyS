@@ -1247,7 +1247,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
             NewTimestamp = Tmw #no prev up to date levels
         else:
             NewTimestamp = Timestamp + 604800 #add a week
-        mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp) VALUES (%s, %s)", (Extra["LevelID"], NewTimestamp))
+        mycursor.execute("INSERT INTO dailyfeatures (levelID, timestamp, type) VALUES (%s, %s, 1)", (Extra["LevelID"], NewTimestamp))
         mydb.commit()
         LogAction(Extra["AccountID"], f"has queued the level {Extra['LevelID']} to be weekly.")
         return True

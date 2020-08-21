@@ -318,6 +318,16 @@ def tools_adminlogs_route(page):
         return render_template("403.html", session=session, title = "Missing Permissions!")
     return render_template("adminlogs.html", session=session, title="Admin Logs", logs = get_logs(page), page=page)
 
+@ToolBlueprint.route("/account/change-password", methods=["GET", "POST"])
+def tool_change_password_route():
+    if request.method == "POST":
+        a = change_password(request.form,session)
+        if a:
+            SetSession(ExampleSession)
+            return render_template("passchange.html", session=session, title="Change Password", GoodAlert = "Password Changed Successfully!")
+        return render_template("passchange.html", session=session, title="Change Password", BadAlert = "Password Change Failed!")
+    return render_template("passchange.html", session=session, title="Change Password")
+
 @ToolBlueprint.errorhandler(500)
 def Tool500(_):
     return render_template("500.html", session=session, title = "Code Broke")

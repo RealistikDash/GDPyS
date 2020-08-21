@@ -1,8 +1,9 @@
-from functions import AIDToUID, CheckBcryptPw, HasPrivilege, mycursor, Bot, Xor, TimeAgoFromNow
+from functions import AIDToUID, HasPrivilege, mycursor, Bot, Xor, TimeAgoFromNow, GetBcryptPassword
 from constants import *
 from core.glob import glob
 from core.mysqlconn import mydb
 from config import UserConfig
+from helpers.passwordhelper import CheckBcryptPw, CreateBcrypt
 import requests
 import urllib.parse
 import time
@@ -261,4 +262,16 @@ def get_logs(page):
     return resp
 
 def change_password(post_data: dict, session: dict) -> dict:
-    """[NOT RESTFUL] Changes a user's password."""
+    """Changes a user's password."""
+    if not session["LoggedIn"]:
+        return False
+    new_password = post_data["password"]
+    prev_bcrypt = GetBcryptPassword(session["AccountID"])
+    old_password = post_data["oldpass"]
+    if not CheckBcryptPw(prev_bcrypt, old_password):
+        return False
+    #change it here
+    new_password = CreateBcrypt(new_password)
+    mycursor.execute("UPDATE accounts SET password = %s WHERE accountID = %s LIMIT 1", (session["AccountID"],))
+    mydb.commit()
+    return True

@@ -1263,7 +1263,7 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     elif Command[0] == "weekly" and HasPrivilege(Extra["AccountID"], ModSetDaily):
         #port of cvoltons command as its his system
         Tmw = time.mktime(((datetime.date.today()+datetime.timedelta(days=-datetime.today.weekday(), weeks=1)).timetuple()))
-        mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
+        mycursor.execute("SELECT timestamp FROM dailyfeatures WHERE timestamp >= %s AND type = 1 ORDER BY timestamp DESC LIMIT 1", (Tmw,))
         Timestamp = mycursor.fetchone()
         if Timestamp == None:
             NewTimestamp = Tmw #no prev up to date levels
@@ -2058,7 +2058,6 @@ def GetUserString(UID):
 
 def DLLevel(request):
     """Returns a stored level."""
-
     LevelID = int(request.form["levelID"])
     Log(f"Getting level {LevelID}!")
     IsDaily = False
@@ -2066,7 +2065,7 @@ def DLLevel(request):
     if LevelID == -1: #would make into dict switch-like statement but it would be slower
         mycursor.execute("SELECT levelID, feaID FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (round(time.time()),))
         a=mycursor.fetchone()
-        LevelID = a[0]
+        LevelID = a[0] 
         FeaID = a[1]
         IsDaily = True
     elif LevelID == -2: #would make into dict switch-like statement but it would be slower

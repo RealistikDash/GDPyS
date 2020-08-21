@@ -2116,16 +2116,13 @@ def DLLevel(request):
         "46" : "1",
         "47" : "2",
         "48" : "1",
-        "40" : Level[42]
+        "40" : Level[42],
+        "41" : FeaID
     })
 
     ReturnStr += f"#{SoloGen(LevelFiles)}#"
     CoolString = f"{Level[35]},{Level[26]},{Level[24]},{LevelID},{Level[30]},{Level[31]},{Password},{FeaID}"
-    ReturnStr += SoloGen2(CoolString) + "#"
-    if not IsDaily:
-        ReturnStr += CoolString
-    else:
-        ReturnStr += GetUserString(Level[35])
+    ReturnStr += SoloGen2(CoolString) + "#" + CoolString
     Success(f"Served level {LevelID}!")
     return ReturnStr
 

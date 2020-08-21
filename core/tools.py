@@ -259,3 +259,6 @@ def get_logs(page):
             "timeago" : TimeAgoFromNow(log[3])
         })
     return resp
+
+def change_password(post_data: dict, session: dict) -> dict:
+    """[NOT RESTFUL] Changes a user's password."""

@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 from core.mysqlconn import mydb
 from helpers.filters import *
 from core.bot import GDPySBot
-from helpers.passwordhelper import CreateBcrypt, RandomString
+from helpers.passwordhelper import CreateBcrypt, RandomString, CheckBcryptPw
 
 mycursor = mydb.cursor() #creates a thing to allow us to run mysql commands
 
@@ -656,7 +656,7 @@ def UploadLevel(request):
         return "-1"
     AccountID = AccountID[0][0]
 
-    if not VerifyGJP(AccountID, GJP) not HasPrivilege(AccountID, UserUploadLevel):
+    if not VerifyGJP(AccountID, GJP) or not HasPrivilege(AccountID, UserUploadLevel):
         return "-1"
 
     ToGet = ["levelID", "levelName", "levelDesc", "levelVersion", "levelLength", "audioTrack", "auto", "password", "original", "twoPlayer", "songID", "objects", "coins", "requestedStars", "extraString", "levelString", "levelInfo", "secret", "ldm", "udid", "binaryVersion", "unlisted"]
@@ -1052,23 +1052,6 @@ def SoloGen(LevelString: str):
 def SoloGen2(LevelString: str):
     """Port of genSolo2 from Cvolton's GMDPrivateServer."""
     return Sha1It(LevelString + "xI25fpAapCQg")
-
-def CheckBcryptPw(dbpassword, painpassword):
-    """
-    Checks Bcrypt passwords. Taken from RealistikPanel (made by me)
-    By: kotypey
-    password checking...
-    """
-
-    painpassword = painpassword.encode('utf-8')
-    dbpassword = dbpassword.encode('utf-8')
-    try:
-        check = bcrypt.checkpw(painpassword, dbpassword)
-    except:
-        Fail("Invalid password type (not Bcrypt)")
-        return False
-
-    return check
 
 def GetSong(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
@@ -2115,7 +2098,7 @@ def DLLevel(request):
         "15" : Level[7],
         "17" : Level[24],
         "18" : Level[26],
-        "19" : Level[31],
+        "19" : Level[31], #TODO: Feature score
         "25" : Level[25],
         "27" : PasswordXor,
         "28" : UploadAgo,

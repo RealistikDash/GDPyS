@@ -1941,9 +1941,9 @@ def ScoreSubmitHandler(request):
     AllUserData = mycursor.fetchall()
 
     ReturnStr = ""
-    for i in range(len(Scores)):
+    for i in range(1,len(Scores)+1):
         #in a for loop to also get places
-        Score = Scores[i]
+        Score = Scores[i-1]
         UserData = Select(AllUserData, 0, Score[1]) #got userdata from prev query
         if UserData != ():
             UserData = UserData[0]

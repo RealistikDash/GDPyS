@@ -1053,6 +1053,10 @@ def SoloGen2(LevelString: str):
     """Port of genSolo2 from Cvolton's GMDPrivateServer."""
     return Sha1It(LevelString + "xI25fpAapCQg")
 
+def SoloGen3(LevelString: str):
+    """Port of genSolo3 from Cvolton's GMDPrivateServer."""
+    return Sha1It(LevelString + "oC36fpYaPtdg")
+
 def GetSong(request):
     """A mix of getting the song info and adding it if it doesnt exist."""
     SongID = int(request.form["songID"])
@@ -2375,15 +2379,28 @@ def QuestHandler(request):
     """Handles quest."""
     #i just wanna finish this to make osu ps
     AccountID = request.form["accountID"]
+    Udid = request.form["udid"]
     mycursor.execute("SELECT * FROM quests LIMIT 3")
     Quests = mycursor.fetchall()
     if len(Quests) == 0:
         return "-1"
     chk = DecodeCHK(request.form["chk"])
+    # TODO: cache user IDs
+    mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (AccountID,))
+    UserID = mycursor.fetchone()[0]
     #using  time for different quest ids
     # TODO: better quest system
-    Time = 1445385600
-    InitID = round(time.time()) - Time
+    Time=time.time()
+    InitID = Time//2
+    TimeLeft = (((Time//86400)*86400)+86400)-Time#seconds left in the day
+    Quests = []
+    a = 0
+    for q in Quests:
+        Quests.append(f"{InitID+a},{q[1]},{q[2]},{q[3]},{q[4]}")
+        a+=1
+    resp= base64.b64encode(Xor(f"bruhh:{UserID}:{chk}:{Udid}:{AccountID}:{TimeLeft}:{Quests[0]}:{Quests[1]}:{Quests[2]}",19847).encode()).decode()
+    hash_resp = SoloGen3(resp)
+    return f"bruhh{resp}|{hash_resp}"
     
 def RateDemonHandler(request):
     """Handles requesting demons."""

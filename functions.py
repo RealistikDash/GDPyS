@@ -2381,8 +2381,8 @@ def QuestHandler(request):
     AccountID = request.form["accountID"]
     Udid = request.form["udid"]
     mycursor.execute("SELECT * FROM quests LIMIT 3")
-    Quests = mycursor.fetchall()
-    if len(Quests) == 0:
+    QuestsDB = mycursor.fetchall()
+    if len(QuestsDB) == 0:
         return "-1"
     chk = DecodeCHK(request.form["chk"])
     # TODO: cache user IDs
@@ -2395,7 +2395,7 @@ def QuestHandler(request):
     TimeLeft = (((Time//86400)*86400)+86400)-Time#seconds left in the day
     Quests = []
     a = 0
-    for q in Quests:
+    for q in QuestsDB:
         Quests.append(f"{InitID+a},{q[1]},{q[2]},{q[3]},{q[4]}")
         a+=1
     resp= base64.b64encode(Xor(f"bruhh:{UserID}:{chk}:{Udid}:{AccountID}:{TimeLeft}:{Quests[0]}:{Quests[1]}:{Quests[2]}",19847).encode()).decode()

@@ -28,11 +28,10 @@ def Home():
 @app.route("/database/accounts/loginGJAccount.php", methods=["GET", "POST"])
 def LoginHandler():
     """Handles login requests"""
-    Udid = request.form["udid"]
     Username = request.form["userName"]
     Password = request.form["password"]
     Log(f"{Username} attempts login...")
-    answer = LoginCheck(Udid, Username, Password, request)
+    answer = LoginCheck(Username, Password, request)
     return answer
 
 @app.route("/database///accounts/registerGJAccount.php", methods=["GET", "POST"])

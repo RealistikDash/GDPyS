@@ -2398,9 +2398,9 @@ def QuestHandler(request):
     for q in QuestsDB:
         Quests.append(f"{InitID+a},{q[1]},{q[2]},{q[3]},{q[4]}")
         a+=1
-    resp= base64.b64encode(Xor(f"bruhh:{UserID}:{chk}:{Udid}:{AccountID}:{TimeLeft}:{Quests[0]}:{Quests[1]}:{Quests[2]}",19847).encode()).decode()
+    resp= base64.b64encode(Xor(f"BrUhH:{UserID}:{chk}:{Udid}:{AccountID}:{TimeLeft}:{Quests[0]}:{Quests[1]}:{Quests[2]}",19847).encode()).decode()
     hash_resp = SoloGen3(resp)
-    return f"bruhh{resp}|{hash_resp}"
+    return f"BrUhH{resp}|{hash_resp}"
     
 def RateDemonHandler(request):
     """Handles requesting demons."""

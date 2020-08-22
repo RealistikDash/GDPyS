@@ -97,7 +97,7 @@ def GetServerIP():
         CurrentIP = Request.json()["ip"]
     return CurrentIP
 
-def LoginCheck(Udid, Username, Password, request):
+def LoginCheck(Username, Password, request):
     """Checks login and password"""
     mycursor.execute("SELECT password, accountID FROM accounts WHERE userName LIKE %s LIMIT 1", (Username,))
     AccData = mycursor.fetchone()
@@ -1895,7 +1895,7 @@ def ScoreSubmitHandler(request):
     mycursor.execute("SELECT * FROM levelscores WHERE accountID = %s and levelID = %s LIMIT 1", (AccountID, LevelID))
     Score = mycursor.fetchone()
     #new scores
-    if Score == None or Percent != 0: #no prev scores
+    if Score == None and Percent != 0: #no prev scores
         Log("New score on level!")
         #creting new score
         #dont thread the check
@@ -1964,7 +1964,7 @@ def ScoreSubmitHandler(request):
             }) + "|"
     
     if len(ReturnStr) == 0:
-        return ""
+        return "-1"
     return ReturnStr[:-1]
 
 def Select(TheList: list, Position: int, Thing):

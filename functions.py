@@ -1963,8 +1963,6 @@ def ScoreSubmitHandler(request):
                 42 : TimeAgoFromNow(Score[4])[:-4]
             }) + "|"
     
-    if len(ReturnStr) == 0:
-        return "-1"
     return ReturnStr[:-1]
 
 def Select(TheList: list, Position: int, Thing):

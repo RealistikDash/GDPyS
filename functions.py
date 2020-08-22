@@ -1941,11 +1941,11 @@ def ScoreSubmitHandler(request):
     AllUserData = mycursor.fetchall()
 
     ReturnStr = ""
-    for i in range(0, len(Scores)):
+    for i in range(len(Scores)):
         #in a for loop to also get places
         Score = Scores[i]
         UserData = Select(AllUserData, 0, str(Score[1])) #got userdata from prev query
-        if not UserData == ():
+        if UserData != ():
             UserData = UserData[0]
             #skip users that are either banned or something weird had happened to them
             ReturnStr += JointStringBuilder({

@@ -156,7 +156,7 @@ def GetRank(AccountID):
     """Gets rank for user."""
     try:
         Rank = Ranks[str(AccountID)]
-    except:
+    except KeyError:
         Rank = 0
     return Rank
 
@@ -314,7 +314,7 @@ def UpdateUserScore(request):
     for Thing in ToGet:
         try:
             DataDict[Thing] = request.form[Thing]
-        except:
+        except KeyError:
             DataDict[Thing] = 0
 
     UserID = AIDToUID(AccountID)
@@ -582,7 +582,7 @@ def LoadUserData(request):
     mycursor.execute("SELECT saveData FROM accounts WHERE accountID = %s", (AccountID,))
     try:
         DBSaveData = mycursor.fetchall()[0][0]
-    except:
+    except IndexError:
         Log("No user data found in db!")
         DBSaveData = "" #why did i do this in this way? idk.
 
@@ -747,7 +747,7 @@ def UploadLevel(request):
 def CheckForm(form, TheThing):
     """Checks if something in a form is set."""
     #I KNOW I CAN JUST CHECK IF THE THING IS IN THE KEYS BUT IM TOO LAZY TO DO THIS RN
-    try:
+    try: #TODO: replace
         form[TheThing] = ""
         return True
     except:
@@ -763,7 +763,7 @@ def UserString(UserID: int):
 
     try:
         Data[1] = int(Data[1])
-    except:
+    except IndexError:
         Data[1] = 0
     
     return f"{UserID}:{Data[0]}:{Data[1]}"
@@ -813,7 +813,7 @@ def IsInt(TheThing):
     try:
         int(TheThing)
         return True
-    except:
+    except ValueError:
         return False
 
 def empty(variable) -> bool:
@@ -1099,7 +1099,7 @@ def GetComments(request):
     for Key in ToGet:
         try:
             Data[Key[0]] = int(request.form[Key[0]])
-        except:
+        except ValueError:
             Data[Key[0]] = Key[1]
 
     Offset = Data["page"] * Data["count"]
@@ -1135,7 +1135,7 @@ def GetComments(request):
             Fail(f"Failed to find data for user with the UserID of {Data['levelID']}! This will lead to a lot of bad things.")
         try:
             AccountID = int(UserData[-1])
-        except:
+        except ValueError:
             AccountID = 0
         RoleData = GetRoleForUser(AccountID)
         ReturnString += f"2~{Comment[3]}~3~{Comment[4]}~4~{Comment[5]}~5~0~7~{Comment[6]}~9~{UploadAgo}~6~{Comment[1]}~10~{Comment[7]}~11~{RoleData['Badge']}~12~{RoleData['Colour']}:1~{UserData[1]}~7~1~9~{UserData[2]}~10~{UserData[3]}~11~{UserData[4]}~14~{UserData[5]}~15~{UserData[6]}~16~{UserData[7]}|"

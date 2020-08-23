@@ -1320,7 +1320,7 @@ def PostComment(request):
     Log(f"{Username} tries to post a comment...")
     AccountID = request.form.get("accountID") # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
     if not VerifyGJP(AccountID, request.form["gjp"]) or not HasPrivilege(AccountID, UserPostComment):
-        return "-1"
+        return f"temp_60_You do not have sufficient permissions to comment!"
     Percent = int(request.form.get("percent", 0))
     UserID = AIDToUID(AccountID)
     LevelID = request.form["levelID"]

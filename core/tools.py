@@ -272,6 +272,6 @@ def change_password(post_data: dict, session: dict) -> dict:
         return False
     #change it here
     new_password = CreateBcrypt(new_password)
-    mycursor.execute("UPDATE accounts SET password = %s WHERE accountID = %s LIMIT 1", (session["AccountID"],))
+    mycursor.execute("UPDATE accounts SET password = %s WHERE accountID = %s LIMIT 1", (new_password,session["AccountID"],))
     mydb.commit()
     return True

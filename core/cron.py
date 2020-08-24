@@ -1,7 +1,7 @@
 import time as pytime
 #gdpys things
 from console import logger, Log, Success, Fail
-from functions import UserIDCache, Ranks
+from functions import UserIDCache, Ranks, CommentBanCache
 from core.mysqlconn import mydb
 from config import UserConfig
 from helpers.timer import Timer
@@ -17,6 +17,7 @@ def cron_thread():
         cache_ranks(cron_cursor)
         calculate_cp(cron_cursor)
         max_star_count_ban(cron_cursor)
+        cache_comment_bans(cron_cursor)
         cron_cursor.close() #close it after all is done
         Log(f"Cron done! Took {time.end()}s")
         pytime.sleep(UserConfig["CronThreadDelay"])
@@ -110,6 +111,22 @@ def max_star_count_ban(cron_cursor) -> None:
         mydb.commit()
         time.end()
         logger.info(f"Done with {BannedCount} users banned! {time.ms_return()}ms")
+
+def cache_comment_bans(cron_cursor):
+    """Caches comment bans so a lookup doesn't have to be made."""
+    time = Timer()
+    time.start()
+    logger.info("Caching comment bans...")
+    timestamp = round(pytime.time()) #so expired bans dont get cached
+    cron_cursor.execute("SELECT accountID, endTimestamp, reason FROM commentbans WHERE endTimestamp > %s", (timestamp,))
+    comment_bans = cron_cursor.fetchall()
+    CommentBanCache.clear()
+    for ban in comment_bans:
+        CommentBanCache[ban[0]] = {
+            "end_time" : ban[1],
+            "reason" : ban[2]
+        }
+    logger.info(f"Done with {len(comment_bans)} comment bans cached! {time.ms_return()}ms")
 
 if __name__ == "__main__":
     Log("Would you like to start the cron job? (y/N)")

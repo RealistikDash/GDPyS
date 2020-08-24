@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 24, 2020 at 03:58 PM
+-- Generation Time: Aug 24, 2020 at 04:06 PM
 -- Server version: 5.7.28-0ubuntu0.18.04.4
 -- PHP Version: 7.1.33-9+ubuntu18.04.1+deb.sury.org+1
 
@@ -133,6 +133,7 @@ CREATE TABLE `blocks` (
 --
 
 CREATE TABLE `commentbans` (
+  `id` int(11) NOT NULL,
   `accountID` int(11) NOT NULL,
   `endTimestamp` int(11) NOT NULL,
   `reason` mediumtext NOT NULL
@@ -657,7 +658,7 @@ ALTER TABLE `blocks`
 -- Indexes for table `commentbans`
 --
 ALTER TABLE `commentbans`
-  ADD PRIMARY KEY (`accountID`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `comments`
@@ -878,7 +879,7 @@ ALTER TABLE `blocks`
 -- AUTO_INCREMENT for table `commentbans`
 --
 ALTER TABLE `commentbans`
-  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `comments`
 --

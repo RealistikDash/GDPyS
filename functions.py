@@ -1319,9 +1319,15 @@ def PostComment(request):
     """Posts a level comment."""
     Username = request.form["userName"] #why is this passed? idk... ill still use it
     Log(f"{Username} tries to post a comment...")
-    AccountID = request.form.get("accountID") # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
+    AccountID = int(request.form.get("accountID")) # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
+    Timestamp = round(time.time())
     if not VerifyGJP(AccountID, request.form["gjp"]) or not HasPrivilege(AccountID, UserPostComment):
         return f"temp_60_You do not have sufficient permissions to comment!"
+    if AccountID in list(CommentBanCache.keys()):
+        TempBan = CommentBanCache[AccountID]
+        if TempBan["end_time"] > Timestamp: #checking if it didnt expire already
+            Fail(f"{Username} is comment banned!")
+            return f"temp_{TempBan['end_time']-Timestamp}_{TempBan['reason']}"
     Percent = int(request.form.get("percent", 0))
     UserID = AIDToUID(AccountID)
     LevelID = request.form["levelID"]
@@ -1333,7 +1339,6 @@ def PostComment(request):
             "LevelID" : LevelID,
             "AccountID" : AccountID
         }))) #cursed
-    Timestamp = round(time.time())
     #we finally add the comment
     mycursor.execute("INSERT INTO comments (levelID, userID, comment, timeStamp, percent, userName) VALUES (%s, %s, %s, %s, %s, %s)", (LevelID, UserID, Comment, Timestamp, Percent, Username))
     mydb.commit()

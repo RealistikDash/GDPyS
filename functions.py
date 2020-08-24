@@ -31,6 +31,7 @@ PrivilegeCache = {} # Privileges will be cached here
 LevelDLCache = {} #the level data will be stored here so it doesnt have to be redownloaded
 BrcyptCache = {} #so we dont call mysql in gjpchecks
 UserIDCache = {} #caches user ids (1 less query!)
+CommentBanCache = {} # so a large lookup doesnt have to be made
 
 def CacheUserIDs():
     """Caches all UserIDs from table. Used to remove the query from AIDToUID."""

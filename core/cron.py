@@ -19,7 +19,7 @@ def cron_thread():
         max_star_count_ban(cron_cursor)
         cache_comment_bans(cron_cursor)
         cron_cursor.close() #close it after all is done
-        Log(f"Cron done! Took {time.end()}s")
+        Log(f"Cron done! Took {round(time.end(),2)}s")
         pytime.sleep(UserConfig["CronThreadDelay"])
 
 def cache_user_ids(cron_cursor):
@@ -126,6 +126,7 @@ def cache_comment_bans(cron_cursor):
             "end_time" : ban[1],
             "reason" : ban[2]
         }
+    time.end()
     logger.info(f"Done with {len(comment_bans)} comment bans cached! {time.ms_return()}ms")
 
 if __name__ == "__main__":

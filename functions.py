@@ -1327,7 +1327,7 @@ def PostComment(request):
     AccountID = int(request.form.get("accountID")) # WHY DIDNT I FIND OUT REQUEST.FORM.GET BEFORE THIS
     Timestamp = round(time.time())
     if not VerifyGJP(AccountID, request.form["gjp"]) or not HasPrivilege(AccountID, UserPostComment):
-        return f"temp_60_You do not have sufficient permissions to comment!"
+        return "-10"
     if AccountID in list(CommentBanCache.keys()):
         TempBan = CommentBanCache[AccountID]
         if TempBan["end_time"] > Timestamp: #checking if it didnt expire already

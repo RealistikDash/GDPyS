@@ -18,6 +18,7 @@ def cron_thread():
         calculate_cp(cron_cursor)
         max_star_count_ban(cron_cursor)
         cache_comment_bans(cron_cursor)
+        cache_server_stats(cron_cursor)
         cron_cursor.close() #close it after all is done
         Log(f"Cron done! Took {round(time.end(),2)}s")
         pytime.sleep(UserConfig["CronThreadDelay"])

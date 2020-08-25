@@ -327,7 +327,7 @@ def tool_change_password_route():
         return render_template("passchange.html", session=session, title="Change Password", BadAlert = "Password Change Failed!")
     return render_template("passchange.html", session=session, title="Change Password")
 
-@ToolBlueprint("/staff/comment-ban", methods=["GET", "POST"])
+@ToolBlueprint.route("/staff/comment-ban", methods=["GET", "POST"])
 def tool_commentban_route():
     if not HasPrivilege(session["AccountID"], ModCommentBan):
         return render_template("403.html", session=session, title = "Missing Permissions!")

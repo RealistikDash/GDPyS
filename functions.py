@@ -1553,7 +1553,7 @@ def LevelSuggest(request):
         LogAction(AccountID, f"has rated the level {LevelID} {Stars} stars.")
         mydb.commit()
         return "1"
-    return "-1"
+    return "-2"
 
 def DebugManualAddSong(Source, SongID):
     """[DEBUG] Manually add a custom song from a custom source."""

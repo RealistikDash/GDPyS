@@ -13,6 +13,7 @@ import gdpys
 from constants import __version__
 from core.tools import *
 from core.cron import cron_thread
+from helpers.antibot import ip_limit
 
 app = Flask(__name__)
 APIBlueprint = Blueprint("api", __name__)
@@ -28,6 +29,10 @@ def Home():
 @app.route("/database/accounts/loginGJAccount.php", methods=["GET", "POST"])
 def LoginHandler():
     """Handles login requests"""
+    ip = FetchIP(request)
+    if ip_limit.get_action_count(ip, "login") > UserConfig["LoginsPerDay"]: #20 login attempts a day
+        return "-12"
+    ip_limit.bump_ip(ip, "login")
     Username = request.form["userName"]
     Password = request.form["password"]
     Log(f"{Username} attempts login...")
@@ -37,6 +42,10 @@ def LoginHandler():
 @app.route("/database///accounts/registerGJAccount.php", methods=["GET", "POST"])
 @app.route("/database/accounts/registerGJAccount.php", methods=["GET", "POST"])
 def RegisterHandler():
+    ip = FetchIP(request) #so we dont fetch it multiple times
+    if ip_limit.get_action_count(ip, "register") > UserConfig["RegistersPerDay"]: #allow 2 registers per ip per day
+        return "-1" #register limit a day
+    ip_limit.bump_ip(ip, "register")
     return RegisterFunction(request)
 
 

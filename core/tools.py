@@ -9,6 +9,7 @@ import urllib.parse
 import time
 import zlib
 import base64
+from datetime import datetime
 
 def ToolLoginCheck(request) -> bool:
     """Handles the login checks for user tools. Returns new session if true"""
@@ -275,3 +276,27 @@ def change_password(post_data: dict, session: dict) -> dict:
     mycursor.execute("UPDATE accounts SET password = %s WHERE accountID = %s LIMIT 1", (new_password,session["AccountID"],))
     mydb.commit()
     return True
+
+def comment_ban(request):
+    """Comment bans and returns an alert."""
+    #check if all args are not empty
+    for a in ["date", "username", "reason"]:
+        if request.form[a] == "":
+            return (False, "All arguments must be filled.")
+
+    #ok now we parse the date input type
+    end_timestamp = time.mktime(datetime.strptime(request.form["date"], "%Y-%m-%d").timetuple())
+    if time.time() > end_timestamp:
+        return (False, "That time is in the past!")
+    
+    #find the user
+    mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s", (request.form["username"],))
+    account_id = mycursor.fetchone()
+    if not account_id:
+        return (False, "Could not find user!")
+    account_id = account_id[0]
+
+    #insert comment ban
+    mycursor.execute("INSERT INTO commentbans (accountID, endTimestamp, reason) VALUES (%s,%s,%s)", (account_id, end_timestamp, request.form["reason"]))
+    mydb.commit()
+    return (True,)

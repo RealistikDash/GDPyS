@@ -311,7 +311,7 @@ def tools_level_reupload_route():
 def tools_song_reupload_route():
     return render_template("songreupload.html", title="Song Reupload")
 
-@ToolBlueprint.route("/stats/admin-logs/<page>")
+@ToolBlueprint.route("/staff/admin-logs/<page>")
 def tools_adminlogs_route(page):
     if not HasPrivilege(session["AccountID"], ModViewLogs):
         return render_template("403.html", session=session, title = "Missing Permissions!")
@@ -326,6 +326,20 @@ def tool_change_password_route():
             return render_template("passchange.html", session=session, title="Change Password", GoodAlert = "Password Changed Successfully!")
         return render_template("passchange.html", session=session, title="Change Password", BadAlert = "Password Change Failed!")
     return render_template("passchange.html", session=session, title="Change Password")
+
+@ToolBlueprint("/staff/comment-ban", methods=["GET", "POST"])
+def tool_commentban_route():
+    if not HasPrivilege(session["AccountID"], ModCommentBan):
+        return render_template("403.html", session=session, title = "Missing Permissions!")
+    
+    if request.method == "GET":
+        return render_template("commentban.html", session=session, title="Comment Ban")
+    
+    a = comment_ban(request)
+
+    if not a[0]:
+        return render_template("commentban.html", session=session, title="Comment Ban", BadAlert=a[1])
+    return render_template("commentban.html", session=session, title="Comment Ban", GoodAlert=f"{a[1]} will next be able to comment {a[2]}")
 
 @ToolBlueprint.errorhandler(500)
 def Tool500(_):

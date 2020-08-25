@@ -1,7 +1,7 @@
 import time as pytime
 #gdpys things
 from console import logger, Log, Success, Fail
-from functions import UserIDCache, Ranks, CommentBanCache
+from functions import UserIDCache, Ranks, CommentBanCache, ServerStatsCache
 from core.mysqlconn import mydb
 from config import UserConfig
 from helpers.timer import Timer
@@ -128,6 +128,25 @@ def cache_comment_bans(cron_cursor):
         }
     time.end()
     logger.info(f"Done with {len(comment_bans)} comment bans cached! {time.ms_return()}ms")
+
+def cache_server_stats(cron_cursor):
+    """Caches server statistics."""
+    time = Timer()
+    time.start()
+    logger.info("Caching server statictics...")
+
+    cron_cursor.execute("SELECT COUNT(*) FROM accounts")
+    ServerStatsCache["registered"] = cron_cursor.fetchone()[0]
+    week_ago = round(pytime.time()) - 604800
+
+    cron_cursor.execute("SELECT COUNT(*) FROM accounts WHERE registerDate > %s", (week_ago,))
+    ServerStatsCache["registered_in_last_week"] = cron_cursor.fetchone()[0]
+
+    cron_cursor.execute("SELECT COUNT(*) FROM levels WHERE uploadDate > %s", (week_ago,))
+    ServerStatsCache["levels_in_last_week"] = cron_cursor.fetchone()[0]
+
+    time.end()
+    logger.info(f"Done! {time.ms_return()}ms")
 
 if __name__ == "__main__":
     Log("Would you like to start the cron job? (y/N)")

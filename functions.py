@@ -32,6 +32,11 @@ LevelDLCache = {} #the level data will be stored here so it doesnt have to be re
 BrcyptCache = {} #so we dont call mysql in gjpchecks
 UserIDCache = {} #caches user ids (1 less query!)
 CommentBanCache = {} # so a large lookup doesnt have to be made
+ServerStatsCache = {
+    "registered":0,
+    "levels_in_last_week":0,
+    "registered_in_last_week":0
+}
 
 def CacheUserIDs():
     """Caches all UserIDs from table. Used to remove the query from AIDToUID."""

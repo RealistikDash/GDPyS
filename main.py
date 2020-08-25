@@ -286,7 +286,7 @@ def BeforeRequest():
 
 @ToolBlueprint.route("/")
 def HomeToolRoute():
-    return render_template("home.html", session=session, title = "Home", ver=__version__)
+    return render_template("home.html", session=session, title = "Home", ver=__version__, stats=ServerStatsCache)
 
 @ToolBlueprint.route("/login", methods=["GET", "POST"])
 def ToolsLoginRoute():

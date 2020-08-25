@@ -299,4 +299,4 @@ def comment_ban(request):
     #insert comment ban
     mycursor.execute("INSERT INTO commentbans (accountID, endTimestamp, reason) VALUES (%s,%s,%s)", (account_id, end_timestamp, request.form["reason"]))
     mydb.commit()
-    return (True,)
+    return (True,request.form["username"],TimeAgoFromNow(end_timestamp))

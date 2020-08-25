@@ -21,6 +21,7 @@ ModSetDaily = 2 << 16
 ModDeleteLevel = 2<<17
 ModViewLogs = 2<<18
 ModSetFeatureScore = 2<<19
+ModCommentBan = 2<<20
 
 __version__ = "InDev"
 

@@ -363,7 +363,7 @@ def GetLeaderboards(request):
         #gjp check
         if not VerifyGJP(AccID, request.form["gjp"]):
             return "-1"
-        FriendsList = ListToCommaString(GetFriendsList(AccID)+[AccID])
+        FriendsList = ListToCommaString(GetFriendsList(AccID))
         mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND extID in (%s) LIMIT 100", (FriendsList,))
     
     elif LeaderboardType == "relative":
@@ -2160,7 +2160,7 @@ def GetFriendsList(AccountID: int):
     Friends = mycursor.fetchall()
     mycursor.execute("SELECT person1 FROM friendships WHERE person2 = %s", (AccountID,))
     Friends1 = mycursor.fetchall()
-    FriendsRetrun = []
+    FriendsRetrun = [int(AccountID)]
 
     for Friend in (Friends + Friends1):
         FriendsRetrun.append(Friend[0])

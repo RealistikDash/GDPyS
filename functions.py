@@ -1316,6 +1316,16 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
         mydb.commit()
         LogAction(Extra["AccountID"], f"has rated the level {Extra['LevelID']} {Stars} stars")
         return True
+    elif Command[0] == "magic" and HasPrivilege(Extra["AccountID"], ModRateLevel): # maybe i should make like /magic 1/0 #update, i added both lmfao
+        magic = 1
+        if len(Command) == 2:
+            magic=int(Command[1])
+        mycursor.execute("UPDATE levels SET magic = %s WHERE levelID = %s LIMIT 1", (magic,Extra["LevelID"],))
+        mydb.commit()
+        LogAction(Extra["AccountID"], f"has set the level {Extra['LevelID']} as {'' if magic else 'not'} magic")
+    elif Command[0] == "unmagic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+        mycursor.execute("UPDATE levels SET magic = 0 WHERE levelID = %s LIMIT 1", (magic,Extra["LevelID"],))
+        LogAction(Extra["AccountID"], f"has set the level {Extra['LevelID']} as not magic")
 
     Fail("Command not found.")
     return False

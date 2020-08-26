@@ -1103,10 +1103,7 @@ def GetComments(request):
     ToGet = [["mode", 0], ["count", 10], ["page", 0], ["levelID", 0], ["userID", 0]]
 
     for Key in ToGet:
-        try:
-            Data[Key[0]] = int(request.form[Key[0]])
-        except ValueError:
-            Data[Key[0]] = Key[1]
+        Data[Key[0]] = int(request.form.get(Key[0], Key[1]))
 
     Offset = Data["page"] * Data["count"]
     Column = "likes"
@@ -1326,6 +1323,16 @@ def CommentCommand(Comment: str, Extra: dict) -> bool:
     elif Command[0] == "unmagic" and HasPrivilege(Extra["AccountID"], ModRateLevel):
         mycursor.execute("UPDATE levels SET magic = 0 WHERE levelID = %s LIMIT 1", (magic,Extra["LevelID"],))
         LogAction(Extra["AccountID"], f"has set the level {Extra['LevelID']} as not magic")
+    elif Command[0] == "award" and HasPrivilege(Extra["AccountID"], ModRateLevel): # maybe i should make like /magic 1/0 #update, i added both lmfao
+        award = 1
+        if len(Command) == 2:
+            award=int(Command[1])
+        mycursor.execute("UPDATE levels SET awarded = %s WHERE levelID = %s LIMIT 1", (award,Extra["LevelID"],))
+        mydb.commit()
+        LogAction(Extra["AccountID"], f"has set the level {Extra['LevelID']} as {'' if award else 'not'} awarded")
+    elif Command[0] == "unaward" and HasPrivilege(Extra["AccountID"], ModRateLevel):
+        mycursor.execute("UPDATE levels SET awarded = 0 WHERE levelID = %s LIMIT 1", (award,Extra["LevelID"],))
+        LogAction(Extra["AccountID"], f"has set the level {Extra['LevelID']} as not awarded")
 
     Fail("Command not found.")
     return False

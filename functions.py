@@ -2424,9 +2424,9 @@ def QuestHandler(request):
     UserID = mycursor.fetchone()[0]
     #using  time for different quest ids
     # TODO: better quest system
-    Time=time.time()
-    InitID = Time//2
-    TimeLeft = (((Time//86400)*86400)+86400)-Time#seconds left in the day
+    Time=round(time.time())
+    InitID = round(Time*1.5)
+    TimeLeft = (((Time//86400)*86400)+86400)-Time#seconds left in the day SMARTEST PROGRAMMER THAT HAS EVER
     Quests = []
     a = 0
     for q in QuestsDB:

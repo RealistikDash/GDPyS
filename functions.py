@@ -2407,7 +2407,7 @@ def DeleteLevelHandler(request):
 
 def DecodeCHK(chk):
     """Decodes chk"""
-    return Xor(base64.b64decode(chk[5:].encode().decode()), 19847)
+    return Xor(base64.b64decode(chk[5:].encode()).decode(), 19847)
 
 def QuestHandler(request):
     """Handles quest."""

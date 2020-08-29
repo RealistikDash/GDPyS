@@ -240,6 +240,10 @@ def GetQuestsRoute():
 def RaateDemonRoute():
     return RateDemonHandler(request)
 
+@app.route("/database/getGJTopArtists.php", methods=["POST"])
+def GetTopArtistsRoute():
+    return GetFeaturedArtists(request)
+
 @app.route("/database/")
 def DatabaseRoute():
     Log("Someone just got ricked!")

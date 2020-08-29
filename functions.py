@@ -2444,3 +2444,20 @@ def RateDemonHandler(request):
     mydb.commit()
     LogAction(request.form["accountID"], f"has changed the demon difficulty of the level {request.form['levelID']}")
     return "1"
+
+def GetFeaturedArtists(request):
+    """Handler for the artists page."""
+    offset = int(request.form["page"]) * 20
+    mycursor.execute("SELECT COUNT(DISTINCT(authorName)) FROM songs")
+    count = mycursor.fetchone()[0]
+    #get the artsits
+    mycursor.execute("""SELECT authorName AS frequency 
+        FROM songs 
+        GROUP BY authorName 
+        ORDER BY frequency DESC
+        LIMIT 20 OFFSET %s""", (offset,))
+    artists = mycursor.fetchall()
+    resp = ""
+    for artist in artists:
+        resp += f"4:{artist[0]}|"
+    return f"{resp[:-1]}#{count}:{offset}:20"

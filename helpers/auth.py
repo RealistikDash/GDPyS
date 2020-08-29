@@ -27,7 +27,7 @@ class AuthHelper():
         """Verifies gjp authentication."""
         account_id = int(account_id) # Making sure it's the correct type
         if not account_id in dict_keys(self.cached_credentials):
-            self._cache_bcrypt(account_id)
+            await self._cache_bcrypt(account_id)
 
         if self.cached_credentials[account_id].known_gjp == gjp:
             return True

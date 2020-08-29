@@ -9,3 +9,14 @@ class Comment():
     likes : int
     percent : int
     spam : bool
+    username : str
+
+@dataclass
+class AccountComment():
+    """Account comment structure."""
+    user_id : int
+    comment : str
+    timestamp : int
+    likes : int
+    spam : bool
+    username : str

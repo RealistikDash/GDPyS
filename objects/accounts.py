@@ -28,3 +28,4 @@ class Account():
     spider : int
     explosion : int
     banned : bool
+    acc_comments : list

@@ -1,12 +1,16 @@
 import os
 import json
 
+__name__ = "ConfigModule"
+__author__ = "RealistikDash"
+
 default_config = {
     "port" : 69,
     "sql_server" : "localhost",
     "sql_user" : "root",
     "sql_db" : "realistikosu",
-    "sql_password" : ""
+    "sql_password" : "",
+    "debug" : False
 }
 
 config_options = list(default_config.keys())

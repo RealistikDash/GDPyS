@@ -16,10 +16,10 @@ async def init(loop):
     return app
 
 if __name__ == "__main__":
-    #logger
+    # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     logging.basicConfig(level = logging_level)
-    #aiohttp app setup
+    # Inits the app.
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init(loop))
     config_routes(app)

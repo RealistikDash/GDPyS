@@ -1,6 +1,0 @@
-flask
-mysql-connector
-colorama
-timeago 
-requests
-bcrypt

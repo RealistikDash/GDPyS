@@ -1,4 +1,3 @@
-#the home route
 from aiohttp import web
 
 async def home_page(request):

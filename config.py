@@ -42,7 +42,7 @@ if user_config is None:
     print("Generated new config! Please edit it and restart Scoresu.")
     raise SystemExit
 
-#check for config updates
+# Checks for default configuration updates.
 config_keys = list(user_config.keys())
 updated_conf = False
 

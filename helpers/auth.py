@@ -18,7 +18,7 @@ class AuthHelper():
         """Caches a person's bcrypt into an object."""
         logging.debug(f"Caching bcrypt for person {account_id}")
         async with myconn.conn.cursor() as mycursor:
-            mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
             response = await mycursor.fetchone()
         assert response is not None
         self.cached_credentials[int(account_id)] = Credentials(response[0], "")#no known gjp yet
@@ -42,7 +42,7 @@ class AuthHelper():
         """Checks the username and password combination."""
         # No caching here as it is rarely used
         async with myconn.conn.cursor() as mycursor:
-            mycursor.execute("SELECT password FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
+            await mycursor.execute("SELECT password FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
             response = await mycursor.fetchone()
         if response is None:
             return False

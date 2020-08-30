@@ -93,7 +93,7 @@ class UserHelper():
     async def get_accountid_from_username(self, username:str) -> int:
         """Gets an account ID from username."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIR 1", (username,))
+            await mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
             accountID = await mycursor.fetchone()
         assert accountID is not None
         return accountID[0]

@@ -54,7 +54,8 @@ class UserHelper():
             user_data[16],
             user_data[17],
             user_data[18],
-            bool(user_data[19])
+            bool(user_data[19]),
+            acc_comments
         )
     
     async def _cache_aid_uid(self, account_id: int) -> None:

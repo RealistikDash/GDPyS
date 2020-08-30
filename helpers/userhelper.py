@@ -89,7 +89,7 @@ class UserHelper():
 
     async def has_privilege(self, user_obj: Account, privileges: int) -> bool:
         """Checks if a user has a privilege."""
-        return bool(user_obj.privileges, privileges)
+        return bool(user_obj.privileges & privileges)
     
     async def get_accountid_from_username(self, username:str) -> int:
         """Gets an account ID from username."""

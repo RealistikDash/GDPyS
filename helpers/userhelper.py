@@ -16,7 +16,7 @@ class UserHelper():
         account_id = int(account_id)
         user_id = await self.accid_userid(account_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userName, email, registerDate, privileves FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT userName, email, registerDate, privileges FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
             account_data = await mycursor.fetchone()
             await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
@@ -86,9 +86,9 @@ class UserHelper():
             self.object_cache[account_id]=await self.recache_object(account_id)
         return self.object_cache[account_id]
 
-    async def has_privilege(self, user_obj: Account, privileve: int) -> bool:
+    async def has_privilege(self, user_obj: Account, privileges: int) -> bool:
         """Checks if a user has a privilege."""
-        return bool(user_obj.privileges, privileve)
+        return bool(user_obj.privileges, privileges)
     
     async def get_accountid_from_username(self, username:str) -> int:
         """Gets an account ID from username."""

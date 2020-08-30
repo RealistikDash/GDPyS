@@ -824,7 +824,7 @@ def IsInt(TheThing):
 
 def empty(variable) -> bool:
     """Python ver of empty php function"""
-    if not variable and variable != "-" and variable != "0":
+    if variable and variable != "-" and variable != "0":
         return True
     return False
 
@@ -906,7 +906,7 @@ def GetLevels(request):
         else:
             SQLParams.append("starDifficulty IN (%s)")
             SQLFormats.append(f"{diff.replace(',', '0,')}0")#multiply by 10 in the best way
-            
+
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:
         SQLParams.append("starFeatured = 1")

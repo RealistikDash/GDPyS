@@ -47,7 +47,7 @@ class AuthHelper():
         if response is None:
             logging.debug("Didnt find user with that username")
             return False
-        return compare_bcrypt(response[0], password)
+        return compare_bcrypt(password, response[0])
         
 
 

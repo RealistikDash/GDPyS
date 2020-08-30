@@ -24,7 +24,9 @@ def hash_bcrypt(text: str) -> str:
     return bcrypt.hashpw(text.encode("utf-8"), bcrypt.gensalt(10)).decode()
 
 def compare_bcrypt(text1: str, text2: str) -> bool:
-    """Compares two strings using bcrypt."""
+    """Compares two strings using bcrypt.
+    text1: Plain password
+    text2: hashed password"""
     check : bool = False
     try:
         check = bcrypt.checkpw(text1.encode(), text2.encode())

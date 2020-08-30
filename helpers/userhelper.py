@@ -61,7 +61,7 @@ class UserHelper():
         """Caches an account id to user id value."""
         account_id =int(account_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userID FROM users WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_id = await mycursor.fetchone()
         assert user_id is not None
         self.accid_userid_cache[account_id] = user_id[0]

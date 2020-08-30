@@ -86,4 +86,16 @@ class UserHelper():
             self.object_cache[account_id]=await self.recache_object(account_id)
         return self.object_cache[account_id]
 
+    async def has_privilege(self, user_obj: Account, privileve: int) -> bool:
+        """Checks if a user has a privilege."""
+        return bool(user_obj.privileges, privileve)
+    
+    async def get_accountid_from_username(self, username:str) -> int:
+        """Gets an account ID from username."""
+        async with myconn.conn.cursor() as mycursor:
+            mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIR 1", (username,))
+            accountID = await mycursor.fetchone()
+        assert accountID is not None
+        return accountID[0]
+
 user_helper = UserHelper() # This has to be a common class.

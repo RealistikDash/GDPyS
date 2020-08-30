@@ -20,7 +20,7 @@ class UserHelper():
             account_data = await mycursor.fetchone()
             await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
-            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam FROM acccoments WHERE userID = %s LIMIT 1", (user_id,))
+            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam FROM acccomments WHERE userID = %s LIMIT 1", (user_id,))
             comments = await mycursor.fetchall()
         
         acc_comments = []

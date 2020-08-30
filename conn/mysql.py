@@ -7,7 +7,7 @@ class Myconn:
 myconn = Myconn()
 
 async def create_connection(loop, config: dict):
-    myconn.conn = await aiomysql.create_pool(
+    myconn.conn = await aiomysql.connect(
         host=config["sql_server"],
         port=3306,
         user=config["sql_user"],

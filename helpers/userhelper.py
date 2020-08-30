@@ -72,5 +72,18 @@ class UserHelper():
         if account_id not in dict_keys(self.accid_userid_cache):
             await self._cache_aid_uid(account_id)
         return self.accid_userid_cache[account_id]
+    
+    async def recache_object(self, account_id: int) -> None:
+        """Forces a user object to recache."""
+        account_id = int(account_id)
+        obj = await self._create_user_object(account_id)
+        self.object_cache[account_id] = obj
+    
+    async def get_object(self, account_id: int) -> Account:
+        """Gets user object from cache or caches and returns it."""
+        account_id = int(account_id)
+        if account_id not in dict_keys(self.object_cache):
+            self.object_cache[account_id]=await self.recache_object(account_id)
+        return self.object_cache[account_id]
 
 user_helper = UserHelper() # This has to be a common class.

@@ -5,6 +5,7 @@ import string
 import random
 from itertools import cycle
 from constants import XorKeys
+import logging
 
 def hash_sha1(text: str) -> str:
     """Hashes text in SHA1."""
@@ -27,7 +28,8 @@ def compare_bcrypt(text1: str, text2: str) -> bool:
     check : bool = False
     try:
         check = bcrypt.checkpw(text1.encode(), text2.encode())
-    except ValueError:
+    except ValueError as e:
+        logging.debug(f"Handled checkpw ValueError {e}")
         pass
     return check
 

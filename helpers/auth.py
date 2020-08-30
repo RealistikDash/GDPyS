@@ -45,6 +45,7 @@ class AuthHelper():
             await mycursor.execute("SELECT password FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
             response = await mycursor.fetchone()
         if response is None:
+            logging.debug("Didnt find user with that username")
             return False
         return compare_bcrypt(response[0], password)
         

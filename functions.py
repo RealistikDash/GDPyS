@@ -825,8 +825,8 @@ def IsInt(TheThing):
 def empty(variable) -> bool:
     """Python ver of empty php function"""
     if variable and variable != "-" and variable != "0":
-        return True
-    return False
+        return False
+    return True
 
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""

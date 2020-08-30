@@ -4,6 +4,7 @@ from helpers.crypthelper import decode_base64
 from objects.accounts import Account
 from objects.comments import AccountComment
 from conn.mysql import myconn
+import logging
 
 class UserHelper():
     """Responsible for caching and getting user objects and other user-related actions."""
@@ -84,6 +85,7 @@ class UserHelper():
         """Gets user object from cache or caches and returns it."""
         account_id = int(account_id)
         if account_id not in dict_keys(self.object_cache):
+            logging.debug("Object doesnt exist! Caching.")
             await self.recache_object(account_id)
         return self.object_cache[account_id]
 

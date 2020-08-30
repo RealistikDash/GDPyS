@@ -84,7 +84,7 @@ class UserHelper():
         """Gets user object from cache or caches and returns it."""
         account_id = int(account_id)
         if account_id not in dict_keys(self.object_cache):
-            self.object_cache[account_id]=await self.recache_object(account_id)
+            await self.recache_object(account_id)
         return self.object_cache[account_id]
 
     async def has_privilege(self, user_obj: Account, privileges: int) -> bool:

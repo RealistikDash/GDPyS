@@ -16,11 +16,11 @@ class UserHelper():
         account_id = int(account_id)
         user_id = await self.accid_userid(account_id)
         async with myconn.conn.cursor() as mycursor:
-            mycursor.execute("SELECT userName, email, registerDate, privileves FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT userName, email, registerDate, privileves FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
             account_data = await mycursor.fetchone()
-            mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
-            mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam FROM acccoments WHERE userID = %s LIMIT 1", (user_id,))
+            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam FROM acccoments WHERE userID = %s LIMIT 1", (user_id,))
             comments = await mycursor.fetchall()
         
         acc_comments = []
@@ -61,7 +61,7 @@ class UserHelper():
         """Caches an account id to user id value."""
         account_id =int(account_id)
         async with myconn.conn.cursor() as mycursor:
-            mycursor.execute("SELECT userID FROM users WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT userID FROM users WHERE accountID = %s LIMIT 1", (account_id,))
             user_id = await mycursor.fetchone()
         assert user_id is not None
         self.accid_userid_cache[account_id] = user_id[0]
@@ -93,7 +93,7 @@ class UserHelper():
     async def get_accountid_from_username(self, username:str) -> int:
         """Gets an account ID from username."""
         async with myconn.conn.cursor() as mycursor:
-            mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIR 1", (username,))
+            await mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIR 1", (username,))
             accountID = await mycursor.fetchone()
         assert accountID is not None
         return accountID[0]

@@ -10,6 +10,7 @@ class Account():
     register_date : int
     privileges : int
     stars : int
+    demons : int
     icon : int
     colour1 : int
     colour2 : int

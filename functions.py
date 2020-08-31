@@ -849,9 +849,10 @@ def GetLevels(request):
     if Gauntlet != 0:
         mycursor.execute("SELECT level1, level2, level3, level4, level5 FROM gauntlets WHERE ID = %s LIMIT 1", (Gauntlet,))
         GauntletLevels = mycursor.fetchone()
-        if GauntletLevels == None:
+        if GauntletLevels is not None:
             SQLParams.append("levelID IN (%s)")
             SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
+            Order = f"FIELD(levelID, {GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]})"
     
     ################################### YandereDev tribute
     if not empty(request.form.get("featured")):

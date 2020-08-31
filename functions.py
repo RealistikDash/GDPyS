@@ -858,8 +858,8 @@ def GetLevels(request):
         mycursor.execute("SELECT level1, level2, level3, level4, level5 FROM gauntlets WHERE ID = %s LIMIT 1", (Gauntlet,))
         GauntletLevels = mycursor.fetchone()
         if GauntletLevels is not None:
-            SQLParams.append("levelID IN (%s)")
-            SQLFormats.append(f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}")
+            ids = f"{GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]}"
+            SQLParams.append(f"levelID IN ({SafeIDList(ids)})")
             Order = f"FIELD(levelID, {GauntletLevels[0]},{GauntletLevels[1]},{GauntletLevels[2]},{GauntletLevels[3]},{GauntletLevels[4]})"
     
     ################################### YandereDev tribute

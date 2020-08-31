@@ -828,6 +828,14 @@ def empty(variable) -> bool:
         return False
     return True
 
+def SafeIDList(string: str) -> str:
+    """Returns a fomrattable comma string list."""
+    string = string.split(",")
+    new_list = []
+    for a in string:
+        new_list.append(int(a))
+    return ListToCommaString(new_list)
+
 def GetLevels(request):
     """As the function states, this gets (get ready for it) levels!"""
     Log("Beginning to fetch levels!")
@@ -877,8 +885,7 @@ def GetLevels(request):
         SQLParams.append("starStars = 0")
     
     if not empty(request.form.get("len")):
-        SQLParams.append("levelLength IN (%s)")
-        SQLFormats.append(request.form["len"])
+        SQLParams.append(f"levelLength IN ({SafeIDList(request.form['len'])})")
     
     if not empty(request.form.get("song")):
         SongID = int(request.form.get("song"))
@@ -905,8 +912,7 @@ def GetLevels(request):
         elif diff == "-3":
             SQLParams.append("starAuto = 1")
         else:
-            SQLParams.append("starDifficulty IN (%s)")
-            SQLFormats.append(f"{diff.replace(',', '0,')}0")#multiply by 10 in the best way
+            SQLParams.append(f"starDifficulty IN ({SafeIDList(f'{diff.replace(',', '0,')}0')})")#multiply by 10 in the best way
 
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:
@@ -960,8 +966,7 @@ def GetLevels(request):
     elif Type == 7:
         SQLParams.append("magic = 1")
     elif Type == 10: #mappacks
-        SQLParams.append("levelID in (%s)")
-        SQLFormats.append(Form["str"])
+        SQLParams.append(f"levelID in ({SafeIDList(Form['str'])})")
     elif Type == 11:
         SQLParams.append("awarded = 1")
     elif Type == 12:
@@ -971,8 +976,7 @@ def GetLevels(request):
         AccountID = request.form["accountID"]
         if not VerifyGJP(AccountID, request.form["gjp"]):
             return "-1"
-        SQLParams.append("levels.extID in (%s)")
-        SQLFormats.append(ListToCommaString(GetFriendsList(AccountID)))
+        SQLParams.append(f"extID in ({SafeIDList(ListToCommaString(GetFriendsList(AccountID)))})")
     elif Type == 16:
         SQLParams.append("starEpic = 1")
         Order = "rateDate DESC, uploadDate"

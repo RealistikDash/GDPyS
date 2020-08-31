@@ -912,7 +912,8 @@ def GetLevels(request):
         elif diff == "-3":
             SQLParams.append("starAuto = 1")
         else:
-            SQLParams.append(f"starDifficulty IN ({SafeIDList(f'{diff.replace(',', '0,')}0')})")#multiply by 10 in the best way
+            id_list=f"{diff.replace(',', '0,')}0"
+            SQLParams.append(f"starDifficulty IN ({SafeIDList(id_list)})")#multiply by 10 in the best way
 
     #SO MANY IF STATEMENTS I HATE THIS
     if CheckForm(Form, "featured") and Form["featured"]:

@@ -364,7 +364,7 @@ def GetLeaderboards(request):
         if not VerifyGJP(AccID, request.form["gjp"]):
             return "-1"
         FriendsList = ListToCommaString(GetFriendsList(AccID))
-        mycursor.execute("SELECT * FROM users WHERE isBanned = 0 AND extID in (%s) LIMIT 100", (FriendsList,))
+        mycursor.execute(f"SELECT * FROM users WHERE isBanned = 0 AND extID in ({FriendsList}) LIMIT 100")
     
     elif LeaderboardType == "relative":
         #global
@@ -931,8 +931,7 @@ def GetLevels(request):
     if CheckForm(Form, "noStar"):
         SQLParams.append("starStars = 0")
     if CheckForm(Form, "len"):
-        SQLParams.append(f"levelLength IN (%s)")
-        SQLFormats.append(Form['len'])
+        SQLParams.append(f"levelLength IN ({SafeIDList(Form['len'])})")
 
     if Type == 0 or Type == 15:
         Order = "likes"
@@ -1961,7 +1960,7 @@ def ScoreSubmitHandler(request):
 
     #I WISH SWITCH STATEMENTS EXISTED and I might do something about this involving tuples
     if Type == 0:
-        mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s AND accountID in (%s) ORDER BY percent DESC LIMIT 50", (LevelID, ListToCommaString(GetFriendsList(AccountID))))
+        mycursor.execute(f"SELECT * FROM levelscores WHERE levelID = %s AND accountID in ({ListToCommaString(GetFriendsList(AccountID))}) ORDER BY percent DESC LIMIT 50", (LevelID,))
     elif Type == 1:
         mycursor.execute("SELECT * FROM levelscores WHERE levelID = %s ORDER BY percent DESC LIMIT 50", (LevelID,))
     
@@ -1976,11 +1975,11 @@ def ScoreSubmitHandler(request):
     for Score in Scores:
         SQLList += f"{Score[1]},"
     
-    if len(SQLList) != "":
-        SQLList = SQLList[:-1]
+
+    SQLList = SQLList[:-1]
 
     #get all the user date
-    mycursor.execute("SELECT extID, userName, userID, icon, color1, color2, iconType, special FROM users WHERE extID in (%s) AND isBanned = 0", (SQLList,))
+    mycursor.execute(f"SELECT extID, userName, userID, icon, color1, color2, iconType, special FROM users WHERE extID in ({SQLList}) AND isBanned = 0")
     AllUserData = mycursor.fetchall()
 
     ReturnStr = ""

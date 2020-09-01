@@ -2295,9 +2295,8 @@ def GetDaily(request):
     else:
         DayToday = datetime.today().weekday()
         EndTime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=7-DayToday) #new level every monday
-        TimeToChange = time.mktime(EndTime.timetuple())
-        LevelID += 100001 #idk what he was thinking either
-    TimeToChange -= Timestamp
+        TimeToChange = time.mktime(EndTime.timetuple()) - Timestamp
+        LevelID += 100001 #idk what he was thinking eithe
     return f"{LevelID}|{round(TimeToChange)}"
 
 def AcceptFriendRequestHandler(request):

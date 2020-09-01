@@ -2291,8 +2291,7 @@ def GetDaily(request):
     if not Weekly:
         #this is big brain time
         now = datetime.now()
-        SecondsSinceMidnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds() #calculate time since midnight
-        TimeToChange = 86400 - SecondsSinceMidnight #substract for seconds in day to get time til next midnight
+        TimeToChange = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds() + 86400 #calculate time since midnight
     else:
         DayToday = datetime.today().weekday()
         EndTime = datetime.combine(datetime.today(), datetime.min.time()) + timedelta(days=7-DayToday) #new level every monday

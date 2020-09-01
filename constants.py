@@ -3,6 +3,7 @@ class XorKeys():
     chk = 19847
     level_password = 26364
     quests = 19847
+    chests = 59182
 
 class Permissions():
     authenticate = 2<<0

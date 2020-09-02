@@ -3,8 +3,8 @@ from objects.songs import Song
 from exceptions import BannedSongException, SongNotFoundException
 
 class BoomlingsAPI():
-    """A wrapper around the boomlings API."""
-    def __init__(self, server_url : str = "http://www.boomlings.com/database"):
+    """A wrapper around the boomlings servers."""
+    def __init__(self, server_url : str = "http://www.boomlings.com/database/"):
         """Inits the Boomlings API."""
         self.URL = server_url
 

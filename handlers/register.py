@@ -15,7 +15,7 @@ async def register_handler(request: aiohttp.web.Request):
     ip = get_ip(request)
     if not check_username(username):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    if user_helper.get_accountid_from_username(username):
+    if await user_helper.get_accountid_from_username(username):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail2)
     await user_helper.create_user(
         username,

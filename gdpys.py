@@ -1,11 +1,12 @@
 import asyncio
 from aiohttp import web
 import logging
+import random
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
 from config import user_config
-from constants import ASCII_ART
+from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 
 def config_routes(app: web.Application) -> None:
@@ -16,7 +17,7 @@ def config_routes(app: web.Application) -> None:
 
 def welcome_sequence():
     """Startup welcome print art things."""
-    print(ASCII_ART)
+    print(ASCII_ART.format(reset = Colours.reset, col1 = random.choice(Colours.all_col), col2 = random.choice(Colours.all_col), col3 = random.choice(Colours.all_col), col4 = random.choice(Colours.all_col), col5 = random.choice(Colours.all_col)))
 
 async def init(loop):
     """Initialises the app and MySQL connection."""

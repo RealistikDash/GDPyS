@@ -3,6 +3,7 @@ from aiohttp import web
 import logging
 from handlers.frontend import home_page
 from handlers.login import login_handler
+from handlers.register import register_handler
 from config import user_config
 from conn.mysql import create_connection
 
@@ -10,6 +11,7 @@ def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
     app.router.add_get("/", home_page)
     app.router.add_post("/database/accounts/loginGJAccount.php", login_handler)
+    app.router.add_post("/database/accounts/registerGJAccount.php", register_handler)
 
 async def init(loop):
     """Initialises the app and MySQL connection."""

@@ -1,6 +1,7 @@
 from helpers.auth import auth
 from helpers.generalhelper import dict_keys
-from helpers.crypthelper import decode_base64
+from helpers.timehelper import get_timestamp
+from helpers.crypthelper import decode_base64, hash_bcrypt
 from objects.accounts import Account
 from objects.comments import AccountComment
 from conn.mysql import myconn
@@ -98,7 +99,15 @@ class UserHelper():
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
             accountID = await mycursor.fetchone()
-        assert accountID is not None
-        return accountID[0]
+        return accountID[0] if accountID is not None else False
+    
+    async def create_user(self, username: str, password: str, email : str, ip : str = "127.0.0.1") -> None:
+        """Inserts a user into db."""
+        timestamp = get_timestamp()
+        hashed_password = hash_bcrypt(password)
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (username, hashed_password, email, timestamp))
+            await mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, username, ip))
+            await myconn.conn.commit()
 
 user_helper = UserHelper() # This has to be a common class.

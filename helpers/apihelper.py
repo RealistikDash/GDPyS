@@ -1,6 +1,7 @@
 import aiohttp
 from objects.songs import Song
 from exceptions import BannedSongException, SongNotFoundException
+from constants import Secrets
 
 class BoomlingsAPI():
     """A wrapper around the boomlings servers."""
@@ -13,7 +14,7 @@ class BoomlingsAPI():
         async with aiohttp.ClientSession() as session:
             async with session.post(self.URL + "getGJSongInfo.php", data={
                 "songID" : song_id,
-                "secret" : "Wmfd2893gb7"
+                "secret" : Secrets.normal
             }) as resp:
                 response = await resp.text()
         if response in ("-1", ""): # I am not sure what causes an empty response but I am certain it exists.

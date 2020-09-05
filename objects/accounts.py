@@ -30,3 +30,6 @@ class Account():
     explosion : int
     banned : bool
     acc_comments : list
+    youtube : str
+    twitter : str
+    twitch : str

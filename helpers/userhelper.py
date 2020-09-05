@@ -18,7 +18,7 @@ class UserHelper():
         account_id = int(account_id)
         user_id = await self.accid_userid(account_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userName, email, registerDate, privileges FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT userName, email, registerDate, privileges, youtubeurl, twitter, twitch FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
             account_data = await mycursor.fetchone()
             await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
@@ -57,7 +57,10 @@ class UserHelper():
             user_data[17],
             user_data[18],
             bool(user_data[19]),
-            acc_comments
+            acc_comments,
+            account_data[4],
+            account_data[5],
+            account_data[6]
         )
     
     async def _cache_aid_uid(self, account_id: int) -> None:

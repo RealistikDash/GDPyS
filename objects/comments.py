@@ -15,8 +15,10 @@ class Comment():
 class AccountComment():
     """Account comment structure."""
     user_id : int
+    comment_base64 : str
     comment : str
     timestamp : int
     likes : int
     spam : bool
     username : str
+    comment_id : int

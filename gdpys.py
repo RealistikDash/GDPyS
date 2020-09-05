@@ -5,6 +5,7 @@ import random
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
+from handlers.profiles import profile_comment_handler
 from config import user_config
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
@@ -14,6 +15,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_get("/", home_page)
     app.router.add_post("/database/accounts/loginGJAccount.php", login_handler)
     app.router.add_post("/database/accounts/registerGJAccount.php", register_handler)
+    app.router.add_post("/database/getGJAccountComments20.php", profile_comment_handler)
 
 def welcome_sequence():
     """Startup welcome print art things."""

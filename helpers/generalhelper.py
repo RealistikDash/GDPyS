@@ -10,3 +10,7 @@ def get_ip(request : aiohttp.web.Request) -> str:
     if request.headers.get("x-forwarded-for"):
         return request.headers.get("x-forwarded-for")
     return request.remote
+
+def create_offsets_from_page(page: int, amount_per_page : int = 10) -> int:
+    """Calculates the offset of mysql query."""
+    return int(page) * int(amount_per_page)

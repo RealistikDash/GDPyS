@@ -21,6 +21,7 @@ class ResponseCodes():
     generic_success = "1"
     generic_fail2 = "-2"
     login_contact_rob = "-12"
+    empty_list = "#0:0:0"
 
 class Colours():
     """ALL THE COLOURS IN THE SKY"""

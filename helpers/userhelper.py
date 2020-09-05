@@ -22,13 +22,13 @@ class UserHelper():
             account_data = await mycursor.fetchone()
             await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
-            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam FROM acccomments WHERE userID = %s LIMIT 1", (user_id,))
+            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam, commentID FROM acccomments WHERE userID = %s LIMIT 1", (user_id,))
             comments = await mycursor.fetchall()
         
         acc_comments = []
 
         for comment in comments:
-            acc_comments.append(AccountComment(comment[0], decode_base64(comment[2]), comment[3], comment[4], bool(comment[5]), comment[1]))
+            acc_comments.append(AccountComment(comment[0], decode_base64(comment[2]), comment[2], comment[3], comment[4], bool(comment[5]), comment[1], comment[6]))
         
         return Account(
             account_data[0],
@@ -109,5 +109,10 @@ class UserHelper():
             await mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (username, hashed_password, email, timestamp))
             await mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, username, ip))
             await myconn.conn.commit()
+    
+    async def upload_account_comment(self, comment : AccountComment) -> None:
+        """Uploads an account comment."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("")
 
 user_helper = UserHelper() # This has to be a common class.

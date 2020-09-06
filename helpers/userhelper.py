@@ -148,7 +148,7 @@ class UserHelper():
         """Returns an account extra object for specified user."""
         account_id = int(account_id)
         if account_id not in dict_keys(self.extra_object_cache):
-            await self._create_account_extra(account_id)
+            await self._cache_account_extra(account_id)
         return self.extra_object_cache[account_id]
     
     def mod_badge_level(self, privileges: int) -> int:

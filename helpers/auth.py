@@ -1,4 +1,4 @@
-from helpers.crypthelper import compare_bcrypt, hash_bcrypt, decode_gjp
+from helpers.crypthelper import compare_bcrypt, decode_gjp
 from helpers.generalhelper import dict_keys
 from conn.mysql import myconn
 from dataclasses import dataclass
@@ -33,7 +33,7 @@ class AuthHelper():
             return True
         elif self.cached_credentials[account_id].known_gjp == "":
             logging.debug("No known GJP, checking")
-            if compare_bcrypt(self.cached_credentials[account_id].bcrypt, hash_bcrypt(decode_gjp(gjp))):
+            if compare_bcrypt(decode_gjp(gjp), self.cached_credentials[account_id].bcrypt):
                 self.cached_credentials[account_id].known_gjp = gjp
                 return True
         logging.debug("Failed check.")

@@ -41,14 +41,6 @@ async def profile_handler(request : aiohttp.web.Request):
     user = await user_helper.get_object(account_id)
     response = ""
     friend_state = 0
-
-    if checking_self:
-        extra_acc = await user_helper.get_account_extra(account_id)
-        response += joint_string({
-            "38" : extra_acc.count_messages,
-            "39" : extra_acc.count_reqs,
-            "40" : extra_acc.count_new_friends
-        })
     
     logging.debug(friend_state)
     logging.debug(response)
@@ -85,5 +77,12 @@ async def profile_handler(request : aiohttp.web.Request):
         29 : 1,
         49 : user_helper.mod_badge_level(user.privileges)
     })
+    if checking_self:
+        extra_acc = await user_helper.get_account_extra(account_id)
+        response += joint_string({
+            "38" : extra_acc.count_messages,
+            "39" : extra_acc.count_reqs,
+            "40" : extra_acc.count_new_friends
+        })
     logging.debug(response)
     return aiohttp.web.Response(text=response)

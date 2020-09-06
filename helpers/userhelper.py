@@ -128,15 +128,15 @@ class UserHelper():
         async with myconn.conn.cursor() as mycursor:
             # TODO: Replace these count queries with simple len of friend request object
             await mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE toAccountID = %s AND isNew = 1", (account_id,))
-            friend_reqs = await mycursor.fetchone()[0]
+            friend_reqs = await mycursor.fetchone()
             await mycursor.execute("SELECT COUNT(*) FROM messages WHERE toAccountID = %s AND isNew = 0", (account_id,))
-            new_messages = await mycursor.fetchone()[0]
+            new_messages = await mycursor.fetchone()
             await mycursor.execute("SELECT COUNT(*) FROM friendships WHERE (person1 = %s AND isNew2 = 1) OR  (person2 = %s AND isNew1 = 1)", (account_id,account_id))
-            new_friends = await mycursor.fetchone()[0]
+            new_friends = await mycursor.fetchone()
         return AccountExtras(
-            friend_reqs,
-            new_messages,
-            new_friends,
+            friend_reqs[0],
+            new_messages[0],
+            new_friends[0],
             [],[],[] # TODO: Finish all the lists when friendship system is fully implemented.
         )
     

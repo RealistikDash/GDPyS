@@ -5,6 +5,7 @@ from helpers.timehelper import time_ago
 from helpers.auth import auth
 from constants import ResponseCodes
 import aiohttp
+import logging
 
 async def profile_comment_handler(request : aiohttp.web.Request):
     """Handles fetching profile comments."""
@@ -23,7 +24,7 @@ async def profile_comment_handler(request : aiohttp.web.Request):
     response = ""
     for comment in user.acc_comments[offset:10]:
         response += f"2~{comment.comment_base64}~3~{comment.user_id}~4~{comment.likes}~5~0~~6~{comment.comment_id}~7~{int(comment.spam)}~9~{time_ago(comment.timestamp)}|" # I should make a builder for this.....
-
+    logging.debug(response[:-1])
     return aiohttp.web.Response(text=response[:-1])
 
 async def profile_handler(request : aiohttp.web.Request):
@@ -49,6 +50,9 @@ async def profile_handler(request : aiohttp.web.Request):
             "40" : extra_acc.count_new_friends
         })
     
+    logging.debug(friend_state)
+    logging.debug(response)
+
     response += joint_string({
         "1" : user.username,
         "2" : user.user_id,
@@ -81,4 +85,5 @@ async def profile_handler(request : aiohttp.web.Request):
         29 : 1,
         49 : user_helper.mod_badge_level(user.privileges)
     })
+    logging.debug(response)
     return aiohttp.web.Response(text=response)

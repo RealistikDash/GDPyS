@@ -33,3 +33,16 @@ class Account():
     youtube : str
     twitter : str
     twitch : str
+    state_req : bool
+    state_msg : bool
+    state_comment : bool
+
+@dataclass
+class AccountExtras():
+    """Extra account information that may not be always needed."""
+    count_reqs : int
+    count_messages : int
+    count_new_friends : int
+    friend_requests : list
+    sent_requests : list
+    received_requests : list

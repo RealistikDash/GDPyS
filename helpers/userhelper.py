@@ -2,15 +2,17 @@ from helpers.auth import auth
 from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp
 from helpers.crypthelper import decode_base64, hash_bcrypt
-from objects.accounts import Account
+from objects.accounts import Account, AccountExtras
 from objects.comments import AccountComment
 from conn.mysql import myconn
+from constants import Permissions
 import logging
 
 class UserHelper():
     """Responsible for caching and getting user objects and other user-related actions."""
     def __init__(self):
         self.object_cache = {}
+        self.extra_object_cache = {}
         self.accid_userid_cache = {}
     
     async def _create_user_object(self, account_id: int) -> Account:
@@ -18,7 +20,7 @@ class UserHelper():
         account_id = int(account_id)
         user_id = await self.accid_userid(account_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userName, email, registerDate, privileges, youtubeurl, twitter, twitch FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute("SELECT userName, email, registerDate, privileges, youtubeurl, twitter, twitch, frS, mS, cS FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
             account_data = await mycursor.fetchone()
             await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
@@ -60,7 +62,10 @@ class UserHelper():
             acc_comments,
             account_data[4],
             account_data[5],
-            account_data[6]
+            account_data[6],
+            bool(account_data[7]),
+            bool(account_data[8]),
+            bool(account_data[9])
         )
     
     async def _cache_aid_uid(self, account_id: int) -> None:
@@ -117,5 +122,41 @@ class UserHelper():
         """Uploads an account comment."""
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("")
+    
+    async def _create_account_extra(self, account_id: int) -> AccountExtras:
+        """Creates an account extra object for user."""
+        async with myconn.conn.cursor() as mycursor:
+            # TODO: Replace these count queries with simple len of friend request object
+            await mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE toAccountID = %s AND isNew = 1", (account_id,))
+            friend_reqs = await mycursor.fetchone()[0]
+            await mycursor.execute("SELECT COUNT(*) FROM messages WHERE toAccountID = %s AND isNew = 0", (account_id,))
+            new_messages = await mycursor.fetchone()[0]
+            await mycursor.execute("SELECT COUNT(*) FROM friendships WHERE (person1 = %s AND isNew2 = 1) OR  (person2 = %s AND isNew1 = 1)", (account_id,account_id))
+            new_friends = await mycursor.fetchone()[0]
+        return AccountExtras(
+            friend_reqs,
+            new_messages,
+            new_friends,
+            [],[],[] # TODO: Finish all the lists when friendship system is fully implemented.
+        )
+    
+    async def _cache_account_extra(self, account_id: int) -> None:
+        """Caches an account extra object."""
+        self.extra_object_cache[account_id] = await self._create_account_extra(account_id)
+    
+    async def get_account_extra(self, account_id: int) -> AccountExtras:
+        """Returns an account extra object for specified user."""
+        account_id = int(account_id)
+        if account_id not in dict_keys(self.extra_object_cache):
+            await self._create_account_extra(account_id)
+        return self.extra_object_cache[account_id]
+    
+    def mod_badge_level(self, privileges: int) -> int:
+        """Converts privileges to mod badge level."""
+        if privileges & Permissions.mod_elder:
+            return 2
+        elif privileges & Permissions.mod_regular:
+            return 1
+        return 0
 
 user_helper = UserHelper() # This has to be a common class.

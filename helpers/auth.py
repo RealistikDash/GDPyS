@@ -36,6 +36,7 @@ class AuthHelper():
             if compare_bcrypt(self.cached_credentials[account_id].bcrypt, hash_bcrypt(decode_gjp(gjp))):
                 self.cached_credentials[account_id].known_gjp = gjp
                 return True
+        logging.debug("Failed check.")
         return False
     
     async def check_password(self, username: str, password: str) -> bool:

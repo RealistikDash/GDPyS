@@ -30,7 +30,7 @@ async def profile_handler(request : aiohttp.web.Request):
     """Handles user profiles."""
     post_data = await request.post()
 
-    if not auth.check_gjp(post_data["accountID"], post_data["gjp"]):
+    if not await auth.check_gjp(post_data["accountID"], post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     
     # Define variables that will be used in the handler

@@ -10,6 +10,8 @@ class Permissions():
     upload_level = 2<<1
     post_comment = 2<<2
     post_acc_comment = 2<<3
+    mod_regular = 2<<6
+    mod_elder = 2<<7
 
 class Secrets():
     """All the GeometryDash secret values"""

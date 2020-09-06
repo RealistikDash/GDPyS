@@ -5,7 +5,7 @@ import random
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
-from handlers.profiles import profile_comment_handler
+from handlers.profiles import profile_comment_handler, profile_handler
 from config import user_config
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
@@ -16,6 +16,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/accounts/loginGJAccount.php", login_handler)
     app.router.add_post("/database/accounts/registerGJAccount.php", register_handler)
     app.router.add_post("/database/getGJAccountComments20.php", profile_comment_handler)
+    app.router.add_post("/database/updateGJUserScore22.php", profile_handler)
 
 def welcome_sequence():
     """Startup welcome print art things."""
@@ -36,4 +37,7 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init(loop))
     config_routes(app)
-    web.run_app(app, port=user_config["port"])
+    try:
+        web.run_app(app, port=user_config["port"])
+    except KeyboardInterrupt:
+        print("Shutting down! Bye!")

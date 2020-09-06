@@ -17,7 +17,7 @@ async def profile_comment_handler(request : aiohttp.web.Request):
     comment_count = len(user.acc_comments)
 
     #CHECKS
-    if len(comment_count) == 0:
+    if comment_count == 0:
         return aiohttp.web.Response(text=ResponseCodes.empty_list)
     
     # I might make this a separate helper function however since account comments aare only ever used in one place I'll make the struct here.

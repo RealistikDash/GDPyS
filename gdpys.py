@@ -16,7 +16,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/accounts/loginGJAccount.php", login_handler)
     app.router.add_post("/database/accounts/registerGJAccount.php", register_handler)
     app.router.add_post("/database/getGJAccountComments20.php", profile_comment_handler)
-    app.router.add_post("/database/updateGJUserScore22.php", profile_handler)
+    app.router.add_post("/database/getGJUserInfo20.php", profile_handler)
 
 def welcome_sequence():
     """Startup welcome print art things."""

@@ -6,6 +6,7 @@ from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
 from handlers.profiles import profile_comment_handler, profile_handler
+from handlers.songs import featured_artists_handler
 from config import user_config
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
@@ -17,6 +18,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/accounts/registerGJAccount.php", register_handler)
     app.router.add_post("/database/getGJAccountComments20.php", profile_comment_handler)
     app.router.add_post("/database/getGJUserInfo20.php", profile_handler)
+    app.router.add_post("/database/getGJTopArtists.php", featured_artists_handler)
 
 def welcome_sequence():
     """Startup welcome print art things."""

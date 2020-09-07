@@ -74,5 +74,6 @@ class SongHelper():
         # TODO : Error handling
         boomlings_song = await self.api.get_boomlings_song(song_id)
         await self.add_song_to_db(boomlings_song)
+        return boomlings_song
 
 songs = SongHelper()

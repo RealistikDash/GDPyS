@@ -10,7 +10,7 @@ class SongHelper():
     def __init__(self):
         """Inits the song helper."""
         self.song_obj_cache = {}
-        self.top_artists = await self._top_artists()
+        self.top_artists = []
         self.api = BoomlingsAPI()
     
     async def _top_artists(self) -> list:

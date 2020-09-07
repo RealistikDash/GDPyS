@@ -20,6 +20,6 @@ async def featured_artists_handler(request : aiohttp.web.Request):
         response += joint_string({
             4 : artist
         }) + "|"
-    
-    logging.debug(response[:-1])
+    response = response[:-1] + f"#{len(songs.top_artists)}:{offset*-1}:20"
+    logging.debug(response)
     return aiohttp.web.Response(text=response[:-1])

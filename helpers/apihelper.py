@@ -2,6 +2,7 @@ import aiohttp
 from objects.songs import Song
 from exceptions import BannedSongException, SongNotFoundException
 from constants import Secrets
+import logging
 
 class BoomlingsAPI():
     """A wrapper around the boomlings servers."""
@@ -17,6 +18,7 @@ class BoomlingsAPI():
                 "secret" : Secrets.normal
             }) as resp:
                 response = await resp.text()
+        logging.debug(response)
         if response in ("-1", ""): # I am not sure what causes an empty response but I am certain it exists.
             raise SongNotFoundException
         if response == "-2":

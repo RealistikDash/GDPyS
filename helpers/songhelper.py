@@ -7,7 +7,7 @@ import logging
 
 class SongHelper():
     """Helper class that helps with songs. Good desc."""
-    async def __init__(self):
+    def __init__(self):
         """Inits the song helper."""
         self.song_obj_cache = {}
         self.top_artists = await self._top_artists()

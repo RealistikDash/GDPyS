@@ -59,7 +59,10 @@ class SongHelper():
         """Force cache song object."""
         song = await self._song_from_db(song_id)
         if song is None:
-            song = await self.add_from_boomlings(song_id)
+            try:
+                song = await self.add_from_boomlings(song_id)
+            except Exception:
+                return None
         self.song_obj_cache[song_id] = song
     
     async def get_song_obj(self, song_id: int) -> Song:

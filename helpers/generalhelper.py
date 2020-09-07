@@ -19,6 +19,13 @@ def joint_string(content: dict):
     """Builds a joint string out of a dict."""
     return_str = ""
     #iterating through dict
-    for key in list(content.keys()):
+    for key in dict_keys(content):
         return_str += f":{key}:{content[key]}"
     return return_str[1:]
+
+def pipe_string(content : dict) -> str:
+    """Generates a pipe separated string."""
+    return_str = ""
+    for key in dict_keys(content):
+        return_str += f"{key}~|~{content[key]}~|~"
+    return return_str

@@ -24,7 +24,7 @@ class BoomlingsAPI():
         if response == "-2":
             raise BannedSongException
 
-        song = resp.split("|")
+        song = response.split("|")
         return Song(
             int(song[1][1:-1]),
             song[3][1:-1],

@@ -13,6 +13,8 @@ default_config = {
     "debug" : False
 }
 
+user_config = {}
+
 config_options = list(default_config.keys())
 
 class JsonFile():
@@ -33,25 +35,27 @@ class JsonFile():
             json.dump(new_content, f, indent=4)
         self.file = new_content
 
-config = JsonFile("config.json")
-user_config = config.get_file()
+def load_config(location : str = "config.json"):
+    config = JsonFile(location)
+    global user_config
+    user_config = config.get_file()
 
-if user_config is None:
-    print("Generating new config")
-    config.write_file(default_config)
-    print("Generated new config! Please edit it and restart Scoresu.")
-    raise SystemExit
+    if user_config is None:
+        print("Generating new config")
+        config.write_file(default_config)
+        print("Generated new config! Please edit it and restart Scoresu.")
+        raise SystemExit
 
-# Checks for default configuration updates.
-config_keys = list(user_config.keys())
-updated_conf = False
+    # Checks for default configuration updates.
+    config_keys = list(user_config.keys())
+    updated_conf = False
 
-for def_conf_option in config_options:
-    if def_conf_option not in config_keys:
-        updated_conf = True
-        user_config[def_conf_option] = default_config[def_conf_option]
+    for def_conf_option in config_options:
+        if def_conf_option not in config_keys:
+            updated_conf = True
+            user_config[def_conf_option] = default_config[def_conf_option]
 
-if updated_conf:
-    config.write_file(user_config)
-    print("Your config has been updated! Please change the new vaulues to your liking.")
-    raise SystemExit
+    if updated_conf:
+        config.write_file(user_config)
+        print("Your config has been updated! Please change the new vaulues to your liking.")
+        raise SystemExit

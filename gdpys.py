@@ -7,7 +7,7 @@ from handlers.login import login_handler
 from handlers.register import register_handler
 from handlers.profiles import profile_comment_handler, profile_handler
 from handlers.songs import featured_artists_handler, get_songinfo_handler
-from config import user_config
+from config import user_config, load_config
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 
@@ -35,6 +35,7 @@ if __name__ == "__main__":
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     logging.basicConfig(level = logging_level)
+    load_config()
     welcome_sequence()
     # Inits the app.
     loop = asyncio.get_event_loop()

@@ -1,5 +1,6 @@
 import os
 import json
+from helpers.generalhelper import dict_keys
 
 __name__ = "ConfigModule"
 __author__ = "RealistikDash"
@@ -37,25 +38,27 @@ class JsonFile():
 
 def load_config(location : str = "config.json"):
     config = JsonFile(location)
-    global user_config
-    user_config = config.get_file()
+    user_config_temp = config.get_file()
 
-    if user_config is None:
+    if user_config_temp is None:
         print("Generating new config")
         config.write_file(default_config)
         print("Generated new config! Please edit it and restart Scoresu.")
         raise SystemExit
 
     # Checks for default configuration updates.
-    config_keys = list(user_config.keys())
+    config_keys = list(user_config_temp.keys())
     updated_conf = False
 
     for def_conf_option in config_options:
         if def_conf_option not in config_keys:
             updated_conf = True
-            user_config[def_conf_option] = default_config[def_conf_option]
+            user_config_temp[def_conf_option] = default_config[def_conf_option]
 
     if updated_conf:
-        config.write_file(user_config)
+        config.write_file(user_config_temp)
         print("Your config has been updated! Please change the new vaulues to your liking.")
         raise SystemExit
+    
+    for key in dict_keys(user_config_temp):
+        user_config[key] = user_config_temp[key]

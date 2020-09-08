@@ -46,9 +46,9 @@ async def profile_handler(request : aiohttp.web.Request):
     logging.debug(response)
 
     response += joint_string({
-        "1" : user.username,
-        "2" : user.user_id,
-        "13" : user.coins,
+        1 : user.username,
+        2 : user.user_id,
+        13 : user.coins,
         17 : user.user_coins,
         10 : user.colour1,
         11 : user.colour2,
@@ -69,7 +69,7 @@ async def profile_handler(request : aiohttp.web.Request):
         28 : int(user.glow),
         43 : user.spider,
         47 : user.explosion,
-        30 : 0, # TODO : RANKS!!
+        30 : user_helper.get_rank(user.account_id),
         16: user.account_id,
         31 : friend_state,
         44 : user.twitter,

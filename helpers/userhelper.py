@@ -1,6 +1,6 @@
 from helpers.auth import auth
 from helpers.generalhelper import dict_keys
-from helpers.timehelper import get_timestamp
+from helpers.timehelper import get_timestamp, Timer
 from helpers.crypthelper import decode_base64, hash_bcrypt
 from objects.accounts import Account, AccountExtras
 from objects.comments import AccountComment
@@ -11,9 +11,12 @@ import logging
 class UserHelper():
     """Responsible for caching and getting user objects and other user-related actions."""
     def __init__(self):
+        # Caches
         self.object_cache = {}
         self.extra_object_cache = {}
         self.accid_userid_cache = {}
+        self.ranks = {}
+        self.relationships = {}
     
     async def _create_user_object(self, account_id: int) -> Account:
         """Creates a user object."""
@@ -158,5 +161,26 @@ class UserHelper():
         elif privileges & Permissions.mod_regular:
             return 1
         return 0
+    
+    async def cron_calc_ranks(self) -> None:
+        """Calculates all ranks for users and stores them in cache.""" # I may move this to a cron category however that does not currently exist.
+        timer = Timer()
+        timer.start()
+        async with myconn.conn.cursor() as mycursor:
+            mycursor.execute("SELECT extID FROM users WHERE extID IN (SELECT accountID FROM accounts WHERE privileges & %s AND isBot = 0) ORDER BY stars", (Permissions.authenticate,))
+            users = mycursor.fetchall()
+        
+        curr_rank = 0 # There is most likely a better way to do this but I don't know it yet
+        for user in users:
+            curr_rank += 1
+            self.ranks[int(user[0])] = curr_rank
+        timer.end()
+        logging.debug(f"Rank caching took {timer.ms_return()}ms")
+    
+    def get_rank(self, account_id : int) -> int:
+        """Gets a users rank if cached, else returns 0."""
+        if account_id not in self.ranks:
+            return 0
+        return self.ranks[account_id]
 
 user_helper = UserHelper() # This has to be a common class.

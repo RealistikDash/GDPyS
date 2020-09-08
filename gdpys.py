@@ -32,7 +32,7 @@ async def init(loop):
     app = web.Application(loop=loop)
     await create_connection(loop, user_config)
     await user_helper.cron_calc_ranks()
-    songs.top_artists = await songs.top_artists()
+    songs.top_artists = await songs._top_artists()
     return app
 
 if __name__ == "__main__":

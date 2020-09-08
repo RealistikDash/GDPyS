@@ -167,7 +167,7 @@ class UserHelper():
         timer = Timer()
         timer.start()
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT extID FROM users WHERE extID IN (SELECT accountID FROM accounts WHERE privileges & %s AND isBot = 0) ORDER BY stars", (Permissions.authenticate,))
+            await mycursor.execute("SELECT extID FROM users WHERE extID IN (SELECT accountID FROM accounts WHERE privileges & %s AND isBot = 0) ORDER BY stars DESC", (Permissions.authenticate,))
             users = await mycursor.fetchall()
         
         curr_rank = 0 # There is most likely a better way to do this but I don't know it yet

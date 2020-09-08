@@ -8,10 +8,6 @@ async def featured_artists_handler(request : aiohttp.web.Request):
     """Handles the featured artists page."""
     post_data = await request.post()
 
-    ## Checks yes
-    if songs.top_artists == []: # This is a solution to no async inits.
-        songs.top_artists = await songs._top_artists()
-
     offset = create_offsets_from_page(int(post_data["page"]), 20) * -1
     artists = songs.top_artists[offset:20]
     response = ""

@@ -69,7 +69,7 @@ class SongHelper():
             await self._cache_song_obj(song_id)
         return self.song_obj_cache[song_id]
     
-    async def add_from_boomlings(self, song_id : int) -> None:
+    async def add_from_boomlings(self, song_id : int) -> Song:
         """Adds a song from boomlings to database."""
         # TODO : Error handling
         boomlings_song = await self.api.get_boomlings_song(song_id)

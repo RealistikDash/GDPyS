@@ -32,10 +32,10 @@ async def init(loop):
     return app
 
 if __name__ == "__main__":
+    load_config()
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     logging.basicConfig(level = logging_level)
-    load_config()
     welcome_sequence()
     # Inits the app.
     loop = asyncio.get_event_loop()

@@ -29,3 +29,22 @@ class Level():
     user_id : int
     account_id : int
     ldm : bool
+
+@dataclass
+class SearchQuery():
+    """An object that stores all the search filter data."""
+    search_type : int
+    offset : int
+    order : str
+    gauntlet : int
+    featured : bool
+    original : bool
+    epic : bool
+    two_player : bool
+    has_stars : bool
+    no_stars : bool
+    length : str
+    song : int
+    custom_song : int
+    difficulty : str
+    search_query : str

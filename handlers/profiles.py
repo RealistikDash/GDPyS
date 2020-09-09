@@ -40,7 +40,7 @@ async def profile_handler(request : aiohttp.web.Request):
     account_id = int(post_data["accountID"])
     target_id = int(post_data["targetAccountID"])
     checking_self = account_id == target_id
-    user = await user_helper.get_object(account_id)
+    user = await user_helper.get_object(target_id)
     response = ""
     friend_state = 0
     

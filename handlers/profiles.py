@@ -34,7 +34,7 @@ async def profile_comment_handler(request : aiohttp.web.Request):
             6 : comment.comment_id,
             7 : int(comment.spam),
             9 : time_ago(comment.timestamp)
-        }) = "|"
+        }) + "|"
     response = response[:-1] + f"#{comment_count}:{offset*1}:10"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

@@ -111,8 +111,8 @@ async def user_search_handler(request : aiohttp.web.Request):
             15 : 0,
             16 : user.account_id,
             3 : user.stars,
-            4 : user.cp,
-            8 : user.demons
+            8 : user.cp,
+            4 : user.demons
         }) + "|"
 
     response = response[:-1] + f"#{users.total_results}:{offset}:10"

@@ -33,7 +33,7 @@ class UserHelper():
         acc_comments = []
 
         for comment in comments:
-            acc_comments.append(AccountComment(comment[0], decode_base64(comment[2]), comment[2], comment[3], comment[4], bool(comment[5]), comment[1], comment[6]))
+            acc_comments.append(AccountComment(comment[0], comment[2], decode_base64(comment[2]), comment[3], comment[4], bool(comment[5]), comment[1], comment[6]))
         
         return Account(
             account_data[0],

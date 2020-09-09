@@ -91,7 +91,7 @@ async def profile_handler(request : aiohttp.web.Request):
 
 async def user_search_handler(request : aiohttp.web.Request):
     """Handles user account searching."""
-    post_data = await request.form()
+    post_data = await request.post()
 
     response = ""
     offset = create_offsets_from_page(post_data.get("page", 0))

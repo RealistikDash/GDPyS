@@ -5,7 +5,7 @@ import random
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
-from handlers.profiles import profile_comment_handler, profile_handler
+from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler
 from handlers.songs import featured_artists_handler, get_songinfo_handler
 from helpers.userhelper import user_helper
 from helpers.songhelper import songs
@@ -22,6 +22,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/getGJUserInfo20.php", profile_handler)
     app.router.add_post("/database/getGJTopArtists.php", featured_artists_handler)
     app.router.add_post("/database/getGJSongInfo.php", get_songinfo_handler)
+    app.router.add_post("/database/getGJUsers20.php", user_search_handler)
 
 def welcome_sequence():
     """Startup welcome print art things."""

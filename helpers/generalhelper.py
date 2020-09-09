@@ -29,3 +29,27 @@ def pipe_string(content : dict) -> str:
     for key in dict_keys(content):
         return_str += f"{key}~|~{content[key]}~|~"
     return return_str
+
+def safe_id_list(string: str) -> str:
+    """Returns a fomrattable comma string list with input hopefull sanetised."""
+    string = string.split(",")
+    new_list = []
+    for a in string:
+        try:
+            new_list.append(int(a))
+        except ValueError:
+            pass
+    return list_comma_string(new_list)
+
+def list_comma_string(elem_list: list):
+    """Converts a Python list to a comma separated string."""
+    result = ""
+    for elem in elem_list:
+        result += f"{elem},"
+    return result[:-1]
+
+def empty(variable) -> bool:
+    """Python ver of empty php function"""
+    if variable and variable != "-" and variable != "0":
+        return False
+    return True

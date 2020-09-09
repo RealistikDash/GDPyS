@@ -1,8 +1,10 @@
 from helpers.userhelper import user_helper
 from objects.comments import AccountComment
+from objects.accounts import Account # Makes it WAY easier to work with the objects inside VSCode
 from helpers.generalhelper import create_offsets_from_page, joint_string
 from helpers.timehelper import time_ago
 from helpers.auth import auth
+from helpers.searchhelper import search_helper
 from constants import ResponseCodes
 import aiohttp
 import logging
@@ -84,5 +86,35 @@ async def profile_handler(request : aiohttp.web.Request):
             "39" : extra_acc.count_reqs,
             "40" : extra_acc.count_new_friends
         })
+    logging.debug(response)
+    return aiohttp.web.Response(text=response)
+
+async def user_search_handler(request : aiohttp.web.Request):
+    """Handles user account searching."""
+    post_data = await request.form()
+
+    response = ""
+    offset = create_offsets_from_page(post_data.get("page", 0))
+    users = await search_helper.get_users(post_data["str"], offset)
+
+    for user in users.results:
+        user: Account
+        response += joint_string({
+            1 : user.username,
+            2: user.user_id,
+            13 : user.coins,
+            17 : user.user_coins,
+            9 : user.icon,
+            10 : user.colour1,
+            11 : user.colour2,
+            14 : user.icon_type,
+            15 : 0,
+            16 : user.account_id,
+            3 : user.stars,
+            4 : user.cp,
+            8 : user.demons
+        }) + "|"
+
+    response = response[:-1] + f"#{users.total_results}:{offset}:10"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

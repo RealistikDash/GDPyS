@@ -26,15 +26,7 @@ async def profile_comment_handler(request : aiohttp.web.Request):
     response = ""
     for comment in user.acc_comments[offset:10]:
         comment : AccountComment
-        response += pipe_string({
-            2 : comment.comment_base64,
-            3 : comment.user_id,
-            4 : comment.likes,
-            5 : 0,
-            6 : comment.comment_id,
-            7 : int(comment.spam),
-            9 : time_ago(comment.timestamp)
-        }) + "|"
+        response += f"2~{comment.comment_base64}~3~{comment.user_id}~4~{comment.likes}~5~0~6~{comment.comment_id}~7~{int(comment.spam)}~9~{time_ago(comment.timestamp)}|"
     response = response[:-1] + f"#{comment_count}:{offset*1}:10"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

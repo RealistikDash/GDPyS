@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from config import user_config
 
 @dataclass
 class Level():
@@ -16,7 +17,7 @@ class Level():
     objects : int
     coins : int
     requested_stars : int
-    string : str
+    string : str = None
     info : str
     extra : str
     stars : int
@@ -29,6 +30,15 @@ class Level():
     user_id : int
     account_id : int
     ldm : bool
+
+    def load_string(self):
+        if self.string is None:
+            with open(user_config["level_path"] + str(self.ID), "r") as f:
+                try:
+                    self.string = f.readlines()[0]
+                except Exception:
+                    self.string = ""
+        return self.string
 
 @dataclass
 class SearchQuery():

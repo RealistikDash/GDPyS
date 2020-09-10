@@ -11,7 +11,9 @@ default_config = {
     "sql_user" : "root",
     "sql_db" : "realistikosu",
     "sql_password" : "",
-    "debug" : False
+    "debug" : False,
+    "level_path" : "data/levels/",
+    "save_path" : "data/saves/"
 }
 
 user_config = {}

@@ -53,3 +53,63 @@ def empty(variable) -> bool:
     if variable and variable != "-" and variable != "0":
         return False
     return True
+
+class UpdateQueryBuilder():
+    """Makes it simple to work with long update queries."""
+    def __init__(self, target_db : str):
+        """Prepares that builder and sets tthe db."""
+        self.TARGET_DB = target_db
+        self.where_conditions = []
+        self.where_params = []
+        self.set_conds = []
+        self.set_params =[]
+    
+    def set_equals(self, condition : str, equals : str, format_safe : bool = False):
+        """Adds a coundition equals."""
+        if format_safe:
+            self.set_conds.append(f"{condition} = {equals}")
+        else:
+            self.set_conds.append(f"{condition} = %s")
+            self.set_params.append(equals)
+    
+    def set_not_equals(self, condition : str, equals : str, format_safe : bool = False):
+        """Adds a coundition equals."""
+        if format_safe:
+            self.set_conds.append(f"NOT {condition} = {equals}")
+        else:
+            self.set_conds.append(f"NOT {condition} = %s")
+            self.set_params.append(equals)
+
+    def where_equals(self, condition : str, equals : str, format_safe : bool = False):
+        """Adds a where true condition."""
+        if format_safe:
+            self.where_conditions.append(f"{condition} = {equals}")
+        else:
+            self.where_conditions.append(f"{condition} = %s")
+            self.where_params.append(equals)
+    
+    def where_not_equals(self, condition : str, equals : str, format_safe : bool = False):
+        """Adds a where true condition."""
+        if format_safe:
+            self.where_conditions.append(f"NOT {condition} = {equals}")
+        else:
+            self.where_conditions.append(f"NOT {condition} = %s")
+            self.where_params.append(equals)
+    
+    def get_query(self):
+        """Returns the final query."""
+        base_query = f"UPDATE {self.TARGET_DB} SET "
+        sets = ""
+        wheres = ""
+        if len(self.where_conditions) != 0:
+            wheres = "WHERE "
+        
+        for set_ in self.set_conds:
+            sets += f"{set_},"
+        sets = sets[:-1]
+
+        for where_ in self.set_conds:
+            wheres += f"{where_},"
+        wheres = wheres[:-1]
+
+        return f"{base_query}{sets} {wheres}"

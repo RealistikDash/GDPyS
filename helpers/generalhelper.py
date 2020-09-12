@@ -113,3 +113,62 @@ class UpdateQueryBuilder():
         wheres = wheres[:-1]
 
         return f"{base_query}{sets} {wheres}"
+
+class SelectQueryBuilder():
+    """FOr helping with the building of long and/or complex select queries."""
+    def __init__(self, table : str):
+        self.table = table
+        self.selection = []
+        self.where = []
+        self.where_args = []
+    
+    def select_add(self, selection : str):
+        """Adds a select column."""
+        if type(selection) == list:
+            self.selection += selection
+        else:
+            self.selection.append(selection)
+    
+    def where_equals(self, column : str, value : str, format_safe : bool = False):
+        """Adds a where equals condition"""
+        if format_safe:
+            self.where.append(F"{column} = {value}")
+        else:
+            self.where.append(f"{column} = %s")
+            self.where_args.append(value)
+    
+    def where_not_equals(self, column : str, value : str, format_safe : bool = False):
+        """Adds a where equals condition"""
+        if format_safe:
+            self.where.append(F"NOT {column} = {value}")
+        else:
+            self.where.append(f"NOT {column} = %s")
+            self.where_args.append(value)
+    
+    def where_more_than(self, column : str, value : str, format_safe : bool = False):
+        """Adds a where equals condition"""
+        if format_safe:
+            self.where.append(F"{column} > {value}")
+        else:
+            self.where.append(f"{column} > %s")
+            self.where_args.append(value)
+
+    def where_less_than(self, column : str, value : str, format_safe : bool = False):
+        """Adds a where equals condition"""
+        if format_safe:
+            self.where.append(F"{column} < {value}")
+        else:
+            self.where.append(f"{column} < %s")
+            self.where_args.append(value)
+
+    def build(self) -> str:
+        """Builds the final query."""
+        selection_str = list_comma_string(self.selection)
+        base_query = f"SELECT {selection_str} FROM {self.table}"
+        where = ""
+        where_args = self.where_args
+
+        if len(self.where) > 0:
+            where += " WHERE " + list_comma_string(self.where)
+        
+        return f"{base_query}{where}", where_args

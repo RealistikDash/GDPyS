@@ -17,18 +17,18 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         int(post_data["type"]),
         offset,
         None, # Uncertain if order is used.
-        int(post_data["gauntlet"]),
+        int(post_data.get("gauntlet")),
         string_bool(post_data["featured"]),
         string_bool(post_data["original"]),
         string_bool(post_data["epic"]),
         string_bool(post_data["twoPlayer"]),
         string_bool(post_data["star"]),
         string_bool(post_data["noStar"]),
-        post_data["len"],
-        post_data["song"],
+        post_data.get("len", ""),
+        int(post_data.get("song", 0)),
         int(post_data.get("customSong", 0)),
-        post_data["diff"],
-        post_data["str"]
+        post_data.get("diff", ""),
+        post_data.get("str", "")
     )
     logging.debug(query)
 

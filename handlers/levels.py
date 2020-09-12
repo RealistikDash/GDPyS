@@ -80,6 +80,6 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
             }
         )
     
-    response = response[:-1] + "#" + user_str[:-1] + "#" + song_str[:-3] + f"#{levels.total_results}:{offset}:10#" + level_helper.multi_gen(lvls_list)
+    response = response[:-1] + "#" + user_str[:-1] + "#" + song_str[:-3] + f"#{levels.total_results}:{offset}:10#" + await level_helper.multi_gen(lvls_list)
     logging.debug(response)
     return aiohttp.web.Response(text=response)

@@ -7,6 +7,7 @@ from handlers.login import login_handler
 from handlers.register import register_handler
 from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler
 from handlers.songs import featured_artists_handler, get_songinfo_handler
+from handlers.levels import level_search_modular_hanlder
 from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from config import user_config, load_config
@@ -23,6 +24,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/getGJTopArtists.php", featured_artists_handler)
     app.router.add_post("/database/getGJSongInfo.php", get_songinfo_handler)
     app.router.add_post("/database/getGJUsers20.php", user_search_handler)
+    app.router.add_post("/database/getGJLevels21.php", level_search_modular_hanlder)
 
 def welcome_sequence():
     """Startup welcome print art things."""

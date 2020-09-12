@@ -32,6 +32,8 @@ class Level():
     user_id : int
     account_id : int
     ldm : bool
+    downloads : int
+    likes : int
 
     def load_string(self):
         if self.string is None:

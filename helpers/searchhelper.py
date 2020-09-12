@@ -1,7 +1,10 @@
-from objects.levels import SearchQuery
+# This will probably be rewritten either way soon
+from objects.levels import SearchQuery, Level
 from conn.mysql import myconn
-from helpers.generalhelper import safe_id_list, create_offsets_from_page
+from helpers.generalhelper import safe_id_list, create_offsets_from_page, SelectQueryBuilder
 from helpers.userhelper import user_helper
+from helpers.levelhelper import level_helper
+from helpers.timehelper import week_ago
 from dataclasses import dataclass
 
 @dataclass # I probably should put this into objects but it isnt used anywhere else so i will place it here
@@ -14,14 +17,48 @@ class BasicMysqlSearch():
     """A simple search element."""
     def __init__(self):
         """Inits the search element."""
-        # I may add caches but meh
         pass
 
     async def get_levels(self, filters : SearchQuery):
         """Searches levels and returns list of IDs."""
+        query = SelectQueryBuilder("levels")
+        query.limit = 10
+        query.offset = filters.offset
+        query.set_order("uploadDate")
+        query.select_add("levelID")
 
-        # Constructing the SQL query.
-        pass # Lol levels arent done yet lmfao
+        #I hate working with the filters... It looks ugly and this is one of the most called functions...
+        if filters.search_type == 1:
+            query.set_order("downloads")
+        elif filters.search_type == 2:
+            query.set_order("likes")
+        elif filters.search_type == 3:
+            query.where_more_than("uploadDate", week_ago(), True) #format safe since we trust it
+        elif filters.search_type == 4:
+            pass
+        elif filters.search_type == 5:
+            query.where_equals("userID", filters.search_query)
+        elif filters.search_type == 6:
+            query.where_equals("starFeatured", 1)
+        elif filters.search_type == 7:
+            query.where_equals("magic", 1)
+        elif filters.search_type == 10:
+            query.where_in_int_list("levelID", filters.search_query)
+        elif filters.search_type == 11:
+            query.where_equals("awarded", 1)
+        # TODO : 12 = followed, 13 = friends
+        elif filters.search_type == 16:
+            query.where_equals("starEpic", 1)
+        
+        # TODO: all the other mini filters, this is more of proof of concept or proof it works at all
+        async with myconn.conn.cursor() as mycursor:
+            query_exec, args = query.build()
+            await mycursor.execute(query_exec, args)
+            plays = await mycursor.fetchall()
+            count_query, count_args = query.build_count()
+            await mycursor.execute(count_query, count_args)
+            count = (await mycursor.fetchone())[0]
+        return QueryResponse(count, [i[0] for i in plays])
 
     async def get_accounts_search(self, search_query : str, page : int) -> QueryResponse:
         """Returns list of ids that match search query."""
@@ -46,5 +83,13 @@ class SearchQueryFormatter():
         """Returns list of user objects that watch search query."""
         accs = await self.search_engine.get_accounts_search(query, page)
         return QueryResponse(accs.total_results, [await user_helper.get_object(i) for i in accs.results]) # Oh i love this
+    
+    async def get_levels(self, search_filters : SearchQuery) -> QueryResponse:
+        """Returns a list of level objects."""
+        levels = await self.search_engine.get_levels(search_filters)
+        return QueryResponse(
+            levels.total_results,
+            [await level_helper.get_level_obj(i) for i in levels.results]
+        )
 
 search_helper = SearchQueryFormatter()

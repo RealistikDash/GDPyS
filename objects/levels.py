@@ -45,18 +45,18 @@ class Level():
 @dataclass
 class SearchQuery():
     """An object that stores all the search filter data."""
-    search_type : int
-    offset : int
-    order : str
-    gauntlet : int
-    featured : bool
-    original : bool
-    epic : bool
-    two_player : bool
-    has_stars : bool
-    no_stars : bool
-    length : str
-    song : int
-    custom_song : int
-    difficulty : str
-    search_query : str
+    search_type : int = 0
+    offset : int = 0
+    order : str = "uploadDate"
+    gauntlet : int = 0
+    featured : bool = False
+    original : bool = False
+    epic : bool = False
+    two_player : bool = False
+    has_stars : bool = False
+    no_stars : bool = True
+    length : str = 0
+    song : int = 0
+    custom_song : int = 0
+    difficulty : str = "-"
+    search_query : str = ""

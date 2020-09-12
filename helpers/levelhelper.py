@@ -59,3 +59,5 @@ class LevelHelper():
         if level_id not in dict_keys(self.level_cache):
             await self._cache_level_obj(level_id)
         return self.level_cache[level_id]
+
+level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

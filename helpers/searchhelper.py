@@ -28,7 +28,12 @@ class BasicMysqlSearch():
         query.select_add("levelID")
 
         #I hate working with the filters... It looks ugly and this is one of the most called functions...
-        if filters.search_type == 1:
+        if filters.search_type in (0,15):
+            if filters.search_query.isnumeric:
+                query.where_equals("levelID", filters.search_query) # level ID search
+            else:
+                query.where_like_token("levelName", filters.search_query)
+        elif filters.search_type == 1:
             query.set_order("downloads")
         elif filters.search_type == 2:
             query.set_order("likes")

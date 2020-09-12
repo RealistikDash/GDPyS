@@ -44,9 +44,9 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         level : Level
         response += gauntlet_append
         lvls_list.append(level.ID)
-        user_str += user_helper.get_user_string(level.user_id) + "|"
+        user_str += await user_helper.get_user_string(level.user_id) + "|"
         if level.song_id:
-            song_str += songs.song_string(songs.get_song_obj(level.song_id)) + "~:~"
+            song_str += songs.song_string(await songs.get_song_obj(level.song_id)) + "~:~"
         #THIS IS WHERE THE **FUN** BEGINS
         response += joint_string(
             {

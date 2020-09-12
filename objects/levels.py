@@ -4,6 +4,8 @@ from config import user_config
 @dataclass
 class Level():
     game_version : int
+    binary_version : int
+    username : str
     ID : int
     name : str
     description : str

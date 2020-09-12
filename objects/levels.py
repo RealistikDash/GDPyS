@@ -19,7 +19,7 @@ class Level():
     objects : int
     coins : int
     requested_stars : int
-    string : str = None
+    string : str
     info : str
     extra : str
     stars : int

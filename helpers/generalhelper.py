@@ -1,5 +1,6 @@
 #simple misc functions thaat aim to replace 
 import aiohttp
+import logging
 
 def dict_keys(dictioary: dict) -> tuple:
     """Returns a tuple of all the dictionary keys."""
@@ -121,6 +122,9 @@ class SelectQueryBuilder():
         self.selection = []
         self.where = []
         self.where_args = []
+        self.order = "levelID"
+        self.limit = 0
+        self.offset = 0
     
     def select_add(self, selection : str):
         """Adds a select column."""
@@ -160,6 +164,21 @@ class SelectQueryBuilder():
         else:
             self.where.append(f"{column} < %s")
             self.where_args.append(value)
+    
+    def where_like_token(self, column : str, value : str, format_safe : bool = False):
+        """Adds a where equals condition"""
+        if format_safe:
+            self.where.append(F"{column} LIKE %{value}%")
+        else:
+            self.where.append(f"{column} Like %s")
+            self.where_args.append(f"%{value}%")
+    
+    def where_in_int_list(self, column : str, int_list : list) -> None:
+        """Column in list of integers."""
+        if type(int_list) == list:
+            int_list = list_comma_string(int_list)
+        the_list = safe_id_list(int_list) # Sanetise input
+        self.where.append(f"{column} IN ({the_list})")
 
     def build(self) -> str:
         """Builds the final query."""
@@ -167,8 +186,34 @@ class SelectQueryBuilder():
         base_query = f"SELECT {selection_str} FROM {self.table}"
         where = ""
         where_args = self.where_args
+        limit = ""
 
         if len(self.where) > 0:
-            where += " WHERE " + list_comma_string(self.where)
-        
-        return f"{base_query}{where}", where_args
+            where += " WHERE "
+            for arg in self.where:
+                where += f"{arg} AND"
+            where = where[:-4]
+
+        if self.limit > 0 and self.offset > 0:
+            limit += f" LIMIT {self.limit} OFFSET {self.offset}"
+        logging.debug(f"{base_query}{where} ORDER BY {self.order}")
+        return f"{base_query}{where} ORDER BY {self.order}", where_args
+    
+    def build_count(self) -> str:
+        """BUILDS COUNT QUERy"""
+        base_query = f"SELECT COUNT(*) FROM {self.table}"
+        where = ""
+        where_args = self.where_args
+
+        if len(self.where) > 0:
+            where += " WHERE "
+            for arg in self.where:
+                where += f"{arg} AND"
+            where = where[:-4]
+        query = f"{base_query}{where}"
+        logging.debug(query)
+        return query, where_args
+
+    def set_order(self, order: str):
+        """Sets the order."""
+        self.order = order

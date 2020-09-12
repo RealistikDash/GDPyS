@@ -77,7 +77,7 @@ class LevelHelper():
             9 : 50
         }.get(star_count, 0)
     
-    def multi_gen(self, levels : list) -> str:
+    async def multi_gen(self, levels : list) -> str:
         """
         Ported from GMDPrivateServer by Cvolton
         /incl/lib/generateHash.php

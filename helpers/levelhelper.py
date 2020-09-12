@@ -12,7 +12,7 @@ class LevelHelper():
     async def _create_level_obj(self, level_id : int) -> Level:
         """Private function that creates a level object from db."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT gameVersion,binaryVersion,userName,levelID,levelName,levelDesc,levelVersion,levelLength,audioTrack,password,original,twoPlayer,songID,objects,coins,requestedStars,levelInfo,extraString,starStars,uploadDate,updateDate,starCoins,starFeatured,starEpic,starDemonDiff,userID,extID,isLDM,downloads,likes WHERE levelID = %s LIMIT 1", (level_id,))
+            await mycursor.execute("SELECT gameVersion,binaryVersion,userName,levelID,levelName,levelDesc,levelVersion,levelLength,audioTrack,password,original,twoPlayer,songID,objects,coins,requestedStars,levelInfo,extraString,starStars,uploadDate,updateDate,starCoins,starFeatured,starEpic,starDemonDiff,userID,extID,isLDM,downloads,likes FROM levels WHERE levelID = %s LIMIT 1", (level_id,))
             level = await mycursor.fetchone()
         if level is None:
             return None

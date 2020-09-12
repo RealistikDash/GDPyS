@@ -23,7 +23,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         string_bool(post_data["epic"]),
         string_bool(post_data["twoPlayer"]),
         string_bool(post_data["star"]),
-        string_bool(post_data["noStar"]),
+        string_bool(post_data.get("noStar", "0")),
         post_data.get("len", ""),
         int(post_data.get("song", 0)),
         int(post_data.get("customSong", 0)),

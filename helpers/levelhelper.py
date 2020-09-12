@@ -46,7 +46,8 @@ class LevelHelper():
             account_id=level[26],
             ldm=bool(level[27]),
             downloads=level[28],
-            likes=level[29]
+            likes=level[29],
+            string=None
         )
     
     async def _cache_level_obj(self, level_id : int) -> None:

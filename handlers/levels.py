@@ -17,7 +17,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         int(post_data["type"]),
         offset,
         None, # Uncertain if order is used.
-        int(post_data.get("gauntlet")),
+        int(post_data.get("gauntlet"), 0),
         string_bool(post_data["featured"]),
         string_bool(post_data["original"]),
         string_bool(post_data["epic"]),

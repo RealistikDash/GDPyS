@@ -1,6 +1,7 @@
 from objects.songs import Song
 from helpers.apihelper import BoomlingsAPI
 from helpers.generalhelper import dict_keys
+from helpers.generalhelper import pipe_string
 from constants import ResponseCodes
 from conn.mysql import myconn
 import logging
@@ -75,5 +76,18 @@ class SongHelper():
         boomlings_song = await self.api.get_boomlings_song(song_id)
         await self.add_song_to_db(boomlings_song)
         return boomlings_song
+    
+    def song_string(self, song : Song) -> str:
+        """Returns server response for song."""
+        return pipe_string({
+            1 : song.ID,
+            2 : song.name,
+            3 : song.author_id,
+            4 : song.author_name,
+            5 : song.file_size,
+            6 : "",
+            10 : song.url,
+            7 : ""
+        })
 
 songs = SongHelper()

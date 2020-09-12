@@ -55,6 +55,12 @@ def empty(variable) -> bool:
         return False
     return True
 
+def string_bool(str_bool : str) -> bool:
+    """Converts a string 1/0 to bool."""
+    if int(str_bool):
+        return True
+    return False
+
 class UpdateQueryBuilder():
     """Makes it simple to work with long update queries."""
     def __init__(self, target_db : str):

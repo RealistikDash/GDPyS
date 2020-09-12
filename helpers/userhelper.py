@@ -17,6 +17,7 @@ class UserHelper():
         self.accid_userid_cache = {}
         self.ranks = {}
         self.relationships = {}
+        self.user_str_cache = {}
     
     async def _create_user_object(self, account_id: int) -> Account:
         """Creates a user object."""
@@ -182,5 +183,25 @@ class UserHelper():
         if account_id not in self.ranks:
             return 0
         return self.ranks[account_id]
+
+    async def _create_user_string(self, user_id : int) -> str:
+        """Creates user sting which is used in level search."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT userName, extID FROM users WHERE userID = %s LIMIT 1", (user_id,))
+            user_data = await mycursor.fetchone()
+        if user_data is None:
+            return None
+        return f"{user_id}:{user_data[0]}:{user_data[1]}"
+    
+    async def _cache_user_string(self, user_id : int) -> None:
+        """Caches a user string."""
+        self.user_str_cache = await self._create_user_string(user_id)
+    
+    async def get_user_string(self, user_id : int) -> str:
+        """Gets a user sting which is used in level search."""
+        user_id = int(user_id)
+        if user_id not in dict_keys(self.user_str_cache):
+            await self._cache_user_string(user_id)
+        return self.user_str_cache[user_id]
 
 user_helper = UserHelper() # This has to be a common class.

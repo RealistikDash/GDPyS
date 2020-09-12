@@ -30,16 +30,7 @@ async def get_songinfo_handler(request : aiohttp.web.Request):
     if song is None:
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     
-    response = pipe_string({
-        1 : song.ID,
-        2 : song.name,
-        3 : song.author_id,
-        4 : song.author_name,
-        5 : song.file_size,
-        6 : "",
-        10 : song.url,
-        7 : ""
-    })
+    response = songs.song_string(song)
     logging.debug(response)
 
     return aiohttp.web.Response(text=response)

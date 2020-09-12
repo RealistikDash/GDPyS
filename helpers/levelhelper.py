@@ -1,4 +1,5 @@
 from helpers.generalhelper import dict_keys
+from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
 from objects.levels import Level
 
@@ -11,7 +12,7 @@ class LevelHelper():
     async def _create_level_obj(self, level_id : int) -> Level:
         """Private function that creates a level object from db."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT gameVersion,binaryVersion,userName,levelID,levelName,levelDesc,levelVersion,levelLength,audioTrack,password,original,twoPlayer,songID,objects,coins,requestedStars,levelInfo,extraString,starStars,uploadDate,updateDate,starCoins,starFeatured,starEpic,starDemonDiff,userID,extID,isLDM WHERE levelID = %s LIMIT 1", (level_id,))
+            await mycursor.execute("SELECT gameVersion,binaryVersion,userName,levelID,levelName,levelDesc,levelVersion,levelLength,audioTrack,password,original,twoPlayer,songID,objects,coins,requestedStars,levelInfo,extraString,starStars,uploadDate,updateDate,starCoins,starFeatured,starEpic,starDemonDiff,userID,extID,isLDM,downloads,likes WHERE levelID = %s LIMIT 1", (level_id,))
             level = await mycursor.fetchone()
         if level is None:
             return None
@@ -43,7 +44,9 @@ class LevelHelper():
             demon_diff=level[24],
             user_id=level[25],
             account_id=level[26],
-            ldm=bool(level[27])
+            ldm=bool(level[27]),
+            downloads=level[28],
+            likes=level[29]
         )
     
     async def _cache_level_obj(self, level_id : int) -> None:
@@ -59,5 +62,36 @@ class LevelHelper():
         if level_id not in dict_keys(self.level_cache):
             await self._cache_level_obj(level_id)
         return self.level_cache[level_id]
+    
+    def star_to_difficulty(self, star_count : int) -> int:
+        """Converts star count to in-game difficultry values."""
+        return {
+            1 : 0,
+            2 : 10,
+            3 : 20,
+            4 : 30,
+            5 : 30,
+            6 : 40,
+            7 : 40,
+            8 : 50,
+            9 : 50
+        }.get(star_count, 0)
+    
+    def multi_gen(self, levels : list) -> str:
+        """
+        Ported from GMDPrivateServer by Cvolton
+        /incl/lib/generateHash.php
+        Let me sleep
+        """
+        Hash = ""
+        for level in levels:
+            #async with myconn.conn.cursor() as mycursor:
+            #    await mycursor.execute("SELECT levelID, starStars, starCoins FROM levels WHERE levelID = %s", (level,))
+            #    data = await mycursor.fetchone()
+            level = await self.get_level_obj(level) # Use this as we are expecting them to be already cached.
+
+            Hash += f"{str(level.level_id)[0]}{(level.level_id)[len(str(level.level_id))-1]}{level.stars}{int(level.verified_coins)}"
+        
+        return hash_sha1(Hash + "xI25fpAapCQg")
 
 level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

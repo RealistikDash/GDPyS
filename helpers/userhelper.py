@@ -195,7 +195,7 @@ class UserHelper():
     
     async def _cache_user_string(self, user_id : int) -> None:
         """Caches a user string."""
-        self.user_str_cache = await self._create_user_string(user_id)
+        self.user_str_cache[user_id] = await self._create_user_string(user_id)
     
     async def get_user_string(self, user_id : int) -> str:
         """Gets a user sting which is used in level search."""

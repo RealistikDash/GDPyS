@@ -91,7 +91,7 @@ class LevelHelper():
             #    data = await mycursor.fetchone()
             level = await self.get_level_obj(level) # Use this as we are expecting them to be already cached.
 
-            Hash += f"{str(level.level_id)[0]}{(level.level_id)[len(str(level.level_id))-1]}{level.stars}{int(level.verified_coins)}"
+            Hash += f"{str(level.ID)[0]}{(level.ID)[len(str(level.ID))-1]}{level.stars}{int(level.verified_coins)}"
         
         return hash_sha1(Hash + "xI25fpAapCQg")
 

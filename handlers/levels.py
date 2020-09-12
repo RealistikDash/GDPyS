@@ -21,7 +21,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         string_bool(post_data.get("featured", "0")),
         string_bool(post_data.get("original", "0")),
         string_bool(post_data.get("epic", "0")),
-        string_bool(post_data.get("twoPlayer". "0")),
+        string_bool(post_data.get("twoPlayer", "0")),
         string_bool(post_data.get("star", "0")),
         string_bool(post_data.get("noStar", "0")),
         post_data.get("len", ""),

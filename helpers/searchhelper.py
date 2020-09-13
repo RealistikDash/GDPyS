@@ -54,6 +54,8 @@ class BasicMysqlSearch():
         # TODO : 12 = followed, 13 = friends
         elif filters.search_type == 16:
             query.where_equals("starEpic", 1)
+
+        #now we do the other sub
         
         # TODO: all the other mini filters, this is more of proof of concept or proof it works at all
         async with myconn.conn.cursor() as mycursor:

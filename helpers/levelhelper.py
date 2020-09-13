@@ -94,5 +94,23 @@ class LevelHelper():
             Hash += f"{str(level.ID)[0]}{str(level.ID)[len(str(level.ID))-1]}{level.stars}{int(level.verified_coins)}"
         
         return hash_sha1(Hash + "xI25fpAapCQg")
+    
+    
+    def solo_gen(level_str: str):
+        """Port of genSolo from Cvolton's GMDPrivateServer."""
+        return_str = ""
+        str_len = len(level_str) // 40
+        for i in range(40):
+            return_str += level_str[i * str_len]
+        return hash_sha1(return_str + "xI25fpAapCQg")
+    
+    def solo_gen2(level_string : str) -> str:
+        return hash_sha1(level_string + "xI25fpAapCQg")
+    
+    async def bump_download(self, level_id : int):
+        """Bumps a level's download count by one."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE levels SET downloads = downloads + 1 WHERE levelID = %s", (level_id,))
+            await myconn.conn.commit()
 
 level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

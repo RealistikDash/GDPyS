@@ -202,8 +202,9 @@ class SelectQueryBuilder():
 
         if self.limit > 0 and self.offset > 0:
             limit += f" LIMIT {self.limit} OFFSET {self.offset}"
-        logging.debug(f"{base_query}{where} ORDER BY {self.order}")
-        return f"{base_query}{where} ORDER BY {self.order}", where_args
+        query = f"{base_query}{where} ORDER BY {self.order}{limit}"
+        logging.debug(query)
+        return query, where_args
     
     def build_count(self) -> str:
         """BUILDS COUNT QUERy"""

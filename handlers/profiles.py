@@ -120,3 +120,14 @@ async def user_search_handler(request : aiohttp.web.Request):
     response = response[:-1] + f"#{users.total_results}:{offset}:10"
     logging.debug(response)
     return aiohttp.web.Response(text=response)
+
+async def post_account_comment_handler(request : aiohttp.web.Request):
+    """Handles account comment posting."""
+    post_data = await request.post()
+
+    if not await auth.check_gjp(post_data["accountID"], post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    response = await user_helper.post_account_comment(int(post_data["accountID"]), post_data["comment"])
+    logging.debug(response)
+    return aiohttp.web.Response(text=ResponseCodes.generic_success if response else ResponseCodes.generic_fail)

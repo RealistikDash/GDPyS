@@ -96,7 +96,7 @@ class LevelHelper():
         return hash_sha1(Hash + "xI25fpAapCQg")
     
     
-    def solo_gen(level_str: str):
+    def solo_gen(self, level_str: str):
         """Port of genSolo from Cvolton's GMDPrivateServer."""
         return_str = ""
         str_len = len(level_str) // 40
@@ -104,7 +104,7 @@ class LevelHelper():
             return_str += level_str[i * str_len]
         return hash_sha1(return_str + "xI25fpAapCQg")
     
-    def solo_gen2(level_string : str) -> str:
+    def solo_gen2(self, level_string : str) -> str:
         return hash_sha1(level_string + "xI25fpAapCQg")
     
     async def bump_download(self, level_id : int):

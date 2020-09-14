@@ -1,7 +1,7 @@
 from helpers.auth import auth
 from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp, Timer
-from helpers.crypthelper import decode_base64, hash_bcrypt
+from helpers.crypthelper import decode_base64, hash_bcrypt, encode_base64
 from objects.accounts import Account, AccountExtras
 from objects.comments import AccountComment
 from conn.mysql import myconn
@@ -28,9 +28,8 @@ class UserHelper():
             account_data = await mycursor.fetchone()
             await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
             user_data = await mycursor.fetchone()
-            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam, commentID FROM acccomments WHERE userID = %s LIMIT 1", (user_id,))
+            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam, commentID FROM acccomments WHERE userID = %s ORDER BY timestamp DESC", (user_id,))
             comments = await mycursor.fetchall()
-        
         acc_comments = []
 
         for comment in comments:
@@ -122,11 +121,6 @@ class UserHelper():
             await mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, username, ip))
             await myconn.conn.commit()
     
-    async def upload_account_comment(self, comment : AccountComment) -> None:
-        """Uploads an account comment."""
-        async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("")
-    
     async def _create_account_extra(self, account_id: int) -> AccountExtras:
         """Creates an account extra object for user."""
         async with myconn.conn.cursor() as mycursor:
@@ -203,5 +197,26 @@ class UserHelper():
         if user_id not in dict_keys(self.user_str_cache):
             await self._cache_user_string(user_id)
         return self.user_str_cache[user_id]
+    
+    async def post_account_comment(self, account_id : int, comment: str, is_base64 : bool = True, run_privilege_check : bool = True) -> bool:
+        """Posts a comment to one's account."""
+        if not is_base64:
+            comment = encode_base64(comment)
+        user = await self.get_object(int(account_id))
+        timestamp = get_timestamp()
+
+        if not self.has_privilege(user, Permissions.post_acc_comment) and run_privilege_check:
+            return False
+        if user is None:
+            return False
+        
+        # Inserting it into db
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("INSERT INTO acccomments (userID,userName,comment,timestamp) VALUES (%s,%s,%s,%s)",
+            (user.user_id, user.username, comment, timestamp))
+            await myconn.conn.commit()
+        # We need to re-cache the user object due to how the current system works. (Someone please remind me to change this as yes.)
+        await self.recache_object(account_id)
+        return True
 
 user_helper = UserHelper() # This has to be a common class.

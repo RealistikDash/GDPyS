@@ -218,5 +218,8 @@ class UserHelper():
         # We need to re-cache the user object due to how the current system works. (Someone please remind me to change this as yes.)
         await self.recache_object(account_id)
         return True
+    
+    async def update_user_stats(self, new_obj : Account) -> None:
+        """Sets user's new statistics to db (such as star count)."""
 
 user_helper = UserHelper() # This has to be a common class.

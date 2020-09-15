@@ -5,7 +5,7 @@ import random
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
-from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler, post_account_comment_handler
+from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler, post_account_comment_handler, update_profile_stats
 from handlers.songs import featured_artists_handler, get_songinfo_handler
 from handlers.levels import level_search_modular_hanlder, download_level
 from helpers.userhelper import user_helper
@@ -28,6 +28,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/getGJLevels21.php", level_search_modular_hanlder)
     app.router.add_post("/database/downloadGJLevel22.php", download_level)
     app.router.add_post("/database/uploadGJAccComment20.php", post_account_comment_handler)
+    app.router.add_post("/database/updateGJUserScore22.php", update_profile_stats)
 
 def welcome_sequence(no_ascii : bool = False):
     """Startup welcome print art things."""

@@ -221,5 +221,54 @@ class UserHelper():
     
     async def update_user_stats(self, new_obj : Account) -> None:
         """Sets user's new statistics to db (such as star count)."""
+        async with myconn.conn.cursor() as mycursor:
+            #TODO : Maybe some anticheat?
+            await mycursor.execute("""UPDATE users SET
+                                        stars = %s,
+                                        demons = %s,
+                                        icon = %s,
+                                        color1 = %s,
+                                        color2 = %s, #smh not colour
+                                        iconType = %s,
+                                        coins = %s,
+                                        userCoins = %s,
+                                        accShip = %s,
+                                        accBall = %s,
+                                        accBird = %s,
+                                        accDart = %s,
+                                        accRobot = %s,
+                                        accGlow = %s,
+                                        creatorPoints = %s,
+                                        diamonds = %s,
+                                        orbs = %s,
+                                        accSpider = %s,
+                                        accExplosion = %s
+                                    WHERE
+                                        extID = %s
+                                        LIMIT 1""",
+                                        (
+                                            new_obj.stars,
+                                            new_obj.demons,
+                                            new_obj.icon,
+                                            new_obj.colour1,
+                                            new_obj.colour2,
+                                            new_obj.icon_type,
+                                            new_obj.coins,
+                                            new_obj.user_coins,
+                                            new_obj.ship,
+                                            new_obj.ball,
+                                            new_obj.ufo,
+                                            new_obj.wave,
+                                            new_obj.robot,
+                                            int(new_obj.glow),
+                                            new_obj.cp,
+                                            new_obj.diamonds,
+                                            new_obj.orbs,
+                                            new_obj.spider,
+                                            new_obj.explosion,
+                                            new_obj.account_id
+                                        ))
+            await myconn.conn.commit()
+        await self.recache_object(new_obj.account_id)
 
 user_helper = UserHelper() # This has to be a common class.

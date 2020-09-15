@@ -131,3 +131,39 @@ async def post_account_comment_handler(request : aiohttp.web.Request):
     response = await user_helper.post_account_comment(int(post_data["accountID"]), post_data["comment"])
     logging.debug(response)
     return aiohttp.web.Response(text=ResponseCodes.generic_success if response else ResponseCodes.generic_fail)
+
+async def update_profile_stats(request : aiohttp.web.Request):
+    """Updates stored statistics regarding the player and responds with appropeate response."""
+    post_data = await request.post()
+    account_id = int(post_data["accountID"])
+
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+
+    user = await user_helper.get_object(account_id)
+
+    # Updating stats based on data sent by game. TODO: Some form of anticheat
+
+    logging.debug(post_data)
+    user.stars = int(post_data.get("stars", 0))
+    user.demons = int(post_data.get("demons", 0))
+    user.icon = int(post_data.get("icon", 0))
+    user.diamonds = int(post_data.get("diamonds", 0))
+    user.colour1 = int(post_data.get("color1", 0))
+    user.colour2 = int(post_data.get("colour2", 0))
+    user.ship = int(post_data.get("accShip", 0))
+    user.ball = int(post_data.get("accBall", 0))
+    user.ufo = int(post_data.get("accBird", 0))
+    user.wave = int(post_data.get("accDart", 0))
+    user.robot = int(post_data.get("accRobot", 0))
+    user.glow = int(post_data.get("accGlow", 0))
+    user.spider = int(post_data.get("accSpider", 0))
+    user.explosion = int(post_data.get("accExplosion", 0))
+    user.coins = int(post_data.get("coins", 0))
+    user.user_coins = int(post_data.get("userCoints", 0))
+
+    # Set new user obj to db.
+    await user_helper.update_user_stats(user)
+
+    # For some reason we need to return userid
+    return aiohttp.web.Response(text=str(user.user_id))

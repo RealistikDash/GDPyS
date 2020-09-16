@@ -43,6 +43,7 @@ class BasicMysqlSearch():
             pass
         elif filters.search_type == 5:
             query.where_equals("userID", filters.search_query)
+            query.set_order("uploadDate DESC")
         elif filters.search_type == 6:
             query.where_equals("starFeatured", 1)
         elif filters.search_type == 7:

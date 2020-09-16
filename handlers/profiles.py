@@ -132,7 +132,7 @@ async def post_account_comment_handler(request : aiohttp.web.Request):
     logging.debug(response)
     return aiohttp.web.Response(text=ResponseCodes.generic_success if response else ResponseCodes.generic_fail)
 
-async def update_profile_stats(request : aiohttp.web.Request):
+async def update_profile_stats_handler(request : aiohttp.web.Request):
     """Updates stored statistics regarding the player and responds with appropeate response."""
     post_data = await request.post()
     account_id = int(post_data["accountID"])
@@ -167,3 +167,18 @@ async def update_profile_stats(request : aiohttp.web.Request):
 
     # For some reason we need to return userid
     return aiohttp.web.Response(text=str(user.user_id))
+
+async def save_user_data_handler(request : aiohttp.web.Request):
+    """Handles saving user data."""
+    post_data = await request.post()
+
+    if not await auth.check_password(post_data["userName"], post_data["password"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    return user_helper.load_user_data(await user_helper.get_accountid_from_username(post_data["userName"]))
+
+async def get_account_url_handler(request : aiohttp.web.Request):
+    """Returns URL to database folder."""
+    url = str(request.url)[:-27] # Weird but it works so can't complain. -18
+    logging.debug(url)
+    return aiohttp.web.Response(text=url)

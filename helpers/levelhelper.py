@@ -1,7 +1,9 @@
 from helpers.generalhelper import dict_keys
+from helpers.timehelper import get_timestamp
 from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
 from objects.levels import Level
+from config import user_config
 
 class LevelHelper():
     """Helps with anything regarding levels. This includes level object creation and caching, comments etc."""
@@ -112,5 +114,120 @@ class LevelHelper():
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("UPDATE levels SET downloads = downloads + 1 WHERE levelID = %s", (level_id,))
             await myconn.conn.commit()
+    
+    async def upload_level(self, level : Level) -> int:
+        """Uploads a level from level object, returns levelID."""
+        # First we check if a level like this already exists from the same user
+        # I want to think of a better way to use cursors etc
+        level_id = 0
+        timestamp = get_timestamp()
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT levelID FROM levels WHERE extID = %s AND levelName = %s", (level.account_id, level.name))
+            level_count = await mycursor.fetchone()
+            if level_count is not None:
+                # We are currently updating an existing level.
+                await mycursor.execute("""UPDATE levels SET
+                                gameVersion = %s,
+                                binaryVersion = %s,
+                                levelDesc = %s,
+                                levelVersion = %s,
+                                levelLength = %s,
+                                audioTrack = %s,
+                                password = %s,
+                                original = %s,
+                                twoPlayer = %s,
+                                objects = %s,
+                                coins = %s,
+                                requestedStars = %s,
+                                extraString = %s,
+                                levelInfo = %s,
+                                songID = %s,
+                                updateDate = %s
+                            WHERE
+                                levelID = %s""",(
+                                    level.game_version,
+                                    level.binary_version,
+                                    level.description,
+                                    level.version,
+                                    level.length,
+                                    level.track,
+                                    level.password,
+                                    level.original,
+                                    level.two_player,
+                                    level.objects,
+                                    level.coins,
+                                    level.requested_stars,
+                                    level.extra,
+                                    level.info,
+                                    level.song_id,
+                                    timestamp,
+                                    level_count[0]
+                                ))
+                await myconn.conn.commit()
+                level_id = mycursor.lastrowid
+            
+            else:
+                # It is a new level, insert it instead.
+                await mycursor.execute("""INSERT INTO levels 
+                                            (
+                                                levelName, 
+                                                gameVersion, 
+                                                binaryVersion, 
+                                                userName, 
+                                                levelDesc, 
+                                                levelVersion, 
+                                                levelLength, 
+                                                audioTrack, 
+                                                password, 
+                                                original, 
+                                                twoPlayer, 
+                                                songID, 
+                                                objects, 
+                                                coins, 
+                                                requestedStars, 
+                                                extraString, 
+                                                levelInfo,  
+                                                uploadDate, 
+                                                userID, 
+                                                extID, 
+                                                updateDate, 
+                                                unlisted, 
+                                                isLDM
+                                            )
+                                        VALUES 
+                                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", (
+                                                level.name,
+                                                level.game_version,
+                                                level.binary_version,
+                                                level.username,
+                                                level.description,
+                                                level.version,
+                                                level.length,
+                                                level.track,
+                                                level.password,
+                                                level.original,
+                                                level.two_player,
+                                                level.song_id,
+                                                level.objects,
+                                                level.coins,
+                                                level.requested_stars,
+                                                level.extra,
+                                                level.info,
+                                                timestamp,
+                                                level.user_id,
+                                                level.account_id,
+                                                timestamp,
+                                                0, # TODO: unlisted
+                                                level.ldm
+                                            ))
+                await myconn.conn.commit()
+                level_id = mycursor.lastrowid
+            
+            #After all the database work, we finally save the level to files.
+            with open(user_config["level_path"] + str(level_id), "w+") as file: #tbh this should be a function
+                file.write(level.string)
+                file.close()
+        
+        return level_id
 
 level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

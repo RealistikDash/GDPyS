@@ -6,6 +6,7 @@ from helpers.generalhelper import create_offsets_from_page, string_bool, joint_s
 from helpers.songhelper import songs
 from helpers.userhelper import user_helper
 from helpers.crypthelper import cipher_xor
+from helpers.auth import auth
 from objects.levels import SearchQuery, Level
 from constants import XorKeys, ResponseCodes
 
@@ -141,3 +142,52 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
 
     logging.debug(response)
     return aiohttp.web.Response(text=response)
+
+async def upload_level_handler(request : aiohttp.web.Request):
+    """Level upload handler."""
+    post_data = await request.post()
+
+    account_id = int(post_data["accountID"])
+
+    if not auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    user_obj = await user_helper.get_object(account_id)
+
+    new_level = Level(
+        game_version=int(post_data.get("gameVersion", 0)),
+        binary_version=int(post_data.get("binaryVersion", 0)),
+        username=user_obj.username,
+        ID = None,
+        name=post_data.get("levelName", "Unnamed"),
+        description=post_data.get("levelDesc", ""),
+        version=int(post_data.get("levelVersion", 0)),
+        length=int(post_data.get("levelLength", 0)),
+        track=int(post_data.get("audioTrack", 0)),
+        password=(post_data.get("password", 0)),
+        original=int(post_data.get("original", 0)),
+        two_player=int(post_data.get("twoPlayer", 0)),
+        song_id=int(post_data.get("songID", 0)),
+        objects=int(post_data.get("objects", 0)),
+        coins=int(post_data.get("coins", 0)),
+        requested_stars=int(post_data.get("requestedStars", 0)),
+        string=post_data.get("levelString"),
+        info=post_data.get("levelInfo"),
+        extra=post_data.get("extraString"),
+        stars=0,
+        upload_timestamp=None,
+        update_timestamp=None,
+        verified_coins=0,
+        featured=0,
+        epic=0,
+        demon_diff=0,
+        user_id=user_obj.user_id,
+        account_id=user_obj.account_id,
+        ldm=int(post_data.get("ldm", 0)),
+        downloads=0,
+        likes=0
+    )
+    logging.debug(new_level)
+    level_id = await level_helper.upload_level(new_level)
+
+    return aiohttp.web.Response(text=str(level_id))

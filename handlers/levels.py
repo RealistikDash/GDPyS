@@ -149,7 +149,7 @@ async def upload_level_handler(request : aiohttp.web.Request):
 
     account_id = int(post_data["accountID"])
 
-    if not auth.check_gjp(account_id, post_data["gjp"]):
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     
     user_obj = await user_helper.get_object(account_id)

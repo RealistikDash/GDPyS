@@ -4,6 +4,7 @@ from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
 from objects.levels import Level
 from config import user_config
+import logging
 
 class LevelHelper():
     """Helps with anything regarding levels. This includes level object creation and caching, comments etc."""
@@ -124,7 +125,7 @@ class LevelHelper():
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("SELECT levelID FROM levels WHERE extID = %s AND levelName = %s", (level.account_id, level.name))
             level_count = await mycursor.fetchone()
-            if level_count is not None:
+            if level_count is None:
                 # We are currently updating an existing level.
                 await mycursor.execute("""UPDATE levels SET
                                 gameVersion = %s,
@@ -163,8 +164,8 @@ class LevelHelper():
                                     timestamp,
                                     level_count[0]
                                 ))
-                await myconn.conn.commit()
                 level_id = mycursor.lastrowid
+                await myconn.conn.commit()
             
             else:
                 # It is a new level, insert it instead.
@@ -192,10 +193,11 @@ class LevelHelper():
                                                 extID, 
                                                 updateDate, 
                                                 unlisted, 
-                                                isLDM
+                                                isLDM,
+                                                secret
                                             )
                                         VALUES 
-                                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", (
+                                            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '')""", (
                                                 level.name,
                                                 level.game_version,
                                                 level.binary_version,
@@ -220,9 +222,9 @@ class LevelHelper():
                                                 0, # TODO: unlisted
                                                 level.ldm
                                             ))
-                await myconn.conn.commit()
                 level_id = mycursor.lastrowid
-            
+                await myconn.conn.commit()
+            logging.debug(level_id)
             #After all the database work, we finally save the level to files.
             with open(user_config["level_path"] + str(level_id), "w+") as file: #tbh this should be a function
                 file.write(level.string)

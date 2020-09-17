@@ -100,11 +100,15 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
     await level_helper.bump_download(level_id)
 
     # Creating variables to be used.
-    password_xor = cipher_xor(level.password, XorKeys.level_password)
+    yo_idk = list_comma_string([
+        level.user_id, level.stars, 1 if level.stars == 10 else 0, level.ID, int(level.verified_coins), int(level.featured), level.password, 0 # Featured ID
+    ])
+    password_xor = cipher_xor(level.password, XorKeys.level_password) if level.password != 0 else level.password
+    logging.debug(password_xor)
     response = joint_string({
         1 : level.ID,
         2 : level.name,
-        3 : level.description,
+        3 : level.description if level.description else "0",
         4 : level.load_string(),
         5 : level.version,
         8 : 10,
@@ -136,9 +140,7 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
         48 : 1,
         40 : int(level.ldm),
         27 : password_xor
-    }) + f"#{level_helper.solo_gen(level.load_string())}#" + level_helper.solo_gen2(list_comma_string([
-        level.user_id, level.stars, 1 if level.stars == 10 else 0, level.ID, int(level.verified_coins), int(level.featured), level.password, 0 # Featured ID
-    ]))
+    }) + f"#{level_helper.solo_gen(level.load_string())}#" + level_helper.solo_gen2(yo_idk) + f"#{yo_idk}"
 
     logging.debug(response)
     return aiohttp.web.Response(text=response)

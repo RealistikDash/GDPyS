@@ -6,3 +6,4 @@ class Quest():
     sort : int # I wanted to call it type but thats a python reserver thing
     text : str
     amount : int
+    reward : int

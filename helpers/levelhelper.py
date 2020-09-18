@@ -115,6 +115,10 @@ class LevelHelper():
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("UPDATE levels SET downloads = downloads + 1 WHERE levelID = %s", (level_id,))
             await myconn.conn.commit()
+        
+        # Bump cached downloads if exists
+        if level_id in dict_keys(self.level_cache):
+            self.level_cache[level_id].downloads += 1
     
     async def upload_level(self, level : Level) -> int:
         """Uploads a level from level object, returns levelID."""

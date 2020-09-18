@@ -27,10 +27,12 @@ class RewardsHelper():
                 quest[2]
             ))
         
-        self.cache_quests = quest
+        self.cached_quests = quest
     
     async def get_quests(self):
         """Returns a list of quests (and ensures they are cached)."""
         if len(self.cached_quests) == 0:
             await self.cache_quests()
         return self.cached_quests
+
+rewards_helper = RewardsHelper() # We share this class.

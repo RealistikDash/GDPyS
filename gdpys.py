@@ -10,6 +10,7 @@ from handlers.songs import featured_artists_handler, get_songinfo_handler
 from handlers.levels import level_search_modular_hanlder, download_level, upload_level_handler
 from helpers.userhelper import user_helper
 from helpers.songhelper import songs
+from helpers.ratelimit import rate_limiter
 from config import user_config, load_config
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
@@ -51,6 +52,10 @@ async def init(loop):
     await create_connection(loop, user_config)
     await user_helper.cron_calc_ranks()
     songs.top_artists = await songs._top_artists()
+
+    # Setting up rate limiter
+    rate_limiter.add_to_struct("register", limit=2) # One IP may only register twice a day.
+    rate_limiter.add_to_struct("login", limit=10) # One IP may only try to login ten times a day.
     return app
 
 if __name__ == "__main__":

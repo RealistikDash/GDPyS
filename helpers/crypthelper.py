@@ -51,3 +51,7 @@ def decode_gjp(text: str) -> str:
 def encode_chk(text: str) -> str:
     """Encodes a Geometry Dash chunk."""
     return cipher_xor(encode_base64(text[5:]), XorKeys.chk)
+
+def decode_chk(text : str) -> str:
+    """Decodes a GD chunk."""
+    return cipher_xor(decode_base64(text[5:]), XorKeys.chk)

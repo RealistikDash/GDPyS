@@ -8,7 +8,9 @@ def dict_keys(dictioary: dict) -> tuple:
 
 def get_ip(request : aiohttp.web.Request) -> str:
     """Gets IP address from request."""
-    if request.headers.get("x-forwarded-for"):
+    if request.headers.get("X-Real-IP"): # I do this with nginx
+        return request.headers.get("X-Real-IP")
+    elif request.headers.get("x-forwarded-for"):
         return request.headers.get("x-forwarded-for")
     return request.remote
 

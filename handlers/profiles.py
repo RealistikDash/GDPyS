@@ -175,7 +175,7 @@ async def save_user_data_handler(request : aiohttp.web.Request):
     if not await auth.check_password(post_data["userName"], post_data["password"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     
-    return user_helper.load_user_data(await user_helper.get_accountid_from_username(post_data["userName"]))
+    return await user_helper.load_user_data(await user_helper.get_accountid_from_username(post_data["userName"]))
 
 async def get_account_url_handler(request : aiohttp.web.Request):
     """Returns URL to database folder."""

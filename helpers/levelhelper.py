@@ -4,6 +4,7 @@ from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
 from objects.levels import Level
 from config import user_config
+from aiofile import AIOFile
 import logging
 
 class LevelHelper():
@@ -230,9 +231,9 @@ class LevelHelper():
                 await myconn.conn.commit()
             logging.debug(level_id)
             #After all the database work, we finally save the level to files.
-            with open(user_config["level_path"] + str(level_id), "w+") as file: #tbh this should be a function
-                file.write(level.string)
-                file.close()
+            async with AIOFile(user_config["level_path"] + str(level_id), "w+") as file: #tbh this should be a function
+                await file.write(level.string)
+                await file.fsync()
         
         return level_id
 

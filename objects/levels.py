@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from config import user_config
+from aiofile import AIOFile
+import logging
 
 @dataclass
 class Level():
@@ -35,13 +37,14 @@ class Level():
     downloads : int
     likes : int
 
-    def load_string(self):
+    async def load_string(self):
         if self.string is None:
-            with open(user_config["level_path"] + str(self.ID), "r") as f:
+            async with AIOFile(user_config["level_path"] + str(self.ID), "r") as f:
                 try:
-                    self.string = f.readlines()[0]
+                    self.string = await f.read()
                 except Exception:
                     self.string = ""
+        logging.debug(self.string)
         return self.string
 
 @dataclass

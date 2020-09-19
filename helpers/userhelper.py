@@ -7,6 +7,7 @@ from objects.comments import AccountComment
 from conn.mysql import myconn
 from constants import Permissions
 from config import user_config
+from aiofile import AIOFile
 import logging
 import os
 
@@ -273,20 +274,19 @@ class UserHelper():
             await myconn.conn.commit()
         await self.recache_object(new_obj.account_id)
     
-    def save_user_data(self, account_id : int, save_data : str) -> None:
+    async def save_user_data(self, account_id : int, save_data : str) -> None:
         """Saves/overwrites user's data."""
         # TODO : Password removal.
-        with open(user_config["save_path"] + str(account_id)) as file:
-            file.write(save_data)
-            file.close()
+        async with AIOFile(user_config["save_path"] + str(account_id)) as file:
+            await file.write(save_data)
+            await file.fsync()
     
-    def load_user_data(self, account_id: int) -> str:
+    async def load_user_data(self, account_id: int) -> str:
         """Returns save data for user."""
         save_data = ""
         if os.path.exists(user_config["save_path"] + str(account_id)):
-            file = open(user_config["save_path"] + str(account_id), "r")
-            save_data = file.read()
-            file.close()
+            async with AIOFile(user_config["save_path"] + str(account_id), "r") as file:
+                save_data = file.read()
         return save_data
 
 user_helper = UserHelper() # This has to be a common class.

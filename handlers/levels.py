@@ -109,7 +109,7 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
         1 : level.ID,
         2 : level.name,
         3 : level.description if level.description else "0",
-        4 : level.load_string(),
+        4 : await level.load_string(),
         5 : level.version,
         8 : 10,
         9 : level_helper.star_to_difficulty(level.stars),
@@ -140,7 +140,7 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
         48 : 1,
         40 : int(level.ldm),
         27 : password_xor
-    }) + f"#{level_helper.solo_gen(level.load_string())}#" + level_helper.solo_gen2(yo_idk) + f"#{yo_idk}"
+    }) + f"#{level_helper.solo_gen(await level.load_string())}#" + level_helper.solo_gen2(yo_idk) + f"#{yo_idk}"
 
     logging.debug(response)
     return aiohttp.web.Response(text=response)

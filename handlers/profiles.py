@@ -174,11 +174,22 @@ async def save_user_data_handler(request : aiohttp.web.Request):
 
     if not await auth.check_password(post_data["userName"], post_data["password"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    
-    return await user_helper.load_user_data(await user_helper.get_accountid_from_username(post_data["userName"]))
+    await user_helper.save_user_data(await user_helper.get_accountid_from_username(post_data["userName"]), post_data["saveData"])
+    return aiohttp.web.Response(text=ResponseCodes.generic_success)
 
 async def get_account_url_handler(request : aiohttp.web.Request):
     """Returns URL to database folder."""
     url = str(request.url)[:-27] # Weird but it works so can't complain. -18
     logging.debug(url)
     return aiohttp.web.Response(text=url)
+
+async def load_save_data_handler(request : aiohttp.web.Response):
+    """Handles loading save data."""
+    post_data = await request.post()
+
+    if not await auth.check_password(post_data["userName"], post_data["password"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    save_data = (await user_helper.load_user_data(await user_helper.get_accountid_from_username(post_data["userName"]))) + ";21;30;a;a"
+    logging.debug(save_data)
+    return aiohttp.web.Response(text=save_data)

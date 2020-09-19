@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from config import user_config
 from aiofile import AIOFile
-import logging
 
 @dataclass
 class Level():
@@ -44,7 +43,6 @@ class Level():
                     self.string = await f.read()
                 except Exception:
                     self.string = ""
-        logging.debug(self.string)
         return self.string
 
 @dataclass

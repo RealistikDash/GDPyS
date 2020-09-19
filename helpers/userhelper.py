@@ -277,7 +277,7 @@ class UserHelper():
     async def save_user_data(self, account_id : int, save_data : str) -> None:
         """Saves/overwrites user's data."""
         # TODO : Password removal.
-        async with AIOFile(user_config["save_path"] + str(account_id)) as file:
+        async with AIOFile(user_config["save_path"] + str(account_id), "w+") as file:
             await file.write(save_data)
             await file.fsync()
     
@@ -286,7 +286,7 @@ class UserHelper():
         save_data = ""
         if os.path.exists(user_config["save_path"] + str(account_id)):
             async with AIOFile(user_config["save_path"] + str(account_id), "r") as file:
-                save_data = file.read()
+                save_data = await file.read()
         return save_data
 
 user_helper = UserHelper() # This has to be a common class.

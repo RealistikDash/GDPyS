@@ -55,3 +55,7 @@ def encode_chk(text: str) -> str:
 def decode_chk(text : str) -> str:
     """Decodes a GD chunk."""
     return cipher_xor(decode_base64(text[5:]), XorKeys.chk)
+
+def solo_gen3(string: str):
+    """Port of genSolo3 from Cvolton's GMDPrivateServer."""
+    return hash_sha1(string + "oC36fpYaPtdg")

@@ -38,3 +38,7 @@ def time_ago(timestamp : int) -> str:
 def week_ago() -> int:
     """Returns timestamp exactly week ago."""
     return get_timestamp() - 604800
+
+def tomorrow() -> int:
+    """Returns the timestamp of midnight tomorrow."""
+    return (((get_timestamp()//86400)*86400)+86400) # SMARTEST PROGRAMMER THAT HAS EVER LIVED

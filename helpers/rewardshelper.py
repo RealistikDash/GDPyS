@@ -22,12 +22,12 @@ class RewardsHelper():
         for quest in db_quests:
             quests.append(Quest(
                 quest[0],
-                quest[4],
+                quest[3],
                 quest[1],
                 quest[2]
             ))
         
-        self.cached_quests = quest
+        self.cached_quests = quests
     
     async def get_quests(self):
         """Returns a list of quests (and ensures they are cached)."""

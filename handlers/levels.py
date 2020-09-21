@@ -111,6 +111,7 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
         3 : level.description if level.description else "0",
         4 : await level.load_string(),
         5 : level.version,
+        6 : level.user_id,
         8 : 10,
         9 : level_helper.star_to_difficulty(level.stars),
         10 : level.downloads,

@@ -121,6 +121,15 @@ class LevelHelper():
         if level_id in dict_keys(self.level_cache):
             self.level_cache[level_id].downloads += 1
     
+    async def bump_likes(self, level_id : int):
+        """Bumps a level's like count by one."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE levels SET likes = likes + 1 WHERE levelID = %s", (level_id,))
+            await myconn.conn.commit()
+        
+        if level_id in dict_keys(self.level_cache):
+            self.level_cache[level_id].likes += 1
+    
     async def upload_level(self, level : Level) -> int:
         """Uploads a level from level object, returns levelID."""
         # First we check if a level like this already exists from the same user

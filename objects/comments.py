@@ -5,11 +5,14 @@ class Comment():
     """The comment structure."""
     user_id : int
     level_id : int
+    comment_base64 : str
+    comment : str
     timestamp : int
     likes : int
     percent : int
     spam : bool
     username : str
+    comment_id : int
 
 @dataclass
 class AccountComment():

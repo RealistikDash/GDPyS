@@ -9,6 +9,7 @@ from handlers.profiles import profile_comment_handler, profile_handler, user_sea
 from handlers.songs import featured_artists_handler, get_songinfo_handler
 from handlers.levels import level_search_modular_hanlder, download_level, upload_level_handler
 from handlers.rewards import quests_handler
+from handlers.levelextras import level_comments_handler
 from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
@@ -36,6 +37,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/uploadGJLevel21.php", upload_level_handler)
     app.router.add_post("/database/accounts/syncGJAccountNew.php", load_save_data_handler)
     app.router.add_post("/database/getGJChallenges.php", quests_handler)
+    app.router.add_post("/database/getGJComments21.php", level_comments_handler)
 
 def welcome_sequence(no_ascii : bool = False):
     """Startup welcome print art things."""

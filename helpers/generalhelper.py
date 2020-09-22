@@ -18,7 +18,7 @@ def create_offsets_from_page(page: int, amount_per_page : int = 10) -> int:
     """Calculates the offset of mysql query."""
     return int(page) * int(amount_per_page)
 
-def joint_string(content: dict):
+def joint_string(content: dict) -> str:
     """Builds a joint string out of a dict."""
     return_str = ""
     #iterating through dict
@@ -32,6 +32,13 @@ def pipe_string(content : dict) -> str:
     for key in dict_keys(content):
         return_str += f"{key}~|~{content[key]}~|~"
     return return_str
+
+def wave_string(content : dict) -> str:
+    """Builds a wavy string used in gd responses."""
+    return_str = ""
+    for key in dict_keys(content):
+        return_str += f"{key}~{content[key]}~"
+    return return_str[:-1]
 
 def safe_id_list(string: str) -> str:
     """Returns a fomrattable comma string list with input hopefull sanetised."""

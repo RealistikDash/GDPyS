@@ -1,7 +1,1 @@
-
-def command(func):
-    
-    def decorator():
-        pass
-    
-    return decorator
+# alright relesto, work your magic

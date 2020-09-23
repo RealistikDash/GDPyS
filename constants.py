@@ -12,6 +12,7 @@ class Permissions():
     post_acc_comment = 2<<3
     mod_regular = 2<<6
     mod_elder = 2<<7
+    mod_rate = 2<<8
 
 class Secrets():
     """All the GeometryDash secret values"""

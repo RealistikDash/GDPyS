@@ -9,6 +9,7 @@ from helpers.crypthelper import cipher_xor
 from helpers.auth import auth
 from objects.levels import SearchQuery, Level
 from constants import XorKeys, ResponseCodes
+from config import user_config
 
 async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp.web.Response:
     """Handles the get levels endpoint."""
@@ -105,11 +106,16 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
     ])
     password_xor = cipher_xor(level.password, XorKeys.level_password) if level.password != 0 else level.password
     logging.debug(password_xor)
+    try:
+        level_str = await level.load_string()
+    except FileNotFoundError:
+        logging.error(f"Could not find file data for level {level.ID} at " + user_config["level_path"] + str(level.ID))
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     response = joint_string({
         1 : level.ID,
         2 : level.name,
         3 : level.description if level.description else "0",
-        4 : await level.load_string(),
+        4 : level_str,
         5 : level.version,
         6 : level.user_id,
         8 : 10,

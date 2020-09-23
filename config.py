@@ -13,7 +13,8 @@ default_config = {
     "sql_password" : "",
     "debug" : False,
     "level_path" : "data/levels/",
-    "save_path" : "data/saves/"
+    "save_path" : "data/saves/",
+    "command_prefix" : "/"
 }
 
 user_config = {}

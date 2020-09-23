@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from .levels import Level # For command context
+from .accounts import Account
 
 @dataclass
 class Comment():
@@ -25,3 +27,9 @@ class AccountComment():
     spam : bool
     username : str
     comment_id : int
+
+@dataclass
+class CommandContext():
+    level : Level
+    comment : Comment
+    account : Account

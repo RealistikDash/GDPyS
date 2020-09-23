@@ -1,8 +1,24 @@
 from conn.mysql import myconn
-from objects.comments import Comment
+from objects.comments import Comment, CommandContext
 from helpers.searchhelper import QueryResponse # Expected never to use it outside... Guess I was wrong.
-from helpers.generalhelper import create_offsets_from_page
+from helpers.generalhelper import create_offsets_from_page, dict_keys
 from helpers.crypthelper import decode_base64
+from constants import Permissions
+from exceptions import GDPySCommandError
+from config import user_config
+
+"""
+COMMANDS = {
+    "rate" : {
+        "handler" : rate_command,
+        "permission" : Permissions.mod_rate
+    }
+}
+
+async def rate_command(ctx : CommandContext) -> bool:
+    # Blah blah code
+    return True # True is success
+"""
 
 class CommentHelper():
     """Class containing most things regarding level comments."""
@@ -40,5 +56,18 @@ class CommentHelper():
             count,
             comment_list
         )
+    
+    async def insert_comment(self, comment : Comment) -> None:
+        """Adds comment to database from object."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("INSERT INTO comments (userID, userName, comment, levelID, timestamp, likes, percent, isSpam) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+            (comment.user_id, comment.username, comment.comment_base64, comment.level_id, comment.timestamp, comment.likes, comment.percent, int(comment.spam)))
+            await myconn.conn.commit()
+    
+    # Command stuff that may be moved to its own class sooner or later.
+    async def command_exists(self, command : str) -> bool:
+        """Checks if a given comment is a valid command."""
+        command = command.split(" ")[0].lower()
+        return command[:-1*len(user_config["command_prefix"])] in dict_keys(COMMANDS)
 
 comment_helper = CommentHelper()

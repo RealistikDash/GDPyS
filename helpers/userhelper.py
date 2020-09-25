@@ -288,5 +288,13 @@ class UserHelper():
             async with AIOFile(user_config["save_path"] + str(account_id), "r") as file:
                 save_data = await file.read()
         return save_data
+    
+    async def update_profile_settings(self, account_id : int, youtube : str, twitter : str, twitch : str, ms : int, frs : int, cs : int) -> None:
+        """Update the user's socials stored in the database."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE accounts SET youtubeurl = %s, twitter = %s, twitch = %s, mS = %s, frS = %s, cS = %s WHERE accountID = %s LIMIT 1", (youtube, twitch, twitch, ms, frs, cs, account_id))
+            await myconn.conn.commit()
+        
+        await self.recache_object(new_obj.account_id) # May make this func just edit the current obj
 
 user_helper = UserHelper() # This has to be a common class.

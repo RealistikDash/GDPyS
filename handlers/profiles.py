@@ -193,3 +193,22 @@ async def load_save_data_handler(request : aiohttp.web.Response):
     save_data = (await user_helper.load_user_data(await user_helper.get_accountid_from_username(post_data["userName"]))) + ";21;30;a;a"
     logging.debug(save_data)
     return aiohttp.web.Response(text=save_data)
+
+async def update_acc_settings_handler(request : aiohttp.web.Response):
+    """Handles updateaccsetings."""
+    post_data = await request.post()
+
+    account_id = int(post_data["accountID"])
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    await user_helper.update_profile_settings(
+        account_id,
+        post_data["yt"],
+        post_data["twitter"],
+        post_data["twitch"],
+        int(post_data["mS"]),
+        int(post_data["frS"]),
+        int(post_data.get("cs", 0))
+    )
+    return aiohttp.web.Response(text=ResponseCodes.generic_success)

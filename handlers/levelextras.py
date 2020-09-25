@@ -6,6 +6,7 @@ from helpers.timehelper import time_ago, get_timestamp
 from helpers.auth import auth
 from helpers.crypthelper import decode_base64
 from helpers.filterhelper import check_comment
+from helpers.priveliegehelper import priv_helper
 from objects.comments import Comment # For pylint to help me work better
 from constants import ResponseCodes, Permissions
 import aiohttp
@@ -32,6 +33,7 @@ async def level_comments_handler(request : aiohttp.web.Request):
         except AssertionError: # The user does not exist
             logging.debug(f"Failed searching for user {comment.user_id}. Should be skipped.")
         else:
+            privilege = await priv_helper.get_privilege_from_privs(comment_user.privileges)
             logging.debug(comment.user_id)
             response += wave_string({
                 #1 : comment.level_id,
@@ -44,7 +46,7 @@ async def level_comments_handler(request : aiohttp.web.Request):
                 6 : comment.comment_id,
                 10 : comment.percent,
                 11 : user_helper.mod_badge_level(comment_user.privileges),
-                12 : "255,255,255" # TODO: Privileges and colours.
+                12 : str(privilege.colour)
             }) + ":" + wave_string({
                 1: comment_user.username,
                 7 : 1,

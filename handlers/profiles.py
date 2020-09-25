@@ -202,6 +202,7 @@ async def update_acc_settings_handler(request : aiohttp.web.Response):
     if not await auth.check_gjp(account_id, post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     
+    # TODO: Some filters of these.
     await user_helper.update_profile_settings(
         account_id,
         post_data["yt"],

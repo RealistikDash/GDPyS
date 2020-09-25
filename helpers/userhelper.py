@@ -120,7 +120,7 @@ class UserHelper():
         timestamp = get_timestamp()
         hashed_password = hash_bcrypt(password)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey) VALUES (%s, %s, %s, '', '', %s, '')", (username, hashed_password, email, timestamp))
+            await mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey, privileges) VALUES (%s, %s, %s, '', '', %s, '', %s)", (username, hashed_password, email, timestamp, user_config["default_priv"]))
             await mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, username, ip))
             await myconn.conn.commit()
     
@@ -295,6 +295,6 @@ class UserHelper():
             await mycursor.execute("UPDATE accounts SET youtubeurl = %s, twitter = %s, twitch = %s, mS = %s, frS = %s, cS = %s WHERE accountID = %s LIMIT 1", (youtube, twitch, twitch, ms, frs, cs, account_id))
             await myconn.conn.commit()
         
-        await self.recache_object(new_obj.account_id) # May make this func just edit the current obj
+        await self.recache_object(account_id) # May make this func just edit the current obj
 
 user_helper = UserHelper() # This has to be a common class.

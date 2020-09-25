@@ -2,6 +2,7 @@ import asyncio
 from aiohttp import web
 import logging
 import random
+from config import user_config, load_config
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
@@ -13,7 +14,7 @@ from handlers.levelextras import level_comments_handler, post_comment_handler
 from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
-from config import user_config, load_config
+from helpers.priveliegehelper import priv_helper
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
@@ -58,6 +59,7 @@ async def init(loop):
     app = web.Application(loop=loop)
     await create_connection(loop, user_config)
     await user_helper.cron_calc_ranks()
+    await priv_helper.cache_privs()
     songs.top_artists = await songs._top_artists()
 
     # Setting up rate limiter
@@ -78,5 +80,5 @@ if __name__ == "__main__":
     config_routes(app)
     try:
         web.run_app(app, port=user_config["port"])
-    except KeyboardInterrupt:
+    except RuntimeError:
         print("Shutting down! Bye!")

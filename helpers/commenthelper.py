@@ -1,6 +1,6 @@
 from conn.mysql import myconn
 from objects.comments import Comment, CommandContext
-from helpers.searchhelper import QueryResponse # Expected never to use it outside... Guess I was wrong.
+from objects.misc import QueryResponse
 from helpers.generalhelper import create_offsets_from_page, dict_keys
 from helpers.crypthelper import decode_base64
 from constants import Permissions
@@ -68,6 +68,6 @@ class CommentHelper():
     async def command_exists(self, command : str) -> bool:
         """Checks if a given comment is a valid command."""
         command = command.split(" ")[0].lower()
-        return command[:-1*len(user_config["command_prefix"])] in dict_keys(COMMANDS)
+        #return command[:-1*len(user_config["command_prefix"])] in dict_keys(COMMANDS)
 
 comment_helper = CommentHelper()

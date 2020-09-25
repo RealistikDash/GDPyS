@@ -1,17 +1,11 @@
 # This will probably be rewritten either way soon
 from objects.levels import SearchQuery, Level
+from objects.misc import QueryResponse
 from conn.mysql import myconn
 from helpers.generalhelper import safe_id_list, create_offsets_from_page, SelectQueryBuilder
 from helpers.userhelper import user_helper
 from helpers.levelhelper import level_helper
 from helpers.timehelper import week_ago
-from dataclasses import dataclass
-
-@dataclass # I probably should put this into objects but it isnt used anywhere else so i will place it here
-class QueryResponse():
-    """Small object responsible for storing 2 data values returned by your search."""
-    total_results : int
-    results : list
 
 class BasicMysqlSearch():
     """A simple search element."""

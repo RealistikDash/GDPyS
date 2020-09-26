@@ -123,6 +123,11 @@ class LevelHelper():
     
     async def bump_likes(self, level_id : int):
         """Bumps a level's like count by one."""
+        if level_id in dict_keys(self.level_cache):
+            # Only run this check if already cached so we dont cache only for this tiny action.
+            if self.level_cache[level_id].downloads < self.level_cache[level_id].likes: # More likes than downloads is impossible. Check for it.
+                return
+            self.level_cache[level_id].likes += 1
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("UPDATE levels SET likes = likes + 1 WHERE levelID = %s", (level_id,))
             await myconn.conn.commit()

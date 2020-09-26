@@ -15,6 +15,7 @@ from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
 from helpers.priveliegehelper import priv_helper
+from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
@@ -58,10 +59,9 @@ async def init(loop):
     """Initialises the app and MySQL connection and all the other systems."""
     app = web.Application(loop=loop)
     await create_connection(loop, user_config)
-    await user_helper.cron_calc_ranks()
     await priv_helper.cache_privs()
+    await run_cron()
     songs.top_artists = await songs._top_artists()
-
     # Setting up rate limiter
     rate_limiter.add_to_struct("register", limit=2) # One IP may only register twice a day.
     rate_limiter.add_to_struct("login", limit=10) # One IP may only try to login ten times a day.

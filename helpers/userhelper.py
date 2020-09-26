@@ -8,6 +8,7 @@ from conn.mysql import myconn
 from constants import Permissions
 from config import user_config
 from aiofile import AIOFile
+from cron.rankcalc import ranks
 import logging
 import os
 
@@ -18,7 +19,6 @@ class UserHelper():
         self.object_cache = {}
         self.extra_object_cache = {}
         self.accid_userid_cache = {}
-        self.ranks = {}
         self.relationships = {}
         self.user_str_cache = {}
     
@@ -160,26 +160,11 @@ class UserHelper():
             return 1
         return 0
     
-    async def cron_calc_ranks(self) -> None:
-        """Calculates all ranks for users and stores them in cache.""" # I may move this to a cron category however that does not currently exist.
-        timer = Timer()
-        timer.start()
-        async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT extID FROM users WHERE extID IN (SELECT accountID FROM accounts WHERE privileges & %s AND isBot = 0) ORDER BY stars DESC", (Permissions.authenticate,))
-            users = await mycursor.fetchall()
-        
-        curr_rank = 0 # There is most likely a better way to do this but I don't know it yet
-        for user in users:
-            curr_rank += 1
-            self.ranks[int(user[0])] = curr_rank
-        timer.end()
-        logging.debug(f"Rank caching took {timer.ms_return()}ms")
-    
     def get_rank(self, account_id : int) -> int:
         """Gets a users rank if cached, else returns 0."""
-        if account_id not in self.ranks:
+        if account_id not in ranks:
             return 0
-        return self.ranks[account_id]
+        return ranks[account_id]
 
     async def _create_user_string(self, user_id : int) -> str:
         """Creates user sting which is used in level search."""

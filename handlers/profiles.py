@@ -6,6 +6,7 @@ from helpers.timehelper import time_ago
 from helpers.auth import auth
 from helpers.searchhelper import search_helper
 from constants import ResponseCodes
+from cron.cachelb import top_stars, top_cp
 import aiohttp
 import logging
 
@@ -144,7 +145,6 @@ async def update_profile_stats_handler(request : aiohttp.web.Request):
 
     # Updating stats based on data sent by game. TODO: Some form of anticheat
 
-    logging.debug(post_data)
     user.stars = int(post_data.get("stars", 0))
     user.demons = int(post_data.get("demons", 0))
     user.icon = int(post_data.get("icon", 0))
@@ -213,3 +213,41 @@ async def update_acc_settings_handler(request : aiohttp.web.Response):
         int(post_data.get("cs", 0))
     )
     return aiohttp.web.Response(text=ResponseCodes.generic_success)
+
+async def leaderboards_handler(request : aiohttp.web.Response):
+    """Handles top leaderboards in-game."""
+    post_data = await request.post()
+    obj_list = []
+    lb_type = post_data["type"]
+
+    if lb_type == "top":
+        obj_list = top_stars
+    elif lb_type == "creators":
+        obj_list = top_cp
+    
+    return_str = ""
+    rank = 0 # Weird solution but it works :tm:
+    for account in obj_list:
+        account : Account
+        rank += 1
+        return_str += joint_string({
+            1 : account.username,
+            2 : account.user_id,
+            3 : account.stars,
+            4 : account.stars,
+            6 : rank,
+            7 : account.account_id,
+            8 : account.cp,
+            9 : account.icon,
+            10 : account.colour1,
+            11 : account.colour2,
+            13 : account.coins,
+            14 : account.icon_type,
+            15 : 0,
+            16 : account.account_id,
+            17 : account.user_coins,
+            46 : account.diamonds
+        }) + "|"
+    return_str = return_str[:-1]
+    logging.debug(return_str)
+    return aiohttp.web.Response(text=return_str)

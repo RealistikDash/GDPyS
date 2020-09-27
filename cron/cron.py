@@ -1,12 +1,15 @@
 from .rankcalc import cron_calc_ranks
 from .cpcalc import cron_calc_cp
+from .cachelb import cron_top_stars, cron_top_cp
 from helpers.timehelper import Timer
 import logging
 import traceback
 
 CRON_JOBS = [ # 
     cron_calc_ranks,
-    cron_calc_cp
+    cron_calc_cp,
+    cron_top_stars,
+    cron_top_cp
 ]
 
 async def run_cron():

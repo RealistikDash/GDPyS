@@ -7,19 +7,6 @@ from constants import Permissions
 from exceptions import GDPySCommandError
 from config import user_config
 
-"""
-COMMANDS = {
-    "rate" : {
-        "handler" : rate_command,
-        "permission" : Permissions.mod_rate
-    }
-}
-
-async def rate_command(ctx : CommandContext) -> bool:
-    # Blah blah code
-    return True # True is success
-"""
-
 class CommentHelper():
     """Class containing most things regarding level comments."""
     def __init__(self):
@@ -64,10 +51,4 @@ class CommentHelper():
             (comment.user_id, comment.username, comment.comment_base64, comment.level_id, comment.timestamp, comment.likes, comment.percent, int(comment.spam)))
             await myconn.conn.commit()
     
-    # Command stuff that may be moved to its own class sooner or later.
-    async def command_exists(self, command : str) -> bool:
-        """Checks if a given comment is a valid command."""
-        command = command.split(" ")[0].lower()
-        #return command[:-1*len(user_config["command_prefix"])] in dict_keys(COMMANDS)
-
 comment_helper = CommentHelper()

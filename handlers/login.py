@@ -22,7 +22,7 @@ async def login_handler(request: aiohttp.web.Request):
     if not await auth.check_password(post_data["userName"], post_data["password"]):
         logging.debug("Failed at password check.")
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    if not await user_helper.has_privilege(user_obj, Permissions.authenticate):
+    if not user_helper.has_privilege(user_obj, Permissions.authenticate):
         logging.debug("No auth perms")
         return aiohttp.web.Response(text=ResponseCodes.login_contact_rob)
     return aiohttp.web.Response(text=f"{user_obj.account_id},{user_obj.user_id}")

@@ -2,7 +2,7 @@ USERNAME_ALLOWED_CHARS = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW
 USERNAME_CHAR_LIMIT = 16
 
 COMMENT_CHAR_LIMIT = 100
-COMMENT_ALLOWED_CHARS = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-")
+COMMENT_ALLOWED_CHARS = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-/")
 
 def check_username(username: str) -> bool:
     """Checks if a given username can be made inside GD."""

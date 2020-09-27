@@ -7,7 +7,9 @@ from helpers.auth import auth
 from helpers.crypthelper import decode_base64
 from helpers.filterhelper import check_comment
 from helpers.priveliegehelper import priv_helper
-from objects.comments import Comment # For pylint to help me work better
+from helpers.crypthelper import decode_base64
+from objects.comments import Comment, CommentBan
+from commands.commands import commands
 from constants import ResponseCodes, Permissions
 import aiohttp
 import logging
@@ -83,15 +85,13 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
 
     if not check_comment(decode_base64(content)):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    
-    # TODO : Command stuff
 
     # Creating the object.
     comment_obj = Comment(
         user.user_id,
         level_id,
         content,
-        None, # I don't think we need this now
+        decode_base64(content),
         get_timestamp(),
         0,
         percent,
@@ -99,6 +99,18 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
         user.username,
         None # No comment ID yet.
     )
+    # TODO : Command stuff
+    if commands.command_exists(comment_obj.comment):
+        result = await commands.execute_command(comment_obj)
+        logging.debug(result)
+        if type(result) == bool:
+            result = ResponseCodes.generic_success if result else ResponseCodes.generic_fail
+            logging.debug(result)
+            return aiohttp.web.Response(text=result)
+        # It is a comment ban.
+        result = result.rob_response()
+        logging.debug(result)
+        return aiohttp.web.Response(text=result)
     # Now we add it to the database.
     await comment_helper.insert_comment(comment_obj)
     return aiohttp.web.Response(text=ResponseCodes.generic_success)

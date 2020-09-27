@@ -104,7 +104,7 @@ class UserHelper():
             await self.recache_object(account_id)
         return self.object_cache[account_id]
 
-    async def has_privilege(self, user_obj: Account, privileges: int) -> bool:
+    def has_privilege(self, user_obj: Account, privileges: int) -> bool:
         """Checks if a user has a privilege."""
         return bool(user_obj.privileges & privileges)
     

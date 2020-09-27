@@ -12,3 +12,7 @@ class GDPySCommandError(Exception):
 
 class GDPySCommandNotFound(Exception):
     """Exception raised by command helper when no command is found."""
+    pass
+
+class GDPySCommandMissingPrivileges(Exception):
+    pass

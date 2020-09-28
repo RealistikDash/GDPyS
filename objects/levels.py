@@ -37,13 +37,16 @@ class Level():
     likes : int
 
     async def load_string(self):
+        string = self.string
         if self.string is None:
             async with AIOFile(user_config["level_path"] + str(self.ID), "r") as f:
                 try:
-                    self.string = await f.read()
+                    string = await f.read()
                 except Exception:
-                    self.string = ""
-        return self.string
+                    string = ""
+            if user_config["cache_level_strs"]:
+                self.string = string
+        return string
 
 @dataclass
 class SearchQuery():

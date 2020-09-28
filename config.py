@@ -15,7 +15,8 @@ default_config = {
     "level_path" : "data/levels/",
     "save_path" : "data/saves/",
     "command_prefix" : "/",
-    "default_priv" : 30
+    "default_priv" : 30,
+    "cache_level_strs" : True
 }
 
 user_config = {}
@@ -47,7 +48,7 @@ def load_config(location : str = "config.json"):
     if user_config_temp is None:
         print("Generating new config")
         config.write_file(default_config)
-        print("Generated new config! Please edit it and restart Scoresu.")
+        print("Generated new config! Please edit it and restart GDPyS.")
         raise SystemExit
 
     # Checks for default configuration updates.

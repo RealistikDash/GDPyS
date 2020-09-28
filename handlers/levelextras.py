@@ -11,6 +11,7 @@ from helpers.crypthelper import decode_base64
 from objects.comments import Comment, CommentBan
 from commands.commands import commands
 from constants import ResponseCodes, Permissions
+from config import user_config
 import aiohttp
 import logging
 
@@ -100,7 +101,7 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
         None # No comment ID yet.
     )
     # TODO : Command stuff
-    if commands.command_exists(comment_obj.comment):
+    if comment_obj.comment.startswith(user_config["command_prefix"]) and commands.command_exists(comment_obj.comment):
         result = await commands.execute_command(comment_obj)
         logging.debug(result)
         if type(result) == bool:

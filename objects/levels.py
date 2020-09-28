@@ -66,3 +66,13 @@ class SearchQuery():
     custom_song : int = 0
     difficulty : str = "-"
     search_query : str = ""
+
+@dataclass
+class Rating():
+    """Dataclass containing information on a new rating."""
+    level_id : int
+    stars : int
+    featured : bool
+    epic : bool
+    verified_coins : bool
+    demon_diff : int

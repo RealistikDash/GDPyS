@@ -2,7 +2,7 @@ from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp
 from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
-from objects.levels import Level
+from objects.levels import Level, Rating
 from config import user_config
 from aiofile import AIOFile
 import logging
@@ -250,5 +250,13 @@ class LevelHelper():
                 await file.fsync()
         
         return level_id
+
+    async def rate_level(self, rating : Rating) -> None:
+        """Rates a level."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE levels SET starStars = %s, starFeatured=%s,starEpic = %s, starCoins=%s,starDemonDiff=%s WHERE levelID = %s LIMIT 1", (
+                rating.stars, int(rating.featured), int(rating.epic), int(rating.verified_coins), rating.demon_diff, rating.level_id
+            ))
+            await myconn.conn.commit()
 
 level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

@@ -23,8 +23,10 @@ class ResponseCodes():
     generic_fail = "-1"
     generic_success = "1"
     generic_fail2 = "-2"
+    generic_success2 = "2"
     login_contact_rob = "-12"
     empty_list = "#0:0:0"
+    comment_ban = "-10"
 
 class Colours():
     """ALL THE COLOURS IN THE SKY"""

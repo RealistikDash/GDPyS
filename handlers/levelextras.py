@@ -128,7 +128,7 @@ async def rate_level_handler(request : aiohttp.web.Request):
     featured = post_data.get("feature", "0") == "1"
     user = await user_helper.get_object(account_id)
     # Permission checks
-    if not auth.check_gjp(account_id, post_data["gjp"]):
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     if not user_helper.has_privilege(user, Permissions.mod_rate):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail2)

@@ -20,6 +20,7 @@ from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
 from api.main import api
+from tools.main import tools
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -45,6 +46,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/updateGJAccSettings20.php", update_acc_settings_handler)
     app.router.add_post("/database/getGJScores20.php", leaderboards_handler)
     app.add_subapp("/api/", api)
+    app.add_subapp("/tools/", tools)
 
 def welcome_sequence(no_ascii : bool = False):
     """Startup welcome print art things."""

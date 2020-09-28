@@ -19,6 +19,7 @@ from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
+from api.main import api
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -43,6 +44,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/uploadGJComment21.php", post_comment_handler)
     app.router.add_post("/database/updateGJAccSettings20.php", update_acc_settings_handler)
     app.router.add_post("/database/getGJScores20.php", leaderboards_handler)
+    app.add_subapp("/api/", api)
 
 def welcome_sequence(no_ascii : bool = False):
     """Startup welcome print art things."""

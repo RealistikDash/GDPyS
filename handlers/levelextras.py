@@ -9,10 +9,12 @@ from helpers.filterhelper import check_comment
 from helpers.priveliegehelper import priv_helper
 from helpers.crypthelper import decode_base64
 from objects.comments import Comment, CommentBan
-from commands.commands import commands
+from plugins.gdpys import client
 from constants import ResponseCodes, Permissions
 import aiohttp
 import logging
+
+commands = client.client
 
 async def level_comments_handler(request : aiohttp.web.Request):
     """Responsible for sending the game level comments."""

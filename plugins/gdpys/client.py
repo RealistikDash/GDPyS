@@ -6,15 +6,8 @@ from objects.comments import CommandContext, Comment, CommentBan
 from constants import Permissions
 from config import user_config
 from exceptions import GDPySCommandError
-# Core command imports
-from .levels import test_command
 
-COMMANDS = {
-    "test" : {
-        "handler" : test_command,
-        "permission" : Permissions.mod_rate
-    }
-}
+COMMANDS = {}
 
 class Client:
     def __init__(self):

@@ -32,7 +32,7 @@ def get_timestamp() -> int:
 
 def time_ago(timestamp : int) -> str:
     """Returns a string that is timeago from now (for GD responses)."""
-    raw_timeago = timeago.format(datetime.fromtimestamp(timestamp+1), datetime.now())
+    raw_timeago = timeago.format(datetime.fromtimestamp(timestamp-1), datetime.now())
     return raw_timeago[:-4]
 
 def week_ago() -> int:

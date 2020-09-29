@@ -1,6 +1,7 @@
 # Contains handlers that take care of extras in levels such as rating, liking, comments etc.
 from helpers.commenthelper import comment_helper
 from helpers.userhelper import user_helper
+from helpers.levelhelper import level_helper
 from helpers.generalhelper import wave_string
 from helpers.timehelper import time_ago, get_timestamp
 from helpers.auth import auth
@@ -10,7 +11,9 @@ from helpers.priveliegehelper import priv_helper
 from helpers.crypthelper import decode_base64
 from objects.comments import Comment, CommentBan
 from gdpys import client
+from objects.levels import Rating
 from constants import ResponseCodes, Permissions
+from config import user_config
 import aiohttp
 import logging
 
@@ -83,7 +86,7 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     
     if not user_helper.has_privilege(user, Permissions.post_comment):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.comment_ban)
 
     if not check_comment(decode_base64(content)):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
@@ -102,7 +105,8 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
         None # No comment ID yet.
     )
     # TODO : Command stuff
-    if commands.command_exists(comment_obj.comment):
+    if comment_obj.comment.startswith(user_config["command_prefix"]) and 
+    .command_exists(comment_obj.comment):
         result = await commands.execute_command(comment_obj)
         logging.debug(result)
         if type(result) == bool:
@@ -115,4 +119,30 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
         return aiohttp.web.Response(text=result)
     # Now we add it to the database.
     await comment_helper.insert_comment(comment_obj)
+    return aiohttp.web.Response(text=ResponseCodes.generic_success)
+
+async def rate_level_handler(request : aiohttp.web.Request):
+    """Handles GD level rating."""
+    post_data = await request.post()
+
+    account_id = int(post_data["accountID"])
+    level_id = int(post_data["levelID"])
+    stars = int(post_data["stars"])
+    featured = post_data.get("feature", "0") == "1"
+    user = await user_helper.get_object(account_id)
+    # Permission checks
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    if not user_helper.has_privilege(user, Permissions.mod_rate):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail2)
+    
+    rating = Rating(
+        level_id,
+        stars,
+        featured,
+        0,
+        1,
+        0
+    )
+    await level_helper.rate_level(rating)
     return aiohttp.web.Response(text=ResponseCodes.generic_success)

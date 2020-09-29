@@ -15,7 +15,8 @@ default_config = {
     "level_path" : "data/levels/",
     "save_path" : "data/saves/",
     "command_prefix" : "/",
-    "default_priv" : 30
+    "default_priv" : 30,
+    "cache_level_strs" : True
 }
 
 user_config = {}

@@ -5,7 +5,7 @@ from helpers.generalhelper import create_offsets_from_page, joint_string, pipe_s
 from helpers.timehelper import time_ago
 from helpers.auth import auth
 from helpers.searchhelper import search_helper
-from constants import ResponseCodes
+from constants import ResponseCodes, Permissions
 from cron.cachelb import top_stars, top_cp
 import aiohttp
 import logging
@@ -251,3 +251,19 @@ async def leaderboards_handler(request : aiohttp.web.Response):
     return_str = return_str[:-1]
     logging.debug(return_str)
     return aiohttp.web.Response(text=return_str)
+
+async def mod_check_handler(request : aiohttp.web.Response):
+    """Handles the mod check."""
+    post_data = await request.post()
+
+    account_id = int(post_data["accountID"])
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    user = await user_helper.get_object(account_id)
+
+    if user_helper.has_privilege(user, Permissions.mod_elder):
+        return aiohttp.web.Response(text=ResponseCodes.generic_success2)
+    elif user_helper.has_privilege(user, Permissions.mod_regular):
+        return aiohttp.web.Response(text=ResponseCodes.generic_success2)
+    return aiohttp.web.Response(text=ResponseCodes.generic_fail)

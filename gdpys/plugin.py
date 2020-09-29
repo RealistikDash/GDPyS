@@ -4,9 +4,14 @@ import os, asyncio, time, json
 class Plugin:
     def __init__(self):
         """Start main loop"""
+        depend_check = []
         for p in self.dependencies:
-            if p == 1:
-                pass
+            for f in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins"):
+                f = f.strip(".py")
+                if p == f:
+                    depend_check.append(p)
+        if depend_check != self.dependencies:
+            print(f"Dependencies could not be found for \"{self.__class__}\".")
         self.stopped = False
         loop = asyncio.new_event_loop()
         configpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins/config"

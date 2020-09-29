@@ -23,6 +23,7 @@ from api.main import api
 from tools.main import tools
 import os
 import importlib
+from threading import Thread
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -63,10 +64,15 @@ def pre_run_checks():
         raise SystemExit
 
 def start_plugins():
+    """Start plugins"""
+    plugins = []
     homepath = path.dirname(path.realpath(__file__))
     for plugin in os.listdir(homepath + "/plugins/"):
         if not path.isdir(homepath + "/plugins/" + plugin) and plugin.endswith(".py") and plugin != "__init__.py":
-            print(importlib.import_module("." + plugin.replace(".py", ""), "plugins").setup())
+            plugin = plugin.strip(".py")
+            print(f"Loading plugin \"{plugin}\".")
+            plugins.append(plugin)
+            Thread(target=lambda: importlib.import_module("." + plugin, "plugins").setup()()).start()
 
 async def init(loop):
     """Initialises the app and MySQL connection and all the other systems."""

@@ -1,1 +1,1 @@
-import plugins.gdpys
+import gdpys

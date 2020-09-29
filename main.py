@@ -21,6 +21,8 @@ from conn.mysql import create_connection
 from os import path
 from api.main import api
 from tools.main import tools
+import os
+import importlib
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -60,6 +62,12 @@ def pre_run_checks():
         logging.info(f"Set level path: {user_config['level_path']}\nSet save path: {user_config['save_path']}")
         raise SystemExit
 
+def start_plugins():
+    homepath = path.dirname(path.realpath(__file__))
+    for plugin in os.listdir(homepath + "/plugins/"):
+        if not path.isdir(homepath + "/plugins/" + plugin) and plugin.endswith(".py") and plugin != "__init__.py":
+            print(importlib.import_module("." + plugin.replace(".py", ""), "plugins").setup())
+
 async def init(loop):
     """Initialises the app and MySQL connection and all the other systems."""
     app = web.Application(loop=loop)
@@ -73,6 +81,7 @@ async def init(loop):
     return app
 
 if __name__ == "__main__":
+    start_plugins()
     load_config()
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO

@@ -9,7 +9,7 @@ from helpers.filterhelper import check_comment
 from helpers.priveliegehelper import priv_helper
 from helpers.crypthelper import decode_base64
 from objects.comments import Comment, CommentBan
-from plugins.gdpys import client
+from gdpys import client
 from constants import ResponseCodes, Permissions
 import aiohttp
 import logging

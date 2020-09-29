@@ -1,12 +1,16 @@
 from time import sleep
-import os, asyncio, time
+import os, asyncio, time, json
 
 class Plugin:
     def __init__(self):
         """Start main loop"""
-        time.sleep(6) # wait for functions to finish
+        for p in self.dependencies:
+            if p == 1:
+                pass
         self.stopped = False
         loop = asyncio.new_event_loop()
+        configpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins/config"
+        self.config = json.load(open(configpath + "/" + self.name + "/config.json", "r"))
         if self.metadata == False:
             print(f"Warning: Plugin {self.__class__} has invalid metadata!")
         while True:
@@ -25,17 +29,9 @@ class Plugin:
             os.mkdir(configpath)
         if not os.path.exists(configpath + "/" + self.name):
             os.mkdir(configpath + "/" + self.name)
-        config = open(configpath + "/" + self.name + "/config.json", "w")
-        config.write(str(template).replace("'", '"'))
-        config.close()
+        config = json.dump(template, open(configpath + "/" + self.name + "/config.json", "w"))
 
-    @property
-    def config(self):
-        configpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins/config"
-        config = open(configpath + "/" + self.name + "/config.json", "r")
-        return config.read()
-
-    def set_metadata(self, name="", author="", description="", version="", dependencies={}):
+    def set_metadata(self, name="", author="", description="", version="", dependencies=[]):
         """Set metadata, will be given a warning if this is not done at startup."""
         self.name = name
         self.author = author

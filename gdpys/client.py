@@ -82,12 +82,12 @@ class Client:
         }
 
     def _command_exists(self, command : str) -> bool:
-        """:meta private: Checks if a given comment is a valid command."""
+        """Checks if a given comment is a valid command."""
         command = command.split(" ")[0].lower()
         return command[len(user_config["command_prefix"]):] in dict_keys(COMMANDS)
     
     async def _create_context(self, comment : Comment) -> CommandContext:
-        """:meta private: Creates a context object for a command."""
+        """Creates a context object for a command."""
         level = await level_helper.get_level_obj(comment.level_id)
         account = await user_helper.get_object(await user_helper.accid_userid(comment.user_id))
         return CommandContext(
@@ -97,7 +97,7 @@ class Client:
         )
 
     async def _execute_command(self, command_obj : Comment):
-        """:meta private: Executes a GDPyS command comment command. Returns a bool or commentban object."""
+        """Executes a GDPyS command comment command. Returns a bool or commentban object."""
         command_args = command_obj.comment[len(user_config["command_prefix"]):].split(" ")
         command = COMMANDS[command_args[0].lower()]
         ctx = await self.create_context(command_obj)

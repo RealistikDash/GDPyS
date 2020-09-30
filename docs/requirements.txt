@@ -1,9 +1,4 @@
-sphinxcontrib_trio
-sphinx.ext.autodoc
-sphinx.ext.extlinks
-sphinx.ext.intersphinx
-sphinx.ext.napoleon
-sphinx.ext.viewcode
+sphinx
 sphinxcontrib_trio
 aiohttp == 3.6.2
 aiomysql == 0.0.20

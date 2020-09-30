@@ -1,0 +1,12 @@
+sphinxcontrib_trio
+sphinx.ext.autodoc
+sphinx.ext.extlinks
+sphinx.ext.intersphinx
+sphinx.ext.napoleon
+sphinx.ext.viewcode
+sphinxcontrib_trio
+aiohttp == 3.6.2
+aiomysql == 0.0.20
+bcrypt == 3.2.0
+timeago == 1.0.14
+aiofile == 3.1.0 

@@ -40,19 +40,19 @@ class Client:
         """Get a level object"""
         return await level_helper.get_level_obj(id)
 
-    async def star_to_difficulty(stars: int) -> int:
+    async def star_to_difficulty(self, stars: int) -> int:
         """Convert star rating to a difficulty"""
         return await level_helper.star_to_difficulty(stars)
 
-    async def like_level(id: int):
+    async def like_level(self, id: int):
         """Bump a level's likes by one"""
         return await level_helper.bump_likes(id)
 
-    async def upload_level(level: Level):
+    async def upload_level(self, level: Level):
         """Uploads a level from a level object"""
         return await level_helper.upload_level(level)
 
-    async def rate_level(rating: Rating):
+    async def rate_level(self, rating: Rating):
         """Rates a level given a Rating object"""
         return await level_helper.rate_level(rating)
 

@@ -14,7 +14,7 @@ COMMANDS = {}
 
 class Client:
     def __init__(self):
-        pass
+        self.permissions = Permissions
     
     ############################
     #           User           #
@@ -74,7 +74,7 @@ class Client:
 
         return decorator
 
-    async def create_command(self, name: str, coro: asyncio.coroutine, permission: Permissions) -> None:
+    async def create_command(self, name: str, coro: asyncio.coroutine, permission: Permissions):
         """Create a command"""
         COMMANDS[name]= {
             "handler": coro,

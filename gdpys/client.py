@@ -1,3 +1,4 @@
+import asyncio
 from aiohttp.payload_streamer import streamer
 from helpers.userhelper import user_helper
 from helpers.levelhelper import level_helper
@@ -59,12 +60,33 @@ class Client:
     #         Commands         #
     ############################ 
 
-    def command_exists(self, command : str) -> bool:
+    def command(self, coro: asyncio.coroutine, name: str=None, permission: Permissions=None):
+        """Decorator to create commands"""
+        if not asyncio.iscoroutine(coro):
+            raise Exception("Function is not a coroutine function!")
+
+        if name is None:
+            name = coro.__name__.lower()
+
+        def decorator(coro):
+            loop = asyncio.new_event_loop()
+            loop.create_task(self.create_command(name, coro, permission))
+
+        return decorator
+
+    async def create_command(self, name: str, coro: asyncio.coroutine, permission: Permissions) -> None:
+        """Create a command"""
+        COMMANDS[name]= {
+            "handler": coro,
+            "permission": permission
+        }
+
+    def _command_exists(self, command : str) -> bool:
         """:meta private: Checks if a given comment is a valid command."""
         command = command.split(" ")[0].lower()
         return command[len(user_config["command_prefix"]):] in dict_keys(COMMANDS)
     
-    async def create_context(self, comment : Comment) -> CommandContext:
+    async def _create_context(self, comment : Comment) -> CommandContext:
         """:meta private: Creates a context object for a command."""
         level = await level_helper.get_level_obj(comment.level_id)
         account = await user_helper.get_object(await user_helper.accid_userid(comment.user_id))
@@ -74,7 +96,7 @@ class Client:
             account
         )
 
-    async def execute_command(self, command_obj : Comment):
+    async def _execute_command(self, command_obj : Comment):
         """:meta private: Executes a GDPyS command comment command. Returns a bool or commentban object."""
         command_args = command_obj.comment[len(user_config["command_prefix"]):].split(" ")
         command = COMMANDS[command_args[0].lower()]

@@ -9,6 +9,7 @@ Documentation Contents
 
    intro
    plugins
+   client
    commands
 
 Other

@@ -10,5 +10,5 @@ At the moment, the client class has almost nothing to use, so stay tuned for whe
 Client
 ------
 
-.. autoclass:: Client
+.. autoclass:: gdpys.Client
     :members:

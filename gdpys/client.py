@@ -6,20 +6,20 @@ from objects.comments import CommandContext, Comment, CommentBan
 from constants import Permissions
 from config import user_config
 from exceptions import GDPySCommandError
-# Core command imports
-from .levels import test_command
 
-COMMANDS = {
-    "test" : {
-        "handler" : test_command,
-        "permission" : Permissions.mod_rate
-    }
-}
+COMMANDS = {}
 
-class Commands():
-    """Main class that deals with commands."""
+class Client:
     def __init__(self):
         pass
+
+    def ban(self, user):
+        pass
+
+    def unban(self, user):
+        pass
+
+    # commands
 
     def command_exists(self, command : str) -> bool:
         """Checks if a given comment is a valid command."""
@@ -54,4 +54,4 @@ class Commands():
             )
         return True
 
-commands = Commands()
+client = Client()

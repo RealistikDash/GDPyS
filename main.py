@@ -19,6 +19,11 @@ from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
+from api.main import api
+from tools.main import tools
+import os
+import importlib
+from threading import Thread
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -43,6 +48,8 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/uploadGJComment21.php", post_comment_handler)
     app.router.add_post("/database/updateGJAccSettings20.php", update_acc_settings_handler)
     app.router.add_post("/database/getGJScores20.php", leaderboards_handler)
+    app.add_subapp("/api/", api)
+    app.add_subapp("/tools/", tools)
     app.router.add_post("/database/suggestGJStars20.php", rate_level_handler)
     app.router.add_post("/database/requestUserAccess.php", mod_check_handler)
 
@@ -54,9 +61,20 @@ def welcome_sequence(no_ascii : bool = False):
 def pre_run_checks():
     """Runs checks before startup to make sure all runs smoothly."""
     if not path.exists(user_config["level_path"]) or not path.exists(user_config["save_path"]):
-        logging.error("Level/Save path does not exit! Please create it before starting GDPyS.")
+        logging.error("Level/Save path does not exist! Please create it before starting GDPyS.")
         logging.info(f"Set level path: {user_config['level_path']}\nSet save path: {user_config['save_path']}")
         raise SystemExit
+                     
+def start_plugins():
+    """Start plugins"""
+    plugins = []
+    homepath = path.dirname(path.realpath(__file__))
+    for plugin in os.listdir(homepath + "/plugins/"):
+        if not path.isdir(homepath + "/plugins/" + plugin) and plugin.endswith(".py") and plugin != "__init__.py":
+            plugin = plugin.strip(".py")
+            print(f"Loading plugin \"{plugin}\".")
+            plugins.append(plugin)
+            Thread(target=lambda: importlib.import_module("." + plugin, "plugins").setup()()).start()
 
 async def init(loop):
     """Initialises the app and MySQL connection and all the other systems."""
@@ -71,6 +89,7 @@ async def init(loop):
     return app
 
 if __name__ == "__main__":
+    start_plugins()
     load_config()
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO

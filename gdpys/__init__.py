@@ -1,2 +1,2 @@
 from .plugin import Plugin
-from .client import Client
+from .client import client

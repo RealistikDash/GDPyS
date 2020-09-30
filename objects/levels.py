@@ -76,3 +76,11 @@ class Rating():
     epic : bool
     verified_coins : bool
     demon_diff : int
+
+@dataclass
+class DailyLevel():
+    """Daily level dataclass"""
+    ID : int
+    level_id : int
+    timestamp : int
+    weekly : bool

@@ -2,7 +2,7 @@ from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp
 from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
-from objects.levels import Level, Rating
+from objects.levels import Level, Rating, DailyLevel
 from config import user_config
 from aiofile import AIOFile
 import logging
@@ -12,6 +12,7 @@ class LevelHelper():
     def __init__(self):
         """Inits the level helper."""
         self.level_cache = {}
+        self.daily = None # is DailyLevel object if cached.
     
     async def _create_level_obj(self, level_id : int) -> Level:
         """Private function that creates a level object from db."""

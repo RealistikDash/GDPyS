@@ -6,7 +6,7 @@ def dict_keys(dictioary: dict) -> tuple:
     """Returns a tuple of all the dictionary keys."""
     return tuple(dictioary.keys())
 
-def get_ip(request : aiohttp.web.Request) -> str:
+def get_ip(request) -> str:
     """Gets IP address from request."""
     if request.headers.get("X-Real-IP"): # I do this with nginx
         return request.headers.get("X-Real-IP")

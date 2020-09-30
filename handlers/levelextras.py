@@ -105,8 +105,7 @@ async def post_comment_handler(request : aiohttp.web.Request) -> aiohttp.web.Res
         None # No comment ID yet.
     )
     # TODO : Command stuff
-    if comment_obj.comment.startswith(user_config["command_prefix"]) and 
-    .command_exists(comment_obj.comment):
+    if comment_obj.comment.startswith(user_config["command_prefix"]) and commands.command_exists(comment_obj.comment):
         result = await commands.execute_command(comment_obj)
         logging.debug(result)
         if type(result) == bool:

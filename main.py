@@ -61,7 +61,7 @@ def welcome_sequence(no_ascii : bool = False):
 def pre_run_checks():
     """Runs checks before startup to make sure all runs smoothly."""
     if not path.exists(user_config["level_path"]) or not path.exists(user_config["save_path"]):
-        logging.error("Level/Save path does not exit! Please create it before starting GDPyS.")
+        logging.error("Level/Save path does not exist! Please create it before starting GDPyS.")
         logging.info(f"Set level path: {user_config['level_path']}\nSet save path: {user_config['save_path']}")
         raise SystemExit
                      

@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/gdpys/badge/?version=latest)](https://gdpys.readthedocs.io/en/latest/?badge=latest) [![Actions Status](https://github.com/RealistikDash/GDPyS/workflows/build/badge.svg)](https://github.com/RealistikDash/GDPyS/actions)
+[![Documentation Status](https://readthedocs.org/projects/gdpys/badge/?version=latest)](https://gdpys.readthedocs.io/en/latest/?badge=latest) [![Actions Status](https://github.com/RealistikDash/GDPyS/workflows/build/badge.svg)](https://github.com/RealistikDash/GDPyS/actions) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 # GDPyS 2
 An object oriented rewrite of GDPyS.
 

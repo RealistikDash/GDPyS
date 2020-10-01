@@ -1,4 +1,12 @@
 Introduction
 ============
 
-GDPyS is a Python based Geometry Dash server, it has many unique features including plugins and custom magic and awarded sections. What makes GDPyS better than other alternatives is because of the speed. GDPyS runs much faster than other alternatives and offers many configuration options like Cheatless AntiCheat and more.
+GDPyS is a Python based Geometry Dash server.
+It has many unique features including
+  • plugins 
+  • custom magic sections
+  • custom awarded sections
+  • better Newgrounds API (coming soon)
+
+What makes GDPyS better than other alternatives is speed.
+GDPyS runs much faster than other alternatives and offers many configuration options like Cheatless AntiCheat and more, all available with plugins.

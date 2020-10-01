@@ -15,16 +15,10 @@ We can use the client class by importing gdpys.client to get a working client ob
             super().__init__()
 
         async def loop(self):
-            user_id = 42069
+            user_id = 1
             comment = "This is an account comment"
             await client.post_account_comment(user_id, comment)
             self.stop()
 
     def setup():
         return Example
-
-Client
-------
-
-.. autoclass:: gdpys.client.Client
-    :members:

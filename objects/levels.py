@@ -16,7 +16,7 @@ class Level():
     password : int
     original : bool
     two_player : bool
-    song_id : bool
+    song_id : int
     objects : int
     coins : int
     requested_stars : int

@@ -42,3 +42,8 @@ def week_ago() -> int:
 def tomorrow() -> int:
     """Returns the timestamp of midnight tomorrow."""
     return (((get_timestamp()//86400)*86400)+86400) # SMARTEST PROGRAMMER THAT HAS EVER LIVED
+
+def time_since_midnight() -> int:
+    """Returns time since midnight."""
+    now = datetime.now()
+    return round((now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds())

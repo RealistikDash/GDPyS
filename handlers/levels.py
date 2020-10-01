@@ -7,6 +7,7 @@ from helpers.songhelper import songs
 from helpers.userhelper import user_helper
 from helpers.crypthelper import cipher_xor
 from helpers.auth import auth
+from helpers.timehelper import time_since_midnight, get_timestamp
 from objects.levels import SearchQuery, Level
 from constants import XorKeys, ResponseCodes
 from config import user_config
@@ -15,6 +16,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
     """Handles the get levels endpoint."""
     post_data = await  request.post()
 
+    # Daily levels
     offset = create_offsets_from_page(int(post_data["page"]))
     logging.debug(offset)
     # Okay so here we have to create the search query object. May have to redo it but this should be sufficient for the time being.
@@ -94,6 +96,16 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
     post_data = await request.post()
 
     level_id = int(post_data["levelID"])
+
+    # Daily level check.
+    daily = False
+    fea_id = 0
+    if level_id == -1:
+        daily_obj = await level_helper.get_daily_level()
+        level_id = daily_obj.level_id
+        daily = True
+        fea_id = daily_obj.ID
+
     level = await level_helper.get_level_obj(level_id)
     if level is None:
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
@@ -102,7 +114,7 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
 
     # Creating variables to be used.
     yo_idk = list_comma_string([
-        level.user_id, level.stars, 1 if level.stars == 10 else 0, level.ID, int(level.verified_coins), int(level.featured), level.password, 0 # Featured ID
+        level.user_id, level.stars, 1 if level.stars == 10 else 0, level.ID, int(level.verified_coins), int(level.featured), level.password, fea_id
     ])
     password_xor = cipher_xor(level.password, XorKeys.level_password) if level.password != 0 else level.password
     logging.debug(password_xor)
@@ -146,7 +158,8 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
         47 : 2,
         48 : 1,
         40 : int(level.ldm),
-        27 : password_xor
+        27 : password_xor,
+        41 : fea_id
     }) + f"#{level_helper.solo_gen(await level.load_string())}#" + level_helper.solo_gen2(yo_idk) + f"#{yo_idk}"
 
     logging.debug(response)
@@ -200,3 +213,18 @@ async def upload_level_handler(request : aiohttp.web.Request):
     level_id = await level_helper.upload_level(new_level)
 
     return aiohttp.web.Response(text=str(level_id))
+
+async def get_daily_handler(request : aiohttp.web.Request):
+    """Daily level handler."""
+    post_data = await request.post()
+
+    weekly = string_bool(post_data["weekly"])
+    change_time = 0
+
+    if not weekly:
+        change_time = get_timestamp()-time_since_midnight()
+        level_id = (await level_helper.get_daily_level()).level_id
+
+    response = f"{level_id}|{change_time}"
+    logging.debug(response)
+    return aiohttp.web.Response(text=response)

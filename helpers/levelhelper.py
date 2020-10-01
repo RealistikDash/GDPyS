@@ -260,4 +260,29 @@ class LevelHelper():
             ))
             await myconn.conn.commit()
 
+    async def _daily_level_from_db(self) -> DailyLevel:
+        """Gets daily level from database."""
+        timestamp = get_timestamp()
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT feaID, levelID, timestamp, type FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (timestamp,))
+            daily = await mycursor.fetchone()
+        if daily is None:
+            logging.warning("No daily level set! Please set one or else there won't be a daily level.")
+            return None
+        logging.debug("Cached new daily level.")
+        return DailyLevel(
+            daily[0],
+            daily[1],
+            int(daily[2]),
+            bool(daily[3])
+        )
+    
+    async def get_daily_level(self) -> DailyLevel:
+        """Gets the current daily level."""
+        if self.daily is None:
+            self.daily = await self._daily_level_from_db()
+        if self.daily.timestamp < get_timestamp():
+            self.daily = await self._daily_level_from_db()
+        return self.daily
+
 level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

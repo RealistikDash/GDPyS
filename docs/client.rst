@@ -1,5 +1,3 @@
-.. currentmodule:: gdpys
-
 Client
 ======
 

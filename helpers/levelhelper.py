@@ -5,6 +5,7 @@ from conn.mysql import myconn
 from objects.levels import Level, Rating, DailyLevel
 from config import user_config
 from aiofile import AIOFile
+import os
 import logging
 
 class LevelHelper():
@@ -145,7 +146,8 @@ class LevelHelper():
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("SELECT levelID FROM levels WHERE extID = %s AND levelName = %s", (level.account_id, level.name))
             level_count = await mycursor.fetchone()
-            if level_count is None:
+            if level_count is not None:
+                logging.debug("The level is being updated.")
                 # We are currently updating an existing level.
                 await mycursor.execute("""UPDATE levels SET
                                 gameVersion = %s,
@@ -165,7 +167,8 @@ class LevelHelper():
                                 songID = %s,
                                 updateDate = %s
                             WHERE
-                                levelID = %s""",(
+                                levelID = %s
+                            LIMIT 1""",(
                                     level.game_version,
                                     level.binary_version,
                                     level.description,
@@ -186,8 +189,10 @@ class LevelHelper():
                                 ))
                 level_id = mycursor.lastrowid
                 await myconn.conn.commit()
+                os.remove(user_config["level_path"] + str(level_id)) # Removing previous level version
             
             else:
+                logging.debug("This is a new level.")
                 # It is a new level, insert it instead.
                 await mycursor.execute("""INSERT INTO levels 
                                             (
@@ -249,7 +254,10 @@ class LevelHelper():
             async with AIOFile(user_config["level_path"] + str(level_id), "w+") as file: #tbh this should be a function
                 await file.write(level.string)
                 await file.fsync()
+            
         
+        # We NEED to cache/re-cache it
+        await self._cache_level_obj(level_id)
         return level_id
 
     async def rate_level(self, rating : Rating) -> None:

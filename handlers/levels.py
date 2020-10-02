@@ -98,12 +98,10 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
     level_id = int(post_data["levelID"])
 
     # Daily level check.
-    daily = False
     fea_id = 0
     if level_id == -1:
         daily_obj = await level_helper.get_daily_level()
         level_id = daily_obj.level_id
-        daily = True
         fea_id = daily_obj.ID
 
     level = await level_helper.get_level_obj(level_id)

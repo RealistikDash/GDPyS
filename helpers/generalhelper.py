@@ -72,7 +72,7 @@ def string_bool(str_bool : str) -> bool:
         return True
     return False
 
-def deprecated(func: Union[asyncio.coroutine, function]) -> Union[asyncio.coroutine, function]:
+def deprecated(func):
     """Decorator for deprecation warning"""
     raise DeprecationWarning("Function is deprecated!")
 

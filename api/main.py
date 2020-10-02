@@ -1,4 +1,6 @@
 from aiohttp import web
+from routes import user_handler
 
-api = web.Application()
-# work on this later
+app = web.Application()
+
+app.router.add_post("/user/{userid}", user_handler)

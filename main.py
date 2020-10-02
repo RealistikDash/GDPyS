@@ -19,7 +19,7 @@ from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
-from api.main import api
+from api.main import app as api
 from tools.main import tools
 import os
 import importlib

@@ -1,6 +1,8 @@
 #simple misc functions thaat aim to replace 
+import asyncio
 import aiohttp
 import logging
+from typing import Union
 
 def dict_keys(dictioary: dict) -> tuple:
     """Returns a tuple of all the dictionary keys."""
@@ -70,10 +72,14 @@ def string_bool(str_bool : str) -> bool:
         return True
     return False
 
+def deprecated(func):
+    """Decorator for deprecation warning"""
+    raise DeprecationWarning("Function is deprecated!")
+
 class UpdateQueryBuilder():
     """Makes it simple to work with long update queries."""
     def __init__(self, target_db : str):
-        """Prepares that builder and sets tthe db."""
+        """Prepares that builder and sets the db."""
         self.TARGET_DB = target_db
         self.where_conditions = []
         self.where_params = []

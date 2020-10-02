@@ -5,17 +5,25 @@ class Plugin:
     def __init__(self):
         """Start main loop"""
         depend_check = []
-        for p in self.dependencies:
-            for f in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins"):
-                f = f.strip(".py")
-                if p == f:
-                    depend_check.append(p)
-        if depend_check != self.dependencies:
-            print(f"Dependencies could not be found for \"{self.__class__}\".")
+        try:
+            for p in self.dependencies:
+                for f in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins"):
+                    f = f.strip(".py")
+                    if p == f:
+                        depend_check.append(p)
+            if depend_check != self.dependencies:
+                print(f"Dependencies could not be found for \"{self.__class__}\".")
+        except AttributeError:
+            print("Dependencies is disabled for " + str(self.__class__))
         self.stopped = False
         loop = asyncio.new_event_loop()
         configpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins/config"
-        self.config = json.load(open(configpath + "/" + self.name + "/config.json", "r"))
+        try:
+            self.config = json.load(open(configpath + "/" + self.name + "/config.json", "r"))
+        except AttributeError:
+            print("Warning: Config is disabled for " + str(self.__class__))
+        except FileNotFoundError:
+            print("Warning: Config is disabled for " + str(self.__class__))
         if self.metadata == False:
             print(f"Warning: Plugin {self.__class__} has invalid metadata!")
         while True:
@@ -30,6 +38,7 @@ class Plugin:
             return
         if self.metadata == False:
             print("Warning: Config could not be created due to insufficent metadata.")
+            return
         if not os.path.exists(configpath):
             os.mkdir(configpath)
         if not os.path.exists(configpath + "/" + self.name):

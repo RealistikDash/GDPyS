@@ -19,7 +19,7 @@ from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
-from api.main import api
+#from api.main import app as api
 from tools.main import tools
 import os
 import importlib
@@ -51,7 +51,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/suggestGJStars20.php", rate_level_handler)
     app.router.add_post("/database/requestUserAccess.php", mod_check_handler)
     app.router.add_post("/database/getGJDailyLevel.php", get_daily_handler)
-    app.add_subapp("/api/", api)
+    #app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
 
 def welcome_sequence(no_ascii : bool = False):

@@ -2,13 +2,13 @@ import asyncio
 from aiohttp.payload_streamer import streamer
 from helpers.userhelper import user_helper
 from helpers.levelhelper import level_helper
-from helpers.generalhelper import dict_keys
+from helpers.generalhelper import dict_keys, deprecated
 from helpers.timehelper import get_timestamp
 from objects.comments import CommandContext, Comment, CommentBan
 from constants import Permissions
 from config import user_config
 from exceptions import GDPySCommandError
-from objects.levels import Level, Rating
+from objects.levels import Level, Rating, DailyLevel
 
 COMMANDS = {}
 
@@ -55,6 +55,14 @@ class Client:
     async def rate_level(self, rating: Rating):
         """Rates a level given a Rating object"""
         return await level_helper.rate_level(rating)
+
+    async def get_daily_level(self) -> DailyLevel:
+        """Get the current daily level"""
+        return await level_helper.get_daily_level()
+
+    #async def get_weekly_level(self) -> WeeklyLevel:
+    #    """Get the current weekly level"""
+    #    return await level_helper.get_weekly_level()
 
     ############################
     #         Commands         #

@@ -8,7 +8,7 @@ from handlers.login import login_handler
 from handlers.register import register_handler
 from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler, post_account_comment_handler, update_profile_stats_handler, get_account_url_handler, save_user_data_handler, load_save_data_handler, update_acc_settings_handler, leaderboards_handler, mod_check_handler
 from handlers.songs import featured_artists_handler, get_songinfo_handler
-from handlers.levels import level_search_modular_hanlder, download_level, upload_level_handler, get_daily_handler
+from handlers.levels import level_search_modular_hanlder, download_level, upload_level_handler, get_daily_handler, get_map_packs_handler
 from handlers.rewards import quests_handler
 from handlers.levelextras import level_comments_handler, post_comment_handler, rate_level_handler
 from helpers.userhelper import user_helper
@@ -51,6 +51,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/suggestGJStars20.php", rate_level_handler)
     app.router.add_post("/database/requestUserAccess.php", mod_check_handler)
     app.router.add_post("/database/getGJDailyLevel.php", get_daily_handler)
+    app.router.add_post("/database/getGJMapPacks21.php", get_map_packs_handler)
     #app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
 

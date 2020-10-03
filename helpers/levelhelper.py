@@ -4,7 +4,6 @@ from helpers.crypthelper import hash_sha1
 from conn.mysql import myconn
 from objects.levels import Level, Rating, DailyLevel
 from config import user_config
-from constants import CryptKeys
 from aiofile import AIOFile
 import os
 import logging
@@ -100,7 +99,7 @@ class LevelHelper():
 
             Hash += f"{str(level.ID)[0]}{str(level.ID)[len(str(level.ID))-1]}{level.stars}{int(level.verified_coins)}"
         
-        return hash_sha1(Hash + CryptKeys.solo)
+        return hash_sha1(Hash + "xI25fpAapCQg")
     
     
     def solo_gen(self, level_str: str):
@@ -109,10 +108,10 @@ class LevelHelper():
         str_len = len(level_str) // 40
         for i in range(40):
             return_str += level_str[i * str_len]
-        return hash_sha1(return_str + CryptKeys.solo)
+        return hash_sha1(return_str + "xI25fpAapCQg")
     
     def solo_gen2(self, level_string : str) -> str:
-        return hash_sha1(level_string + CryptKeys.solo)
+        return hash_sha1(level_string + "xI25fpAapCQg")
     
     async def bump_download(self, level_id : int):
         """Bumps a level's download count by one."""

@@ -2,15 +2,14 @@ import logging
 import aiohttp
 from helpers.levelhelper import level_helper
 from helpers.searchhelper import search_helper
-from helpers.generalhelper import create_offsets_from_page, string_bool, joint_string, list_comma_string, paginate_list
+from helpers.generalhelper import create_offsets_from_page, string_bool, joint_string, list_comma_string
 from helpers.songhelper import songs
 from helpers.userhelper import user_helper
-from helpers.crypthelper import cipher_xor, hash_sha1
+from helpers.crypthelper import cipher_xor
 from helpers.auth import auth
 from helpers.timehelper import time_since_midnight, get_timestamp
 from objects.levels import SearchQuery, Level
-from cron.cachempgauntlets import map_packs
-from constants import XorKeys, ResponseCodes, CryptKeys
+from constants import XorKeys, ResponseCodes
 from config import user_config
 
 async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp.web.Response:
@@ -225,34 +224,5 @@ async def get_daily_handler(request : aiohttp.web.Request):
         level_id = (await level_helper.get_daily_level()).level_id
 
     response = f"{level_id}|{change_time}"
-    logging.debug(response)
-    return aiohttp.web.Response(text=response)
-
-async def get_map_packs_handler(request : aiohttp.web.Request):
-    """Handles getting in-game map packs."""
-    post_data = await request.post()
-
-    page = int(post_data["page"])
-    offset = create_offsets_from_page(post_data["page"]) # Used for server resposne
-
-    packs = paginate_list(map_packs, page)
-    response = ""
-    hashed = ""
-    for pack in packs:
-        response += joint_string({
-            1 : pack.ID,
-            2 : pack.name,
-            3 : list_comma_string(pack.levels),
-            4 : pack.stars,
-            5 : pack.coins,
-            6 : pack.difficulty,
-            7 : str(pack.colour),
-            8 : str(pack.colour)
-        }) + "|"
-        id_str = str(pack.ID) # So we don't have to convert every time in the formatted str
-        hashed += f"{id_str[0]}{id_str[len(id_str)-1]}{pack.stars}{pack.coins}"
-    
-    hashed = hash_sha1(hashed+CryptKeys.solo)
-    response = f"{response[:-1]}#{len(map_packs)}:{offset}:10#{hashed}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

@@ -8,7 +8,7 @@ Secondly, it will be written in an asynchronous manner. This will allow multiple
 
 ## Discord
 
-If you are interested in this project join our discord [here](https://discord.gg/Un42FEV).
+If you are interested in this project join our discord [here](https://discord.gg/uPDkEDS/).
 
 ## Docs
 

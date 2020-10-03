@@ -41,11 +41,6 @@ class Colours():
     white = u"\u001b[37m"
     all_col = [red, green, yellow, blue, magenta, cyan, white]
 
-class CryptKeys():
-    solo = "xI25fpAapCQg"
-    solo3 = "oC36fpYaPtdg"
-    solo4 = "pC26fpYaQCtg"
-
 ASCII_ART = r"""
 {col1}          _____          {col2}          _____          {col3}          _____          {col4}      _____          {col5}          _____            {reset}      
 {col1}         /\    \         {col2}         /\    \         {col3}         /\    \         {col4}     |\    \         {col5}         /\    \           {reset}      

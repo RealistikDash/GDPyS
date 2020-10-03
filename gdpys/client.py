@@ -68,15 +68,13 @@ class Client:
     #         Commands         #
     ############################ 
 
-    def command(self, coro: asyncio.coroutine, name: str=None, permission: Permissions=None):
+    def command(self, name: str=None, permission: Permissions=None):
         """Decorator to create commands"""
-        if not asyncio.iscoroutine(coro):
-            raise Exception("Function is not a coroutine function!")
-
-        if name is None:
-            name = coro.__name__.lower()
-
         def decorator(coro):
+            if not asyncio.iscoroutine(coro):
+                raise Exception("Function is not a coroutine function!")
+            if name is None:
+                name = coro.__name__.lower()
             loop = asyncio.new_event_loop()
             loop.create_task(self.create_command(name, coro, permission))
 

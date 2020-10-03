@@ -15,7 +15,7 @@ from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
 from helpers.priveliegehelper import priv_helper
-from cron.cron import run_cron
+from cron.cron import run_cron, cron_gather
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
@@ -83,6 +83,7 @@ async def init(loop):
     await create_connection(loop, user_config)
     await priv_helper.cache_privs()
     await run_cron()
+    #await cron_gather()
     songs.top_artists = await songs._top_artists()
     # Setting up rate limiter
     rate_limiter.add_to_struct("register", limit=2) # One IP may only register twice a day.

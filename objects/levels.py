@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from .misc import RGB
 from config import user_config
 from aiofile import AIOFile
 
@@ -84,3 +85,24 @@ class DailyLevel():
     level_id : int
     timestamp : int
     weekly : bool
+
+@dataclass
+class MapPack():
+    """Map pack dataclass."""
+    ID : int
+    name : str
+    levels : list
+    stars : int
+    coins : int
+    difficulty : int
+    colour : RGB
+
+@dataclass
+class Gauntlet():
+    ID : int
+    # Might make it just a list instead but /shrug
+    level1_id : int
+    level2_id : int
+    level3_id : int
+    level4_id : int
+    level5_id : int

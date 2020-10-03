@@ -47,3 +47,12 @@ def time_since_midnight() -> int:
     """Returns time since midnight."""
     now = datetime.now()
     return round((now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds())
+
+def time_str(timer : Timer) -> str:
+    """If time is in ms, returns ms value. Else returns rounded seconds value."""
+    time = timer.end()
+    if time < 1:
+        time_str = f"{timer.ms_return()}ms"
+    else:
+        time_str = f"{round(time,2)}s"
+    return time_str

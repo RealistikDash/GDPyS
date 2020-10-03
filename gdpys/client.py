@@ -75,8 +75,8 @@ class Client:
                 raise Exception("Function is not a coroutine function!")
             if name is None:
                 name = coro.__name__.lower()
-            loop = asyncio.new_event_loop()
-            loop.create_task(await self.create_command(name, coro, permission))
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.create_command(name, coro, permission))
 
         return decorator
 

@@ -4,7 +4,7 @@ import hashlib
 import string
 import random
 from itertools import cycle
-from constants import XorKeys
+from constants import XorKeys, CryptKeys
 import logging
 
 def hash_sha1(text: str) -> str:
@@ -58,4 +58,4 @@ def decode_chk(text : str) -> str:
 
 def solo_gen3(string: str):
     """Port of genSolo3 from Cvolton's GMDPrivateServer."""
-    return hash_sha1(string + "oC36fpYaPtdg")
+    return hash_sha1(string + CryptKeys.solo3)

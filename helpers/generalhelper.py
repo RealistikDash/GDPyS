@@ -76,6 +76,11 @@ def deprecated(func):
     """Decorator for deprecation warning"""
     raise DeprecationWarning("Function is deprecated!")
 
+def paginate_list(list_to_paginate : list, page : int, elems_page : int = 10):
+    """Gets a page from list."""
+    offset = create_offsets_from_page(page, elems_page)
+    return list_to_paginate[offset:offset+elems_page]
+
 class UpdateQueryBuilder():
     """Makes it simple to work with long update queries."""
     def __init__(self, target_db : str):

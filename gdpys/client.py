@@ -71,7 +71,7 @@ class Client:
     def command(self, name: str=None, permission: Permissions=None):
         """Decorator to create commands"""
         def decorator(coro):
-            if not asyncio.iscoroutine(coro):
+            if not coro.__code__.co_flags & 0x0080 or getattr(coro, '_is_coroutine', False):
                 raise Exception("Function is not a coroutine function!")
             if name is None:
                 name = coro.__name__.lower()

@@ -36,7 +36,7 @@ async def level_comments_handler(request : aiohttp.web.Request):
     for comment in comments.results:
         comment : Comment
         try:
-            comment_user = await user_helper.get_object(await user_helper.accid_userid(comment.user_id))
+            comment_user = await user_helper.get_object(await user_helper.userid_accid(comment.user_id))
         except AssertionError: # The user does not exist
             logging.debug(f"Failed searching for user {comment.user_id}. Should be skipped.")
         else:

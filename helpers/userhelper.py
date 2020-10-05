@@ -19,6 +19,7 @@ class UserHelper():
         self.object_cache = {}
         self.extra_object_cache = {}
         self.accid_userid_cache = {}
+        self.userid_accid_cache = {}
         self.relationships = {}
         self.user_str_cache = {}
     
@@ -89,6 +90,22 @@ class UserHelper():
         if account_id not in dict_keys(self.accid_userid_cache):
             await self._cache_aid_uid(account_id)
         return self.accid_userid_cache[account_id]
+    
+    async def _cache_uid_aid(self, user_id: int) -> None:
+        """Caches an account id to user id value."""
+        user_id =int(user_id)
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT extID FROM users WHERE userID = %s LIMIT 1", (user_id,))
+            acc_id = await mycursor.fetchone()
+        assert acc_id is not None
+        self.userid_accid_cache[user_id] = acc_id[0]
+    
+    async def userid_accid(self, user_id : int) -> int:
+        """Returns the accountID of a user with given userID."""
+        user_id = int(user_id)
+        if user_id not in dict_keys(self.userid_accid_cache):
+            await self._cache_uid_aid(user_id)
+        return self.userid_accid_cache[user_id]
     
     async def recache_object(self, account_id: int) -> None:
         """Forces a user object to recache."""

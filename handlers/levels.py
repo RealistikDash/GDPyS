@@ -9,7 +9,7 @@ from helpers.crypthelper import cipher_xor, hash_sha1
 from helpers.auth import auth
 from helpers.timehelper import time_since_midnight, get_timestamp
 from objects.levels import SearchQuery, Level
-from cron.cachempgauntlets import map_packs
+from cron.cachempgauntlets import map_packs, gauntlets
 from constants import XorKeys, ResponseCodes, CryptKeys
 from config import user_config
 
@@ -254,5 +254,23 @@ async def get_map_packs_handler(request : aiohttp.web.Request):
     
     hashed = hash_sha1(hashed+CryptKeys.solo)
     response = f"{response[:-1]}#{len(map_packs)}:{offset}:10#{hashed}"
+    logging.debug(response)
+    return aiohttp.web.Response(text=response)
+
+async def get_gauntlets_handler(request : aiohttp.web.Request):
+    """Responsible for serving the guantlets to the client."""
+    # The Soviet Union has changed their diplomatic status on us: Declare War
+    # No need for postdata here.
+
+    gautnlet_resp = ""
+    hashed = ""
+    for gauntlet in gauntlets:
+        gautnlet_resp += joint_string({
+            1 : gauntlet.ID,
+            3 : list_comma_string(gauntlet.level_list())
+        }) + "|"
+        hashed += str(gauntlet.ID) + list_comma_string(gauntlet.level_list())
+    
+    response = f"{gautnlet_resp[:-1]}#{level_helper.solo_gen2(hashed)}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

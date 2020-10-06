@@ -106,3 +106,7 @@ class Gauntlet():
     level3_id : int
     level4_id : int
     level5_id : int
+
+    def level_list(self) -> tuple:
+        """Returns a tuple of all levels inside the gauntlet."""
+        return (self.level1_id, self.level2_id, self.level3_id, self.level4_id, self.level5_id)

@@ -6,17 +6,18 @@ __name__ = "ConfigModule"
 __author__ = "RealistikDash"
 
 default_config = {
-    "port" : 69,
+    "port" : 80,
     "sql_server" : "localhost",
     "sql_user" : "root",
-    "sql_db" : "realistikosu",
+    "sql_db" : "gdpys",
     "sql_password" : "",
     "debug" : False,
     "level_path" : "data/levels/",
     "save_path" : "data/saves/",
-    "command_prefix" : "/",
+    "command_prefix" : "!",
     "default_priv" : 30,
-    "cache_level_strs" : True
+    "cache_level_strs" : True,
+    "lang" : "en"
 }
 
 user_config = {}

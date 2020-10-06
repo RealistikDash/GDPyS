@@ -123,6 +123,8 @@ class UserHelper():
 
     def has_privilege(self, user_obj: Account, privileges: int) -> bool:
         """Checks if a user has a privilege."""
+        if privileges is None:
+            return True
         return bool(user_obj.privileges & privileges)
     
     async def get_accountid_from_username(self, username:str) -> int:

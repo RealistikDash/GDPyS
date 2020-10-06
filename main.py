@@ -15,7 +15,7 @@ from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
 from helpers.priveliegehelper import priv_helper
-from cron.cron import run_cron, cron_gather
+from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path

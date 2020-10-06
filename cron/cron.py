@@ -16,15 +16,6 @@ CRON_JOBS = [ #
     cron_cache_gauntlets
 ]
 
-CRON_JOBS_CORO = [ # 
-    cron_calc_ranks(),
-    cron_calc_cp(),
-    cron_top_stars(),
-    cron_top_cp(),
-    cron_cache_mappacks(),
-    cron_cache_gauntlets()
-]
-
 async def run_cron():
     """Runs all of the cron jobs."""
     total_t = Timer()
@@ -46,12 +37,12 @@ async def run_cron():
     t_str = time_str(total_t)
     logging.info("Finished all cron jobs in " + t_str)
 
-async def cron_gather():
-    """An experimental way of running all of the cron jobs simultaniously async style."""
-    logging.debug(f"Queueing {len(CRON_JOBS_CORO)} cron jobs.")
-    t = Timer()
-    t.start()
-    await asyncio.gather(*CRON_JOBS_CORO)
-    #await asyncio.wait(CRON_JOBS, return_when=asyncio.FIRST_COMPLETED)
-    t_str = time_str(t)
-    logging.info(f"Finished {len(CRON_JOBS_CORO)} jobs in {t_str}")
+#async def cron_gather():
+#    """An experimental way of running all of the cron jobs simultaniously async style."""
+#    logging.debug(f"Queueing {len(CRON_JOBS_CORO)} cron jobs.")
+#    t = Timer()
+#    t.start()
+#    await asyncio.gather(*CRON_JOBS_CORO)
+#    #await asyncio.wait(CRON_JOBS, return_when=asyncio.FIRST_COMPLETED)
+#    t_str = time_str(t)
+#    logging.info(f"Finished {len(CRON_JOBS_CORO)} jobs in {t_str}")

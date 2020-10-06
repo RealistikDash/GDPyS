@@ -106,7 +106,7 @@ class Client:
         """Executes a GDPyS command comment command. Returns a bool or commentban object."""
         command_args = command_obj.comment[len(user_config["command_prefix"]):].split(" ")
         command = COMMANDS[command_args[0].lower()]
-        ctx = await self.create_context(command_obj)
+        ctx = await self._create_context(command_obj)
         account = await user_helper.get_object(await user_helper.accid_userid(command_obj.user_id)) # SHOULD be already cached.
         if not user_helper.has_privilege(account, command["permission"]):
             return False

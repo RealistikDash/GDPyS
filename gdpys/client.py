@@ -9,6 +9,8 @@ from constants import Permissions
 from config import user_config
 from exceptions import GDPySCommandError
 from objects.levels import Level, Rating, DailyLevel
+global name
+global permission
 
 COMMANDS = {}
 
@@ -68,13 +70,8 @@ class Client:
     #         Commands         #
     ############################ 
 
-    def command(self, _name: str=None, _permission: Permissions=None):
+    def command(self, name: str=None, permission: Permissions=None):
         """Decorator to create commands"""
-        global name
-        global permission
-        
-        name = _name
-        permission = _permission
         def decorator(coro):
             if not coro.__code__.co_flags & 0x0080 or getattr(coro, '_is_coroutine', False):
                 raise Exception("Function is not a coroutine function!")

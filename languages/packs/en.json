@@ -1,3 +1,12 @@
 {
-  
+  "errors": {
+    "START_LVLPATH": "Level/Save path does not exist! Please create it before starting GDPyS."
+  },
+  "info": {
+    "SET_LVLPATH": "Set level path: {0}\nSet save path: {1}"
+  },
+  "runtime": {
+    "shutdown": "Shutting down! Bye!",
+    "loading_plugin": "Loading plugin {0}...",
+  }
 }

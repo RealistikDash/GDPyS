@@ -5,6 +5,21 @@
   "info": {
     "SET_LVLPATH": "Set level path: {0}\nSet save path: {1}"
   },
+  "warning": {
+    "no_daily": "No daily level set! Please set one."
+  },
+  "debug": {
+    "no_gjp": "No known GJP, checking...",
+    "user_not_found": "Couldn't find user with such name!",
+    "handled_checkpw_err": "Handled checkpw ValueError {0}",
+    "privelege_cached": "Privelege {0} {1} cached to memory.",
+    "ip_new_struct": "Updating all IP rate limits with the new struct...",
+    "added_to_struct": "Added {0} to struct with default value of {1} and limit of {2}",
+    "bumping_ip": "Bumping IP count...",
+    "count_expired": "Count expired for IP. Resetting.",
+    "reached_limit": "{0} reached limit for {1} with {2}/{3}",
+    "passed_limit": "{0} passed limit with {1}/{2}
+  },
   "runtime": {
     "shutdown": "Shutting down! Bye!",
     "loading_plugin": "Loading plugin {0}...",

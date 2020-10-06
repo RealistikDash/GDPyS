@@ -17,4 +17,4 @@ Due to GDPyS' major advances within the GDPS space, its requirements are complet
 - Device/Server capable of running Python (Linux VPS is recommended)
 - Python 3.7+
 - MySQL Server
-- Domain name ~17 characters long (can be a bit more or less if using a few exe tweaks)
+- Domain name ~17 characters long (can be a bit more or less if using a few exe tweaks or if using hosts file)

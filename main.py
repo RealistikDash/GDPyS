@@ -24,6 +24,7 @@ from tools.main import tools
 import os
 import importlib
 from threading import Thread
+import helpers.lang
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""

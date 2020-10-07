@@ -1,6 +1,7 @@
 from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp
 from helpers.crypthelper import hash_sha1
+from helpers.userhelper import user_helper
 from conn.mysql import myconn
 from objects.levels import Level, Rating, DailyLevel
 from config import user_config
@@ -263,11 +264,31 @@ class LevelHelper():
 
     async def rate_level(self, rating : Rating) -> None:
         """Rates a level."""
+        # CP Calculation time
+        level = await self.get_level_obj(rating.level_id)
+        cp_diff = 0
+        # Mess i tell you.
+        if level.featured and not rating.featured:
+            cp_diff -= 1
+        if not level.featured and rating.featured:
+            cp_diff += 1
+        if level.epic and not rating.epic:
+            cp_diff -= 1
+        if not level.epic and rating.epic:
+            cp_diff += 1
+        if level.stars and not rating.stars:
+            cp_diff -= 1
+        if not level.stars and rating.stars:
+            logging.debug("Cp for star.")
+            cp_diff += 1
+        await user_helper.give_cp(level.account_id, cp_diff)
+
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("UPDATE levels SET starStars = %s, starFeatured=%s,starEpic = %s, starCoins=%s,starDemonDiff=%s WHERE levelID = %s LIMIT 1", (
                 rating.stars, int(rating.featured), int(rating.epic), int(rating.verified_coins), rating.demon_diff, rating.level_id
             ))
             await myconn.conn.commit()
+        await self._cache_level_obj(level.ID)
 
     async def _daily_level_from_db(self) -> DailyLevel:
         """Gets daily level from database."""

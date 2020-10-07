@@ -91,7 +91,7 @@ class SearchQueryFormatter():
         levels = await self.search_engine.get_levels(search_filters)
         return QueryResponse(
             levels.total_results,
-            await level_helper.level_list_objs(levels)
+            await level_helper.level_list_objs(levels.results)
         )
 
 search_helper = SearchQueryFormatter()

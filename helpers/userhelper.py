@@ -300,5 +300,13 @@ class UserHelper():
             await myconn.conn.commit()
         
         await self.recache_object(account_id) # May make this func just edit the current obj
+    
+    async def give_cp(self, account_id : int, cp : int = 1):
+        """Gives a user an amount of CP."""
+        logging.debug(f"{account_id} has gained {cp} CP")
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE users SET creatorPoints = creatorPoints + %s WHERE extID = %s LIMIT 1", (cp, account_id,))
+            await myconn.conn.commit()
+            await self.recache_object(account_id) # May make this func just edit the current obj
 
 user_helper = UserHelper() # This has to be a common class.

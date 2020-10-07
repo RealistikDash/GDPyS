@@ -2,53 +2,66 @@ import logging
 import aiohttp
 from helpers.levelhelper import level_helper
 from helpers.searchhelper import search_helper
-from helpers.generalhelper import create_offsets_from_page, string_bool, joint_string, list_comma_string, paginate_list
+from helpers.generalhelper import create_offsets_from_page, string_bool, joint_string, list_comma_string, paginate_list, select_obj_id
 from helpers.songhelper import songs
 from helpers.userhelper import user_helper
 from helpers.crypthelper import cipher_xor, hash_sha1
 from helpers.auth import auth
 from helpers.timehelper import time_since_midnight, get_timestamp
-from objects.levels import SearchQuery, Level
+from objects.levels import SearchQuery, Level, Gauntlet
 from cron.cachempgauntlets import map_packs, gauntlets
 from constants import XorKeys, ResponseCodes, CryptKeys
 from config import user_config
 
-async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp.web.Response:
+async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp.web.Response: # Kinda stole the name for the function from osu lol
     """Handles the get levels endpoint."""
     post_data = await  request.post()
 
     # Daily levels
-    offset = create_offsets_from_page(int(post_data["page"]))
+    page = int(post_data.get("page", 0))
+    offset = create_offsets_from_page(page)
     logging.debug(offset)
-    # Okay so here we have to create the search query object. May have to redo it but this should be sufficient for the time being.
-    query = SearchQuery(
-        int(post_data["type"]),
-        offset,
-        None, # Uncertain if order is used.
-        int(post_data.get("gauntlet", 0)),
-        string_bool(post_data.get("featured", "0")),
-        string_bool(post_data.get("original", "0")),
-        string_bool(post_data.get("epic", "0")),
-        string_bool(post_data.get("twoPlayer", "0")),
-        string_bool(post_data.get("star", "0")),
-        string_bool(post_data.get("noStar", "0")),
-        post_data.get("len", ""),
-        int(post_data.get("song", 0)),
-        int(post_data.get("customSong", 0)),
-        post_data.get("diff", ""),
-        post_data.get("str", "")
-    )
-    logging.debug(query)
 
-    levels = await search_helper.get_levels(query)
+    # I doubt we need to use the search engine for the gauntlets as they are already cached.
+    gauntlet_req = int(post_data.get("gauntlet", 0))
+    if not gauntlet_req:
+        # Okay so here we have to create the search query object. May have to redo it but this should be sufficient for the time being.
+        query = SearchQuery(
+            int(post_data["type"]),
+            offset,
+            None, # Uncertain if order is used.
+            int(post_data.get("gauntlet", 0)),
+            string_bool(post_data.get("featured", "0")),
+            string_bool(post_data.get("original", "0")),
+            string_bool(post_data.get("epic", "0")),
+            string_bool(post_data.get("twoPlayer", "0")),
+            string_bool(post_data.get("star", "0")),
+            string_bool(post_data.get("noStar", "0")),
+            post_data.get("len", ""),
+            int(post_data.get("song", 0)),
+            int(post_data.get("customSong", 0)),
+            post_data.get("diff", ""),
+            post_data.get("str", "")
+        )
+        logging.debug(query)
+
+        levels = await search_helper.get_levels(query)
+    
+    else:
+        # We are getting gauntlets
+        gauntlet : Gauntlet = select_obj_id(gauntlets, gauntlet_req) # Select gauntlet from known list.
+        if gauntlet is None: # Not Found
+            logging.debug(f"Gauntlet {gauntlet_req} not found.") # TODO: Incooperate this with the lang system.
+            return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        levels = await level_helper.level_list_objs(gauntlet.level_list())
 
     # Getting final reponse
     response = ""
     lvls_list = []
     song_str = ""
     user_str = ""
-    gauntlet_append = "" if not query.gauntlet else f"44:{query.gauntlet}:"
-    for level in levels.results:
+    gauntlet_append = "" if not gauntlet_req else f"44:{gauntlet_req}:"
+    for level in levels.results if not gauntlet_req else levels:
         level : Level
         response += gauntlet_append
         lvls_list.append(level.ID)
@@ -88,7 +101,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
             }
         ) + "|"
     
-    response = response[:-1] + "#" + user_str[:-1] + "#" + song_str[:-3] + f"#{levels.total_results}:{offset}:10#" + await level_helper.multi_gen(lvls_list)
+    response = response[:-1] + "#" + user_str[:-1] + "#" + song_str[:-3] + f"#{levels.total_results if not gauntlet_req else len(gauntlets)}:{offset}:10#" + await level_helper.multi_gen(lvls_list)
     logging.debug(response)
     return aiohttp.web.Response(text=response)
 

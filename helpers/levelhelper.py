@@ -293,5 +293,9 @@ class LevelHelper():
         if self.daily.timestamp < get_timestamp():
             self.daily = await self._daily_level_from_db()
         return self.daily
+    
+    async def level_list_objs(self, level_list : list) -> list:
+        """Returns a list of level objects from list of levelIDs."""
+        return [await self.get_level_obj(i) for i in level_list]
 
 level_helper = LevelHelper() # Shared object between all imports for caching to work correctly etc.

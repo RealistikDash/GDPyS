@@ -24,7 +24,6 @@ from tools.main import tools
 import os
 import importlib
 from threading import Thread
-import helpers.lang
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -61,6 +60,9 @@ def welcome_sequence(no_ascii : bool = False):
     """Startup welcome print art things."""
     if not no_ascii:
         print(ASCII_ART.format(reset = Colours.reset, col1 = random.choice(Colours.all_col), col2 = random.choice(Colours.all_col), col3 = random.choice(Colours.all_col), col4 = random.choice(Colours.all_col), col5 = random.choice(Colours.all_col)))
+    # No cache warning
+    #if user_config["no_cache"]:
+    #    logging.warning("CACHING DISABLED (through user config)! This will lead to a MASSIVE performance hit. Keep it on unless under MASSIVE memory limitations.")
 
 def pre_run_checks():
     """Runs checks before startup to make sure all runs smoothly."""

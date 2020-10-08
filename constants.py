@@ -46,6 +46,10 @@ class CryptKeys():
     solo3 = "oC36fpYaPtdg"
     solo4 = "pC26fpYaQCtg"
 
+class Paths():
+    """File paths."""
+    lang_packs = "languages/packs/"
+
 ASCII_ART = r"""
 {col1}          _____          {col2}          _____          {col3}          _____          {col4}      _____          {col5}          _____            {reset}      
 {col1}         /\    \         {col2}         /\    \         {col3}         /\    \         {col4}     |\    \         {col5}         /\    \           {reset}      

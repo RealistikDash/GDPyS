@@ -18,10 +18,10 @@
     "bumping_ip": "Bumping IP count...",
     "count_expired": "Count expired for IP. Resetting.",
     "reached_limit": "{0} reached limit for {1} with {2}/{3}",
-    "passed_limit": "{0} passed limit with {1}/{2}
+    "passed_limit": "{0} passed limit with {1}/{2}"
   },
   "runtime": {
     "shutdown": "Shutting down! Bye!",
-    "loading_plugin": "Loading plugin {0}...",
+    "loading_plugin": "Loading plugin {0}..."
   }
 }

@@ -279,7 +279,6 @@ class LevelHelper():
         if level.stars and not rating.stars:
             cp_diff -= 1
         if not level.stars and rating.stars:
-            logging.debug("Cp for star.")
             cp_diff += 1
         await user_helper.give_cp(level.account_id, cp_diff)
 

@@ -2,6 +2,7 @@
 import asyncio
 import aiohttp
 import logging
+import json
 from typing import Union
 
 def dict_keys(dictioary: dict) -> tuple:
@@ -96,6 +97,24 @@ def select_obj_id(table : list, where):
             return i
     
     return None
+
+class JsonFile():
+    def __init__(self, file_name: str):
+        self.file = None
+        self.file_name = file_name
+        if os.path.exists(file_name):
+            with open(file_name) as f:
+                self.file = json.load(f)
+    
+    def get_file(self) -> dict:
+        """Returns the loaded JSON file as a dict."""
+        return self.file
+    
+    def write_file(self, new_content : dict) -> None:
+        """Writes a new dict to the file."""
+        with open(self.file_name, 'w') as f:
+            json.dump(new_content, f, indent=4)
+        self.file = new_content
 
 class UpdateQueryBuilder():
     """Makes it simple to work with long update queries."""

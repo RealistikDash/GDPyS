@@ -16,3 +16,6 @@ class GDPySCommandNotFound(Exception):
 
 class GDPySCommandMissingPrivileges(Exception):
     pass
+
+class LangNotFound(Exception):
+    """Raised by langhelper if language is not found."""

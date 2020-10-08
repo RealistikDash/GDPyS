@@ -1,6 +1,6 @@
 import os
 import json
-from helpers.generalhelper import dict_keys
+from helpers.generalhelper import dict_keys, JsonFile
 
 __name__ = "ConfigModule"
 __author__ = "RealistikDash"
@@ -23,24 +23,6 @@ default_config = {
 user_config = {}
 
 config_options = list(default_config.keys())
-
-class JsonFile():
-    def __init__(self, file_name: str):
-        self.file = None
-        self.file_name = file_name
-        if os.path.exists(file_name):
-            with open(file_name) as f:
-                self.file = json.load(f)
-    
-    def get_file(self) -> dict:
-        """Returns the loaded JSON file as a dict."""
-        return self.file
-    
-    def write_file(self, new_content : dict) -> None:
-        """Writes a new dict to the file."""
-        with open(self.file_name, 'w') as f:
-            json.dump(new_content, f, indent=4)
-        self.file = new_content
 
 def load_config(location : str = "config.json"):
     config = JsonFile(location)

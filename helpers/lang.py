@@ -1,12 +1,15 @@
 import json
 import os
 from helpers.generalhelper import JsonFile
-from config import user_config
 from constants import Paths
 from exceptions import LangNotFound
+import logging
 
 class Lang():
-    def __init__(self, language : str = "en"):
+    def __init__(self):
+        """Idk how else to make it wait for config."""
+        pass
+    def load_langs(self, language : str = "en"):
         """Loads the given language."""
         self.text_find_msg = "Failed to find translated text for {}|{}"
         self.main_lang = language
@@ -17,6 +20,8 @@ class Lang():
         # Check if lang is valid.
         if self.lang is None:
             raise LangNotFound
+
+        logging.info(self.info("LOADED_LANG", self.lang.get("formal_name", f"{language}.json")))
 
     def _format_string(self, text : str, format_args : tuple) -> str:
         """Formats a string according to the format args provided."""

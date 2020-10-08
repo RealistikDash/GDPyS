@@ -97,11 +97,12 @@ async def init(loop):
     return app
 
 if __name__ == "__main__":
-    start_plugins()
     load_config()
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     logging.basicConfig(level = logging_level)
+    lang.load_langs(user_config["lang"])
+    start_plugins()
     welcome_sequence()
     pre_run_checks()
     # Inits the app.

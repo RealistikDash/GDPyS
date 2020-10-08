@@ -1,9 +1,10 @@
 {
+  "formal_name" : "German - Deutsch",
   "errors": {
     "START_LVLPATH": "Level / Save Pfad existiert nicht! Bitte erstellen Sie es, bevor Sie GDPyS starten."
   },
   "info": {
-    "SET_LVLPATH": "Festlegen des Ebenenpfads: {0} \ nSetzen Sie den Sicherungspfad: {1}"
+    "SET_LVLPATH": "Festlegen des Ebenenpfads: {0} \nSetzen Sie den Sicherungspfad: {1}"
   },
   "warning": {
     "no_daily": "Kein tägliches Level eingestellt! Bitte setzen Sie eine."

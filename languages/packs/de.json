@@ -1,0 +1,27 @@
+{
+  "errors": {
+    "START_LVLPATH": "Level / Save Pfad existiert nicht! Bitte erstellen Sie es, bevor Sie GDPyS starten."
+  },
+  "info": {
+    "SET_LVLPATH": "Festlegen des Ebenenpfads: {0} \ nSetzen Sie den Sicherungspfad: {1}"
+  },
+  "warning": {
+    "no_daily": "Kein tägliches Level eingestellt! Bitte setzen Sie eine."
+  },
+  "debug": {
+    "no_gjp": "Kein bekanntes GJP, Überprüfung ...",
+    "user_not_found": "Benutzer mit diesem Namen konnte nicht gefunden werden!",
+    "handled_checkpw_err": "Checkpw ValueError {0} behandelt",
+    "privelege_cached": "Privileg {0} {1} Cache im Speicher.",
+    "ip_new_struct": "Aktualisieren aller IP-Ratenlimits mit der neuen Struktur ...",
+    "added_to_struct": "{0} zur Struktur mit dem Standardwert {1} und dem Limit {2} hinzugefügt",
+    "bumping_ip": "IP-Anzahl erhöht...",
+    "count_expired": "Anzahl für IP abgelaufen. Zurücksetzen.",
+    "reached_limit": "{0} hat mit {2} / {3} das Limit für {1} erreicht",
+    "passed_limit": "{0} hat das Limit mit {1} / {2 überschritten}"
+  },
+  "runtime": {
+    "shutdown": "Herunterfahren! Tschüss!",
+    "loading_plugin": "Plugin {0} wird geladen..."
+  }
+}

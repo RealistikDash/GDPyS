@@ -1,6 +1,7 @@
 from conn.mysql import myconn
 from helpers.generalhelper import create_offsets_from_page, dict_keys
 from helpers.userhelper import user_helper
+from helpers.lang import lang
 import logging
 import math
 
@@ -19,9 +20,9 @@ async def cron_calc_cp():
         await mycursor.execute("SELECT COUNT(*) FROM levels WHERE starStars > 0 OR starFeatured > 0 OR starEpic > 0 OR awarded > 0 OR magic>0")
         count = (await mycursor.fetchone())[0]
         pages = math.ceil(count/PAGE_SIZE)
-        logging.debug(f"CP cron has {pages} pages.")
+        logging.debug(lang.debug("cron_cp_pages", pages))
         for i in range(pages):
-            logging.debug(f"Running page {i+1}/{pages}")
+            logging.debug(lang.debug("cron_cp_page_running", i+1, pages))
             offset = create_offsets_from_page(i, PAGE_SIZE)
             await mycursor.execute("SELECT extID, starStars,starFeatured,starEpic,awarded,magic FROM levels WHERE starStars > 0 OR starFeatured > 0 OR starEpic > 0 OR awarded > 0 OR magic>0 LIMIT %s OFFSET %s", (PAGE_SIZE, offset))
             levels_db = await mycursor.fetchall()

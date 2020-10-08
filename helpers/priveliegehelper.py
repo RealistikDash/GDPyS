@@ -1,5 +1,6 @@
 from conn.mysql import myconn
 from helpers.generalhelper import dict_keys
+from helpers.lang import lang
 from objects.misc import RGB, Privilege
 from config import user_config
 import logging
@@ -30,7 +31,7 @@ class PrivilegeHelper():
             try:
                 colour = RGB(colour_list[0],colour_list[1],colour_list[2])
             except IndexError:
-                logging.warn(f"Privilege '{priv[1]}' has an invalid colour. Setting to white locally.")
+                logging.warn(lang.warn("privilege_invalid_colour", priv[1]))
                 colour = RGB(255,255,255)
             self.privilege_cache[priv[2]] = Privilege(
                 priv[0],
@@ -38,7 +39,7 @@ class PrivilegeHelper():
                 priv[2],
                 colour
             )
-            logging.debug(f"Privilege {priv[1]} ({priv[2]}) cached to memory.")
+            logging.debug(lang.debug("privelege_cached", priv[1], priv[0]))
     
     async def get_privilege_from_privs(self, privilege_num : int) -> Privilege:
         """Returns privilege from priv num."""

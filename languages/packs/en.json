@@ -1,24 +1,41 @@
 {
   "errors": {
-    "START_LVLPATH": "Level/Save path does not exist! Please create it before starting GDPyS."
+    "START_LVLPATH": "Level/Save path does not exist! Please create it before starting GDPyS.",
+    "CRON_FAIL" : "Job {0} failed with error {1}. Enable GDPyS debug mode for the full traceback.",
+    "LEVEL_FILE_NOT_FOUND" : "Could not find file data for level {0} at {1}."
   },
   "info": {
-    "SET_LVLPATH": "Set level path: {0}\nSet save path: {1}"
+    "SET_LVLPATH": "Set level path: {0}\nSet save path: {1}",
+    "CRON_FINISH" : "Finished cron job {0} in {1}",
+    "CRON_ALL_FINISH" : "Finished all cron jobs in {0}"
   },
   "warning": {
-    "no_daily": "No daily level set! Please set one."
+    "no_daily": "No daily level set! Please set one.",
+    "pack_invalid_colour" : "Map pack {0} has an invalid colour! Setting to white.",
+    "privilege_invalid_colour" : "Privilege '{0}' has an invalid colour. Setting to white locally."
   },
   "debug": {
     "no_gjp": "No known GJP, checking...",
     "user_not_found": "Couldn't find user with such name!",
     "handled_checkpw_err": "Handled checkpw ValueError {0}",
-    "privelege_cached": "Privelege {0} {1} cached to memory.",
+    "privelege_cached": "Privilege {0} ({1}) cached to memory.",
     "ip_new_struct": "Updating all IP rate limits with the new struct...",
     "added_to_struct": "Added {0} to struct with default value of {1} and limit of {2}",
     "bumping_ip": "Bumping IP count...",
     "count_expired": "Count expired for IP. Resetting.",
     "reached_limit": "{0} reached limit for {1} with {2}/{3}",
-    "passed_limit": "{0} passed limit with {1}/{2}"
+    "passed_limit": "{0} passed limit with {1}/{2}",
+    "new_ip" : "New IP added to the ratelimit list.",
+    "cron_cp_pages" : "CP cron has {0} pages.",
+    "cron_cp_page_running" : "Running page {0}/{1}",
+    "cron_job_running" : "Running cron job '{0}'.",
+    "comment_user_search_fail" : "Failed searching for user {0}. Should be skipped.",
+    "gauntlet_not_found" : "Gauntlet {0} could not be found!",
+    "cache_bcrypt" : "Caching bcrypt for person {0}",
+    "bcrypt_fail" : "Bcrypt check failed!",
+    "new_daily_cache" : "A new daily level has been cached!",
+    "cp_gain" : "{0} has gained {1} CP!",
+    "obj_caching" : "The object does not exist! Caching from database."
   },
   "runtime": {
     "shutdown": "Shutting down! Bye!",

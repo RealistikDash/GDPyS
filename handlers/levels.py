@@ -8,6 +8,7 @@ from helpers.userhelper import user_helper
 from helpers.crypthelper import cipher_xor, hash_sha1
 from helpers.auth import auth
 from helpers.timehelper import time_since_midnight, get_timestamp
+from helpers.lang import lang
 from objects.levels import SearchQuery, Level, Gauntlet
 from cron.cachempgauntlets import map_packs, gauntlets
 from constants import XorKeys, ResponseCodes, CryptKeys
@@ -51,7 +52,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         # We are getting gauntlets
         gauntlet : Gauntlet = select_obj_id(gauntlets, gauntlet_req) # Select gauntlet from known list.
         if gauntlet is None: # Not Found
-            logging.debug(f"Gauntlet {gauntlet_req} not found.") # TODO: Incooperate this with the lang system.
+            logging.debug(lang.debug("gauntlet_not_found", gauntlet_req)) # TODO: Incooperate this with the lang system.
             return aiohttp.web.Response(text=ResponseCodes.generic_fail)
         levels = await level_helper.level_list_objs(gauntlet.level_list())
 
@@ -133,7 +134,7 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
     try:
         level_str = await level.load_string()
     except FileNotFoundError:
-        logging.error(f"Could not find file data for level {level.ID} at " + user_config["level_path"] + str(level.ID))
+        logging.error(lang.error("LEVEL_FILE_NOT_FOUND", level.ID,user_config["level_path"] + str(level.ID)))
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     response = joint_string({
         1 : level.ID,

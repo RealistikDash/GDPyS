@@ -1,5 +1,6 @@
 from helpers.crypthelper import compare_bcrypt, decode_gjp
 from helpers.generalhelper import dict_keys
+from helpers.lang import lang
 from conn.mysql import myconn
 from dataclasses import dataclass
 import logging
@@ -16,7 +17,7 @@ class AuthHelper():
     
     async def _cache_bcrypt(self, account_id: int):
         """Caches a person's bcrypt into an object."""
-        logging.debug(f"Caching bcrypt for person {account_id}")
+        logging.debug(lang.debug("cache_bcrypt", account_id))
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("SELECT password FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
             response = await mycursor.fetchone()
@@ -32,11 +33,11 @@ class AuthHelper():
         if self.cached_credentials[account_id].known_gjp == gjp:
             return True
         elif self.cached_credentials[account_id].known_gjp == "":
-            logging.debug("No known GJP, checking")
+            logging.debug(lang.debug("no_gjp"))
             if compare_bcrypt(decode_gjp(gjp), self.cached_credentials[account_id].bcrypt):
                 self.cached_credentials[account_id].known_gjp = gjp
                 return True
-        logging.debug("Failed check.")
+        logging.debug(lang.debug("bcrypt_fail"))
         return False
     
     async def check_password(self, username: str, password: str) -> bool:
@@ -46,7 +47,7 @@ class AuthHelper():
             await mycursor.execute("SELECT password FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
             response = await mycursor.fetchone()
         if response is None:
-            logging.debug("Didnt find user with that username")
+            logging.debug(lang.debug("user_not_found"))
             return False
         return compare_bcrypt(password, response[0])
         

@@ -48,7 +48,7 @@ class CryptKeys():
 
 class Paths():
     """File paths."""
-    lang_packs = "languages/packs/"
+    lang_packs = "lang/"
 
 ASCII_ART = r"""
 {col1}          _____          {col2}          _____          {col3}          _____          {col4}      _____          {col5}          _____            {reset}      

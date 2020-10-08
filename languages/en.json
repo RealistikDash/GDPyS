@@ -1,4 +1,5 @@
 {
+  "name": "English - British English",
   "errors": {
     "START_LVLPATH": "Level/Save path does not exist! Please create it before starting GDPyS."
   },

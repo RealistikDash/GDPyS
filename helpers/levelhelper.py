@@ -2,6 +2,7 @@ from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp
 from helpers.crypthelper import hash_sha1
 from helpers.userhelper import user_helper
+from helpers.lang import lang
 from conn.mysql import myconn
 from objects.levels import Level, Rating, DailyLevel
 from config import user_config
@@ -149,7 +150,6 @@ class LevelHelper():
             await mycursor.execute("SELECT levelID FROM levels WHERE extID = %s AND levelName = %s", (level.account_id, level.name))
             level_count = await mycursor.fetchone()
             if level_count is not None:
-                logging.debug("The level is being updated.")
                 # We are currently updating an existing level.
                 await mycursor.execute("""UPDATE levels SET
                                 gameVersion = %s,
@@ -194,7 +194,6 @@ class LevelHelper():
                 os.remove(user_config["level_path"] + str(level_id)) # Removing previous level version
             
             else:
-                logging.debug("This is a new level.")
                 # It is a new level, insert it instead.
                 await mycursor.execute("""INSERT INTO levels 
                                             (
@@ -296,9 +295,9 @@ class LevelHelper():
             await mycursor.execute("SELECT feaID, levelID, timestamp, type FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1", (timestamp,))
             daily = await mycursor.fetchone()
         if daily is None:
-            logging.warning("No daily level set! Please set one or else there won't be a daily level.")
+            logging.warning(lang.warn("no_daily"))
             return None
-        logging.debug("Cached new daily level.")
+        logging.debug(lang.debug("new_daily_cache"))
         return DailyLevel(
             daily[0],
             daily[1],

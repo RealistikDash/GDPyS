@@ -9,6 +9,7 @@ from helpers.crypthelper import decode_base64
 from helpers.filterhelper import check_comment
 from helpers.priveliegehelper import priv_helper
 from helpers.crypthelper import decode_base64
+from helpers.lang import lang
 from objects.comments import Comment, CommentBan
 from gdpys.client import client
 from objects.levels import Rating
@@ -38,10 +39,9 @@ async def level_comments_handler(request : aiohttp.web.Request):
         try:
             comment_user = await user_helper.get_object(await user_helper.userid_accid(comment.user_id))
         except AssertionError: # The user does not exist
-            logging.debug(f"Failed searching for user {comment.user_id}. Should be skipped.")
+            logging.debug(lang.debug("comment_user_search_fail", comment.user_id))
         else:
             privilege = await priv_helper.get_privilege_from_privs(comment_user.privileges)
-            logging.debug(comment.user_id)
             response += wave_string({
                 #1 : comment.level_id,
                 2 : comment.comment_base64,

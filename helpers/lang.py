@@ -5,7 +5,7 @@ from config import user_config
 from constants import Paths
 from exceptions import LangNotFound
 
-class Lang:
+class Lang():
     def __init__(self, language : str = "en"):
         """Loads the given language."""
         self.text_find_msg = "Failed to find translated text for {}|{}"
@@ -45,7 +45,8 @@ class Lang:
     def _get_full(self, type : str, text : str, format_args : tuple = ()) -> str:
         """Gets full formatted translation from lang pack."""
         new_text = self._get_from_json(type, text)
-        new_text = self._format_string(new_text, format_args)
+        if len(format_args) > 0:
+            new_text = self._format_string(new_text, format_args)
         return new_text
     
     def warn(self, text : str, *args) -> str:

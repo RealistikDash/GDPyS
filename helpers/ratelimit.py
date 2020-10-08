@@ -1,6 +1,7 @@
 # My own rate limiting module. Probably not how it should be done but this suits my needs perfectly
 from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp
+from helpers.lang import lang
 import logging
 
 class RateLimit():
@@ -12,7 +13,7 @@ class RateLimit():
     
     def update_struct(self):
         """Updates struct for all cached IPs (may be costly)."""
-        logging.debug("Updating all ip rate limits with new struct")
+        logging.debug(lang.debug("ip_new_struct"))
         all_ips = dict_keys(self.ips)
         structs_list = dict_keys(self.STTRUCT)
         for ip in all_ips:
@@ -24,15 +25,15 @@ class RateLimit():
         """"Appends onto the struct."""
         self.STTRUCT[name] = default
         self.limits[name] = limit
-        logging.debug(f"Added {name} to struct with default value of {default} and limit of {limit}")
+        logging.debug(lang.debug("added_to_struct", name,default,limit))
         self.update_struct()
     
     def bump_and_check(self, ip : str, name : str) -> bool:
         """Bumps a value for an ip and checks if it reached the limit. Returns bool."""
         structure = self.STTRUCT
-        logging.debug("Bumping ip count")
+        logging.debug(lang.debug("bumping_ip"))
         if ip not in dict_keys(self.ips):
-            logging.debug("New IP.")
+            logging.debug(lang.debug("bumping_ip"))
             self.ips[ip] = structure
             self.ips[ip]["timestamp"] = get_timestamp() # Messy
             # I'm so done i just cant...
@@ -41,7 +42,7 @@ class RateLimit():
         
         # Checks to reset counts
         if self.ips[ip]["timestamp"] + 86400 < get_timestamp():
-            logging.debug("Count expired for ip. Reseting.")
+            logging.debug(lang.debug("count_expired"))
             self.ips[ip] = structure
             self.ips[ip]["timestamp"] = get_timestamp() # Messy
             # I'm so done i just cant...
@@ -52,9 +53,9 @@ class RateLimit():
 
         # Check if it passed the limit
         if self.limits[name] < self.ips[ip][name]:
-            logging.debug(f"{ip} reached limit for {name} with {self.ips[ip][name]}/{self.limits[name]}")
+            logging.debug(lang.debug("reached_limit", ip,name,self.ips[ip][name],self.limits[name]))
             return False
-        logging.debug(f"{ip} passed limit with {self.ips[ip][name]}/{self.limits[name]}")
+        logging.debug(lang.debug("passed_limit", ip, self.ips[ip][name],self.limits[name]))
         return True
 
 # Global rate limiter

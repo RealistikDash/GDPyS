@@ -2,6 +2,7 @@
 from conn.mysql import myconn
 from objects.levels import Gauntlet, MapPack
 from objects.misc import RGB
+from helpers.lang import lang
 import logging
 
 map_packs = []
@@ -22,7 +23,7 @@ async def cron_cache_mappacks():
         try:
             colour = RGB(colour_list[0],colour_list[1],colour_list[2])
         except IndexError:
-            logging.warn(f"Map pack '{pack[2]}' has an invalid colour! Setting to white.")
+            logging.warn(lang.warn("pack_invalid_colour", pack[1]))
             colour = RGB(255,255,255)
         map_packs.append(MapPack(
             pack[0],

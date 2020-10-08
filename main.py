@@ -15,6 +15,7 @@ from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
 from helpers.priveliegehelper import priv_helper
+from helpers.lang import lang
 from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
@@ -67,8 +68,8 @@ def welcome_sequence(no_ascii : bool = False):
 def pre_run_checks():
     """Runs checks before startup to make sure all runs smoothly."""
     if not path.exists(user_config["level_path"]) or not path.exists(user_config["save_path"]):
-        logging.error("Level/Save path does not exist! Please create it before starting GDPyS.")
-        logging.info(f"Set level path: {user_config['level_path']}\nSet save path: {user_config['save_path']}")
+        logging.error(lang.error("START_LVLPATH"))
+        logging.info(lang.info("SET_LVLPATH", user_config['level_path'], user_config['save_path']))
         raise SystemExit
                      
 def start_plugins():

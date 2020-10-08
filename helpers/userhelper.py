@@ -2,6 +2,7 @@ from helpers.auth import auth
 from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp, Timer
 from helpers.crypthelper import decode_base64, hash_bcrypt, encode_base64
+from helpers.lang import lang
 from objects.accounts import Account, AccountExtras
 from objects.comments import AccountComment
 from conn.mysql import myconn
@@ -117,7 +118,7 @@ class UserHelper():
         """Gets user object from cache or caches and returns it."""
         account_id = int(account_id)
         if account_id not in dict_keys(self.object_cache):
-            logging.debug("Object doesnt exist! Caching.")
+            logging.debug(lang.debug("obj_caching"))
             await self.recache_object(account_id)
         return self.object_cache[account_id]
 
@@ -303,7 +304,7 @@ class UserHelper():
     
     async def give_cp(self, account_id : int, cp : int = 1):
         """Gives a user an amount of CP."""
-        logging.debug(f"{account_id} has gained {cp} CP")
+        logging.debug(lang.debug("cp_gain", account_id, cp))
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("UPDATE users SET creatorPoints = creatorPoints + %s WHERE extID = %s LIMIT 1", (cp, account_id,))
             await myconn.conn.commit()

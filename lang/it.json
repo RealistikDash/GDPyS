@@ -1,1 +1,46 @@
-
+{
+  "formal_name" : "Italian - Italiano",
+  "errors": {
+    "START_LVLPATH": "Il percorso del livello/salvataggio non esiste! Si prega di crearlo prima di iniziare GDPyS.",
+    "CRON_FAIL" : "Compito {0} fallito con errore {1}. Si abiliti la modalità debug di GDPyS per visualizzare l'intero stack.",
+    "LEVEL_FILE_NOT_FOUND" : "Impossibile trovare file dati per livello {0} a {1}."
+  },
+  "info": {
+    "SET_LVLPATH": "Impostare percorso livello: {0}\nImpostare percorso salvataggio: {1}",
+    "CRON_FINISH" : "Finished cron job {0} in {1}",
+    "CRON_ALL_FINISH" : "Finished all cron jobs in {0}",
+    "LOADED_LANG" : "Caricato {0}."
+  },
+  "warning": {
+    "no_daily": "Nessun livello daily previsto! Si prega di fissarne uno.",
+    "pack_invalid_colour" : "Il map pack {0} ha un colore invalido! Verrà ripristinato al bianco.",
+    "privilege_invalid_colour" : "Il privilegio '{0}' ha un colore invalido. Verrà segnato bianco localmente."
+  },
+  "debug": {
+    "no_gjp": "No known GJP, checking...",
+    "user_not_found": "Couldn't find user with such name!",
+    "handled_checkpw_err": "Handled checkpw ValueError {0}",
+    "privelege_cached": "Privilege {0} ({1}) cached to memory.",
+    "ip_new_struct": "Updating all IP rate limits with the new struct...",
+    "added_to_struct": "Added {0} to struct with default value of {1} and limit of {2}",
+    "bumping_ip": "Bumping IP count...",
+    "count_expired": "Count expired for IP. Resetting.",
+    "reached_limit": "{0} reached limit for {1} with {2}/{3}",
+    "passed_limit": "{0} passed limit with {1}/{2}",
+    "new_ip" : "New IP added to the ratelimit list.",
+    "cron_cp_pages" : "CP cron has {0} pages.",
+    "cron_cp_page_running" : "Running page {0}/{1}",
+    "cron_job_running" : "Running cron job '{0}'.",
+    "comment_user_search_fail" : "Failed searching for user {0}. Should be skipped.",
+    "gauntlet_not_found" : "Gauntlet {0} could not be found!",
+    "cache_bcrypt" : "Caching bcrypt for person {0}",
+    "bcrypt_fail" : "Bcrypt check failed!",
+    "new_daily_cache" : "A new daily level has been cached!",
+    "cp_gain" : "{0} has gained {1} CP!",
+    "obj_caching" : "The object does not exist! Caching from database."
+  },
+  "runtime": {
+    "shutdown": "Shutting down! Bye!",
+    "loading_plugin": "Loading plugin {0}..."
+  }
+}

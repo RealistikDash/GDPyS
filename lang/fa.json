@@ -1,0 +1,46 @@
+{
+  "formal_name" : "Persian - Farsi",
+  "errors": {
+    "START_LVLPATH": "Poosheye marhale/ vogood nadarad! Lotfan an ra besazid va ba'ad GDPyS ra shroo konid.",
+    "CRON_FAIL" : "Job {0} failed with error {1}. Enable GDPyS debug mode for the full traceback.",
+    "LEVEL_FILE_NOT_FOUND" : "Could not find file data for level {0} at {1}."
+  },
+  "info": {
+    "SET_LVLPATH": "Poosheye marhale ha avaz shod: {0}\nPoosheye backup ha avaz shod: {1}",
+    "CRON_FINISH" : "Cron job {0} be payan resid dar {1}",
+    "CRON_ALL_FINISH" : "Hameye cron job ha dar {0} tamoom shod",
+    "LOADED_LANG" : "{0} bargozari shod."
+  },
+  "warning": {
+    "no_daily": "Hich marhaleye roozane'i entekhab nashoode! Lotfan yeki ra entekhab konid.",
+    "pack_invalid_colour" : "Packate marhale {0} yek range namo'otabar darad! Dar hale avaz kardan be sefid.",
+    "privilege_invalid_colour" : "Shey'e '{0}' yek range namo'otabar darad. Dar hale avaz kardan be sefid be soorat mahalli."
+  },
+  "debug": {
+    "no_gjp": "GJPi ta'arif nashode, dar hale check kardan...",
+    "user_not_found": "Useri ba name morede nazar yaft nashod!",
+    "handled_checkpw_err": "Checkpw ValueErrore {0} daryaft shod",
+    "privelege_cached": "Shey'e {0} ({1}) be memory zakhire shod.",
+    "ip_new_struct": "Dar hale beroozresaniye IP ha be sakhtemane jadid...",
+    "added_to_struct": "{0} be sakhtemane ba meghdare pishfarz {1} va mahdoodiyate {2}",
+    "bumping_ip": "Dar hale afzayeshe te\\'dade IP ha...",
+    "count_expired": "Te\\'dad baraye IP montafee shod. Dar hale shoroe dobare.",
+    "reached_limit": "{0} be mahdoodyate baraye {1} resid ba {2}/{3}",
+    "passed_limit": "Checke {0} pass shod {1}/{2}",
+    "new_ip" : "IP jadidi be list mahdoodiyat ezafeh shod.",
+    "cron_cp_pages" : "Crone emtiyaaz sazandeh {0} safhe darad.",
+    "cron_cp_page_running" : "Dar hale ejraye safheye {0}/{1}",
+    "cron_job_running" : "Dar hale ejraye cron jobe '{0}'.",
+    "comment_user_search_fail" : "Peyda kardan user {0} shekast khord. Rad mishavad.",
+    "gauntlet_not_found" : "Gauntlet {0} peyda nashod!",
+    "cache_bcrypt" : "Checke password zakhiresazi shod baraye {0}",
+    "bcrypt_fail" : "Checke Bcrypt shekast khord!",
+    "new_daily_cache" : "Yek marhale roozaneh jadid zakhiresazi shod!",
+    "cp_gain" : "{0} {1} emtiyaaz sazandeh gereft!",
+    "obj_caching" : "Shey vojood nadarad! Dar hale bargozari az database."
+  },
+  "runtime": {
+    "shutdown": "Dar hale khamoosh kardan! Khodanegahdar!",
+    "loading_plugin": "Dar hale bargozarie plugin {0}..."
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "formal_name": "Finnish - Suomi",
+  "errors": {
+    "START_LVLPATH": "Taso/tallennuspolku ei ole olemassa! Ole hyvä ja luo se ennen GDPyS:n aloittamista.",
+    "CRON_FAIL": "Cron {0} epäonnistui errorilla {1}. Ota GDPyS debug mode käyttöön saadaksesi täyden jäljityksen.",
+    "LEVEL_FILE_NOT_FOUND": "Ei löydetty tiedostodataa tasolle {0} (somewhere, where?) {1}."
+  },
+  "info": {
+    "SET_LVLPATH": "Aseta tason polku: {0}\nAseta tallennuspolku: {1}",
+    "CRON_FINISH": "Suoritettiin cron {0} ajassa {1}",
+    "CRON_ALL_FINISH": "Suoritettiin kaikki cronit ajassa {0}",
+    "LOADED_LANG": "Ladattiin {0}."
+  },
+  "warning": {
+    "no_daily": "Päivittäistä tasoa ei asetettu! Ole hyvä ja aseta yksi.",
+    "pack_invalid_colour": "Map packilla {0} on virheellinen väri! Asetetaan se valkoiseksi.",
+    "privilege_invalid_colour": "Oikeudella '{0}' on virheellinen väri. Asetetaan se valkoiseksi paikallisesti."
+  },
+  "debug": {
+    "no_gjp": "Ei tiettyä GJP:tä, tarkistetaan...",
+    "user_not_found": "Käyttäjää ei löydetty.",
+    "handled_checkpw_err": "Käsiteltiin checkpw ValueError {0}",
+    "privelege_cached": "Oikeus {0} ({1}) cachetettu muistiin.",
+    "ip_new_struct": "Päivitetään kaikki IP rajoitukset uudella rakenteella...",
+    "added_to_struct": "Added {0} to struct with default value of {1} and limit of {2}",
+    "bumping_ip": "Bumpataan IP määrää...",
+    "count_expired": "IP-ajan määrä on vanhentunut. Count expired for IP. Nollataan.",
+    "reached_limit": "{0} saavutti rajan {1} with {2}/{3}",
+    "passed_limit": "{0} ohitti rajan {1}/{2}",
+    "new_ip": "Uusi IP lisätty rajoituslistalle.",
+    "cron_cp_pages": "CP cronilla on {0} sivua.",
+    "cron_cp_page_running": "Suoritetaan sivua {0}/{1}",
+    "cron_job_running": "Suoritetaan cron '{0}'.",
+    "comment_user_search_fail": "Käyttäjän {0} etsiminen epäonnistui. Pitäisi ohittaa.",
+    "gauntlet_not_found": "Gauntlettia {0} ei löydetty!",
+    "cache_bcrypt": "Cachetetaan bcryptiä henkilölle {0}",
+    "bcrypt_fail": "Bcrypt tarkistus epäonnistui!",
+    "new_daily_cache": "Uusi päivittäinen taso on cachetettu!",
+    "cp_gain": "{0} on saanut {1} CP:tä!",
+    "obj_caching": "Objekti ei ole olemassa! Cachetetaan tietokannasta."
+  },
+  "runtime": {
+    "shutdown": "Sammutetaan! Hei hei!",
+    "loading_plugin": "Ladataan laajennusta {0}..."
+  }
+}

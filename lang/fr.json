@@ -1,0 +1,46 @@
+{
+    "formal_name" : "francais - french",
+    "errors": {
+      "START_LVLPATH": "Le chemin de niveau / sauvegarde n'existe pas! Veuillez le créer avant de démarrer GDPyS.",
+      "CRON_FAIL" : "La tâche {0} a échoué avec l'erreur {1}. Activer le mode de débugage de GDPyS pour le suivi complet.",
+      "LEVEL_FILE_NOT_FOUND" : "Impossible de trouver les données de fichier pour le niveau {0} à {1}."
+    },
+    "info": {
+      "SET_LVLPATH": "Définir le chemin de niveau: {0} Définir le chemin de sauvegarde: {1}",
+      "CRON_FINISH" : "Tâche cron terminée {0} en {1}",
+      "CRON_ALL_FINISH" : "Toutes les tâches Cron ont été terminées en {0}",
+      "LOADED_LANG" : "Chargé {0}."
+    },
+    "warning": {
+      "no_daily": "Aucun niveau quotidien défini! Veuillez en définir un.",
+      "pack_invalid_colour" : "Le mappack {0} a une couleur non valide! Couleure blanche par défaut.",
+      "privilege_invalid_colour" : "Le privilège «{0}» a une couleur non valide. Mise en clouleure blanche localement."
+    },
+    "debug": {
+      "no_gjp": "Pas de GJP connu, vérification ...",
+      "user_not_found": "Impossible de trouver l'utilisateur avec un tel nom!",
+      "handled_checkpw_err": "Checkpw ValueError gérée {0}",
+      "privelege_cached": "Privilège {0} ({1}) mis en cache dans la mémoire.",
+      "ip_new_struct": "Mise à jour de toutes les limites de débit IP avec la nouvelle structure ...",
+      "added_to_struct": "Ajout de {0} à la structure avec la valeur par défaut de {1} et la limite de {2}",
+      "bumping_ip": "Augmentation du nombre d'adresses IP ...",
+      "count_expired": "Le compte d'IP a expiré . Réinitialisation.",
+      "reached_limit": "{0} a atteint la limite pour {1} avec {2} / {3}",
+      "passed_limit": "{0} limite dépassée avec {1} / {2}",
+      "new_ip" : "Nouvelle adresse IP ajoutée à la liste des ratelimit",
+      "cron_cp_pages" : "CP cron a {0} pages.",
+      "cron_cp_page_running" : "Page en cours d'exécution {0} / {1}",
+      "cron_job_running" : "Exécution de la tâche cron '{0}'.",
+      "comment_user_search_fail" : "Échec de la recherche de l'utilisateur {0}. Doit être ignoré.",
+      "gauntlet_not_found" : "Gauntlet {0} Ne peut pas être trouvé!",
+      "cache_bcrypt" : "Mise en cache de bcrypt pour la personne {0}",
+      "bcrypt_fail" : "La vérification Bcrypt a échoué!",
+      "new_daily_cache" : "Un nouveau niveau daily a été mis en cache!",
+      "cp_gain" : "{0} a gagné {1} CP!",
+      "obj_caching" : "L'objet n'existe pas! Mise en cache depuis la base de données."
+    },
+    "runtime": {
+      "shutdown": "Etat d'étainte! Au revoir!",
+      "loading_plugin": "Chargement du plugin {0}..."
+    }
+  }

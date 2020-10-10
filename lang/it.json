@@ -1,0 +1,46 @@
+{
+  "formal_name" : "Italian - Italiano",
+  "errors": {
+    "START_LVLPATH": "Il percorso del livello/salvataggio non esiste! Si prega di crearlo prima di iniziare GDPyS.",
+    "CRON_FAIL" : "Compito {0} fallito con errore {1}. Si abiliti la modalità debug di GDPyS per visualizzare l'intero stack.",
+    "LEVEL_FILE_NOT_FOUND" : "Impossibile trovare file dati per livello {0} a {1}."
+  },
+  "info": {
+    "SET_LVLPATH": "Impostare percorso livello: {0}\nImpostare percorso salvataggio: {1}",
+    "CRON_FINISH" : "Completato lavoro cron {0} in {1}",
+    "CRON_ALL_FINISH" : "Completati tutti i lavori cron in {0}",
+    "LOADED_LANG" : "Caricato {0}."
+  },
+  "warning": {
+    "no_daily": "Nessun livello daily previsto! Si prega di fissarne uno.",
+    "pack_invalid_colour" : "Il map pack {0} ha un colore invalido! Verrà ripristinato al bianco.",
+    "privilege_invalid_colour" : "Il privilegio '{0}' ha un colore invalido. Verrà mostrato bianco localmente."
+  },
+  "debug": {
+    "no_gjp": "Nessun GJP conosciuto, verificando...",
+    "user_not_found": "Impossibile trovare un utente con quel nome!",
+    "handled_checkpw_err": "Gestito checkpw ValueError {0}",
+    "privelege_cached": "Privilegio {0} ({1}) memorizzato in cache.",
+    "ip_new_struct": "Aggiornando tutti i limiti di velocità IP per la nuova struct...",
+    "added_to_struct": "Aggiunto {0} alla struct con valore predefinito di {1} e limite di {2}",
+    "bumping_ip": "Incrementando il conto d'IP...",
+    "count_expired": "Conto d'IP scaduto. Ripristinando.",
+    "reached_limit": "{0} ha raggiunto il limite per {1} con {2}/{3}",
+    "passed_limit": "{0} ha superato il limite con {1}/{2}",
+    "new_ip" : "Nuovo IP aggiunto alla lista di velocità limitata.",
+    "cron_cp_pages" : "CP cron ha {0} pagine.",
+    "cron_cp_page_running" : "Eseguendo pagina {0}/{1}",
+    "cron_job_running" : "Eseguendo lavoro cron '{0}'.",
+    "comment_user_search_fail" : "Impossibile cercare utente {0}. Dovrà essere saltato.",
+    "gauntlet_not_found" : "Gauntlet {0} non è stato trovato!",
+    "cache_bcrypt" : "Eseguendo cache Bcrypt per persona {0}",
+    "bcrypt_fail" : "Test Bcrypt fallito!",
+    "new_daily_cache" : "Un nuovo livello daily è stato aggiunto alla cache!",
+    "cp_gain" : "{0} ha ricevuto {1} CP!",
+    "obj_caching" : "L'oggetto non esiste! Ritirando cache dall'archivio."
+  },
+  "runtime": {
+    "shutdown": "Arresto in corso. Arrivederci!",
+    "loading_plugin": "Sto caricando il plugin {0}..."
+  }
+}

@@ -37,7 +37,9 @@
     "bcrypt_fail" : "Bcrypt check failed!",
     "new_daily_cache" : "A new daily level has been cached!",
     "cp_gain" : "{0} has gained {1} CP!",
-    "obj_caching" : "The object does not exist! Caching from database."
+    "obj_caching" : "The object does not exist! Caching from database.",
+    "level_scores_gotten" : "Fetched level leaderboards for level {0}.",
+    "no_score" : "This user has not set a score on this level."
   },
   "runtime": {
     "shutdown": "Shutting down! Bye!",

@@ -110,3 +110,14 @@ class Gauntlet():
     def level_list(self) -> tuple:
         """Returns a tuple of all levels inside the gauntlet."""
         return (self.level1_id, self.level2_id, self.level3_id, self.level4_id, self.level5_id)
+
+@dataclass
+class Score():
+    """Dataclass on level scores."""
+    ID : int
+    account_id : int
+    level_id : int
+    percentage : int
+    timestamp : int
+    attempts : int
+    coins : int

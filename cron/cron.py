@@ -32,7 +32,7 @@ async def run_cron():
             logging.debug(traceback.format_exc())
         # So we dont  gett 32846238746238ms or 0.0s
         t_str = time_str(t)
-        logging.info(lang.info("CRON_FINISH", job.__name__, time_str))
+        logging.info(lang.info("CRON_FINISH", job.__name__, t_str))
     
     # Don't copy paste code now watch me not follow my own advice. If I have to use this somewhere else, I will move this to timehelper.
     t_str = time_str(total_t)

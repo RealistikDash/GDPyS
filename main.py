@@ -10,7 +10,7 @@ from handlers.profiles import profile_comment_handler, profile_handler, user_sea
 from handlers.songs import featured_artists_handler, get_songinfo_handler
 from handlers.levels import level_search_modular_hanlder, download_level, upload_level_handler, get_daily_handler, get_map_packs_handler, get_gauntlets_handler
 from handlers.rewards import quests_handler
-from handlers.levelextras import level_comments_handler, post_comment_handler, rate_level_handler
+from handlers.levelextras import level_comments_handler, post_comment_handler, rate_level_handler, level_scores_handler
 from helpers.userhelper import user_helper
 from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
@@ -54,6 +54,7 @@ def config_routes(app: web.Application) -> None:
     app.router.add_post("/database/getGJDailyLevel.php", get_daily_handler)
     app.router.add_post("/database/getGJMapPacks21.php", get_map_packs_handler)
     app.router.add_post("/database/getGJGauntlets21.php", get_gauntlets_handler)
+    app.router.add_post("/database/getGJLevelScores211.php", level_scores_handler)
     #app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
 

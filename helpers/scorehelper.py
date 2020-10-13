@@ -14,7 +14,7 @@ class ScoreHelper():
         return Score(
             ID = db_result[0],
             account_id=db_result[1],
-            levelID = db_result[2],
+            level_id = db_result[2],
             percentage=db_result[3],
             timestamp=int(db_result[4]),
             attempts=db_result[5],
@@ -25,7 +25,7 @@ class ScoreHelper():
         """Gets a list of user scores from database for level."""
         logging.debug(lang.debug("level_scores_gotten", level_id))
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT scoreID, accountID, levelID, percent, uploadDate, attempts, coins FROM levelscores WHERE levelID = %s", (level_id,))
+            await mycursor.execute("SELECT scoreID, accountID, levelID, percent, uploadDate, attempts, coins FROM levelscores WHERE levelID = %s ORDER BY percent DESC LIMIT 100", (level_id,))
             return [self._score_obj_from_tuple(i) for i in await mycursor.fetchall()]
     
     async def get_from_db_filtered(self, level_id : int, filters : list):
@@ -52,7 +52,7 @@ class ScoreHelper():
     async def get_score_for_user(self, account_id : int, level_id : int) -> Score:
         """Returns the top score for user on a certain level (can return None)."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT scoreID, accountID, levelID, percent, uploadDate, attempts, coins FROM levelscores WHERE levelID = %s AND accountID = %s ORDER BY percent DESC LIMIT 1", (level_id,))
+            await mycursor.execute("SELECT scoreID, accountID, levelID, percent, uploadDate, attempts, coins FROM levelscores WHERE levelID = %s AND accountID = %s ORDER BY percent DESC LIMIT 1", (level_id, account_id))
             score_db = await mycursor.fetchone()
         
         if score_db is None: # No score set by user on that level.
@@ -69,3 +69,5 @@ class ScoreHelper():
             return True # It is a new score.
         
         return score.percentage > curr_score.percentage # Replace based on percentage
+
+score_helper = ScoreHelper() # Global score helper.

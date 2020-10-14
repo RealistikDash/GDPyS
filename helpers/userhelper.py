@@ -3,7 +3,7 @@ from helpers.generalhelper import dict_keys
 from helpers.timehelper import get_timestamp, Timer
 from helpers.crypthelper import decode_base64, hash_bcrypt, encode_base64
 from helpers.lang import lang
-from objects.accounts import Account, AccountExtras
+from objects.accounts import Account, AccountExtras, FriendRequest
 from objects.comments import AccountComment
 from conn.mysql import myconn
 from constants import Permissions
@@ -309,5 +309,43 @@ class UserHelper():
             await mycursor.execute("UPDATE users SET creatorPoints = creatorPoints + %s WHERE extID = %s LIMIT 1", (cp, account_id,))
             await myconn.conn.commit()
             await self.recache_object(account_id) # May make this func just edit the current obj
+    
+    async def get_friends(self, account_id : int) -> list:
+        """Returns a list of account IDs that are friends with the user."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT person1, person2 FROM friendships WHERE person1 = %s OR person2 = %s", (account_id, account_id))
+            friendships_db = await mycursor.fetchall()
+        friends = []
+        for friend in friendships_db:
+            # Messy but it just works :tm:
+            if friend[0] == account_id:
+                friends.append(friend[1])
+            else:
+                friends.append(friend[0])
+        return friends
+    
+    async def get_friend_requests_to(self, account_id : int) -> list: # May add some pagination system directly to the sql for speed ig.
+        """Returns a list of friendrequest objs to account_id passed."""
+        # TODO: split up when the from version of this function is added.
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE toAccountID = %s", (account_id,))
+            requests_db = await mycursor.fetchall()
+        
+        requests = []
+
+        for req in requests_db:
+            requests.append( # How to trigger people 101
+                FriendRequest(
+                    id = req[4],
+                    account_id=req[0],
+                    target_id=req[1],
+                    content_base64=req[2],
+                    content=decode_base64(req[2]), # To make them easier to work with outside the game.
+                    timestamp=req[3],
+                    new=bool(req[5])
+                )
+            )
+        
+        return requests
 
 user_helper = UserHelper() # This has to be a common class.

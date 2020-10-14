@@ -46,3 +46,14 @@ class AccountExtras():
     friend_requests : list
     sent_requests : list
     received_requests : list
+
+@dataclass
+class FriendRequest():
+    """Dataclass storing friend request info."""
+    id : int
+    account_id : int
+    target_id : int
+    content_base64 : str
+    content : str
+    timestamp : int
+    new : bool

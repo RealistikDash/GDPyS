@@ -16,7 +16,7 @@ from config import user_config
 
 async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp.web.Response: # Kinda stole the name for the function from osu lol
     """Handles the get levels endpoint."""
-    post_data = await  request.post()
+    post_data = await request.post()
 
     # Daily levels
     page = int(post_data.get("page", 0))

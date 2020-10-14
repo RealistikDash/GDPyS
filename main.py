@@ -47,7 +47,7 @@ def config_routes(app: web.Application) -> None:
 
 
     for r, h in routes:
-        app.router.add_post()
+        app.router.add_post(r, h)
     
     #app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)

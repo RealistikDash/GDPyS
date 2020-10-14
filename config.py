@@ -17,7 +17,8 @@ default_config = {
     "command_prefix" : "!",
     "default_priv" : 30,
     "cache_level_strs" : True,
-    "lang" : "en"
+    "lang" : "en",
+    "gdpysbot_enabled": "true"
 }
 
 user_config = {}

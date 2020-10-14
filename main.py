@@ -29,32 +29,26 @@ from threading import Thread
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
     app.router.add_get("/", home_page)
-    app.router.add_post("/database/accounts/loginGJAccount.php", login_handler)
-    app.router.add_post("/database/accounts/registerGJAccount.php", register_handler)
-    app.router.add_post("/database/getGJAccountComments20.php", profile_comment_handler)
-    app.router.add_post("/database/getGJUserInfo20.php", profile_handler)
-    app.router.add_post("/database/getGJTopArtists.php", featured_artists_handler)
-    app.router.add_post("/database/getGJSongInfo.php", get_songinfo_handler)
-    app.router.add_post("/database/getGJUsers20.php", user_search_handler)
-    app.router.add_post("/database/getGJLevels21.php", level_search_modular_hanlder)
-    app.router.add_post("/database/downloadGJLevel22.php", download_level)
-    app.router.add_post("/database/uploadGJAccComment20.php", post_account_comment_handler)
-    app.router.add_post("/database/updateGJUserScore22.php", update_profile_stats_handler)
-    app.router.add_post("/database/getAccountURL.php", get_account_url_handler)
-    app.router.add_post("/database/accounts/backupGJAccountNew.php", save_user_data_handler)
-    app.router.add_post("/database/uploadGJLevel21.php", upload_level_handler)
-    app.router.add_post("/database/accounts/syncGJAccountNew.php", load_save_data_handler)
-    app.router.add_post("/database/getGJChallenges.php", quests_handler)
-    app.router.add_post("/database/getGJComments21.php", level_comments_handler)
-    app.router.add_post("/database/uploadGJComment21.php", post_comment_handler)
-    app.router.add_post("/database/updateGJAccSettings20.php", update_acc_settings_handler)
-    app.router.add_post("/database/getGJScores20.php", leaderboards_handler)
-    app.router.add_post("/database/suggestGJStars20.php", rate_level_handler)
-    app.router.add_post("/database/requestUserAccess.php", mod_check_handler)
-    app.router.add_post("/database/getGJDailyLevel.php", get_daily_handler)
-    app.router.add_post("/database/getGJMapPacks21.php", get_map_packs_handler)
-    app.router.add_post("/database/getGJGauntlets21.php", get_gauntlets_handler)
-    app.router.add_post("/database/getGJLevelScores211.php", level_scores_handler)
+
+    routes = [("/database/getGJLevelScores211.php", level_scores_handler), ("/database/getGJGauntlets21.php", get_gauntlets_handler),
+    ("/database/getGJMapPacks21.php", get_map_packs_handler), ("/database/getGJDailyLevel.php", get_daily_handler), 
+    ("/database/requestUserAccess.php", mod_check_handler), ("/database/suggestGJStars20.php", rate_level_handler), 
+    ("/database/getGJScores20.php", leaderboards_handler), ("/database/updateGJAccSettings20.php", update_acc_settings_handler), 
+    ("/database/uploadGJComment21.php", post_comment_handler), ("/database/getGJComments21.php", level_comments_handler), 
+    ("/database/getGJChallenges.php", quests_handler), ("/database/getGJChallenges.php", quests_handler), 
+    ("/database/accounts/syncGJAccountNew.php", load_save_data_handler), ("/database/uploadGJLevel21.php", upload_level_handler), 
+    ("/database/accounts/backupGJAccountNew.php", save_user_data_handler), ("/database/getAccountURL.php", get_account_url_handler), 
+    ("/database/updateGJUserScore22.php", update_profile_stats_handler), ("/database/uploadGJAccComment20.php", post_account_comment_handler), 
+    ("/database/downloadGJLevel22.php", download_level), ("/database/getGJLevels21.php", level_search_modular_hanlder), 
+    ("/database/getGJUsers20.php", user_search_handler), ("/database/getGJSongInfo.php", get_songinfo_handler), 
+    ("/database/getGJTopArtists.php", featured_artists_handler), ("/database/getGJUserInfo20.php", profile_handler), 
+    ("/database/getGJAccountComments20.php", profile_comment_handler), ("/database/accounts/registerGJAccount.php", register_handler), 
+    ("/database/accounts/loginGJAccount.php", login_handler)]
+
+
+    for r, h in routes:
+        app.router.add_post()
+    
     #app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
 

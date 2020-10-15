@@ -40,7 +40,8 @@
     "obj_caching" : "The object does not exist! Caching from database.",
     "level_scores_gotten" : "Fetched level leaderboards for level {0}.",
     "no_score" : "This user has not set a score on this level.",
-    "overwrite_score" : "Overwriting this score."
+    "overwrite_score" : "Overwriting this score.",
+    "adding_handler" : "Adding handler: {0} | {1}"
   },
   "runtime": {
     "shutdown": "Shutting down! Bye!",

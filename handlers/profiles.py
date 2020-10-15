@@ -267,3 +267,42 @@ async def mod_check_handler(request : aiohttp.web.Response):
     elif user_helper.has_privilege(user, Permissions.mod_regular):
         return aiohttp.web.Response(text=ResponseCodes.generic_success2)
     return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+
+async def friends_list_handler(request : aiohttp.web.Response):
+    """Returns the friends list."""
+    post_data = await request.post()
+
+    account_id = int(post_data["accountID"])
+    friends_type = int(post_data["type"])
+
+    if not auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    
+    id_function = { # Coro to get a list of friends ids.
+        0 : user_helper.get_friends # Regular friends.
+    }.get(friends_type, user_helper.get_friends)
+
+    friend_ids = await id_function(account_id)
+
+    response = ""
+    # Create server response.
+    for friend_id in friend_ids:
+        user = await user_helper.get_object(friend_id)
+        if user is not None:
+            response += joint_string(
+                {
+                    1: user.username,
+                    2 : user.user_id,
+                    9 : user.icon,
+                    10 : user.colour1,
+                    11: user.colour2,
+                    14 : user.icon_type,
+                    15 : 0,
+                    16 : user.account_id,
+                    18 : 0,
+                    41 : 0 # IS NEW # TODO : New friends.
+                }
+            ) + "|"
+    response = response[:-1]
+    logging.debug(response)
+    return aiohttp.web.Response(text=response)

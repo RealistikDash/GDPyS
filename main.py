@@ -6,7 +6,7 @@ from config import user_config, load_config
 from handlers.frontend import home_page
 from handlers.login import login_handler
 from handlers.register import register_handler
-from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler, post_account_comment_handler, update_profile_stats_handler, get_account_url_handler, save_user_data_handler, load_save_data_handler, update_acc_settings_handler, leaderboards_handler, mod_check_handler
+from handlers.profiles import profile_comment_handler, profile_handler, user_search_handler, post_account_comment_handler, update_profile_stats_handler, get_account_url_handler, save_user_data_handler, load_save_data_handler, update_acc_settings_handler, leaderboards_handler, mod_check_handler, friends_list_handler
 from handlers.songs import featured_artists_handler, get_songinfo_handler
 from handlers.levels import level_search_modular_hanlder, download_level, upload_level_handler, get_daily_handler, get_map_packs_handler, get_gauntlets_handler
 from handlers.rewards import quests_handler
@@ -35,7 +35,7 @@ def config_routes(app: web.Application) -> None:
     ("/database/requestUserAccess.php", mod_check_handler), ("/database/suggestGJStars20.php", rate_level_handler), 
     ("/database/getGJScores20.php", leaderboards_handler), ("/database/updateGJAccSettings20.php", update_acc_settings_handler), 
     ("/database/uploadGJComment21.php", post_comment_handler), ("/database/getGJComments21.php", level_comments_handler), 
-    ("/database/getGJChallenges.php", quests_handler), ("/database/getGJChallenges.php", quests_handler), 
+    ("/database/getGJChallenges.php", quests_handler), ("/database/getGJUserList20.php", friends_list_handler),
     ("/database/accounts/syncGJAccountNew.php", load_save_data_handler), ("/database/uploadGJLevel21.php", upload_level_handler), 
     ("/database/accounts/backupGJAccountNew.php", save_user_data_handler), ("/database/getAccountURL.php", get_account_url_handler), 
     ("/database/updateGJUserScore22.php", update_profile_stats_handler), ("/database/uploadGJAccComment20.php", post_account_comment_handler), 
@@ -45,8 +45,8 @@ def config_routes(app: web.Application) -> None:
     ("/database/getGJAccountComments20.php", profile_comment_handler), ("/database/accounts/registerGJAccount.php", register_handler), 
     ("/database/accounts/loginGJAccount.php", login_handler)]
 
-
     for r, h in routes:
+        logging.debug(lang.debug("adding_handler", r, h.__name__))
         app.router.add_post(r, h)
     
     #app.add_subapp("/api/", api)

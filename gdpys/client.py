@@ -75,12 +75,11 @@ class Client:
                 raise Exception("Function is not a coroutine function!")
             if name is None: # noqa
                 name = coro.__name__.lower() # noqa
-            loop = asyncio.get_event_loop()
-            loop.create_task(self.create_command(name, coro, permission)) # noqa
+                self.create_command(name, coro, permission) # noqa
 
         return decorator
 
-    async def create_command(self, name: str, coro: asyncio.coroutine, permission: Permissions):
+    def create_command(self, name: str, coro: asyncio.coroutine, permission: Permissions):
         """Create a command"""
         COMMANDS[name]= {
             "handler": coro,
@@ -108,10 +107,12 @@ class Client:
         command = COMMANDS[command_args[0].lower()]
         ctx = await self._create_context(command_obj)
         account = await user_helper.get_object(await user_helper.accid_userid(command_obj.user_id)) # SHOULD be already cached.
+        # Create command args
+        passed_args = command_args[1:]
         if not user_helper.has_privilege(account, command["permission"]):
             return False
         try:
-            await command["handler"](ctx)
+            await command["handler"](ctx, *passed_args)
         except GDPySCommandError as e:
             return CommentBan(
                 0, # /shrug
@@ -121,3 +122,11 @@ class Client:
         return True
 
 client = Client()
+
+# Testing commands
+# If this isnt removed and youre reading this i did forgot this. kindly mass tag me on discord https://discord.gg/Un42FEV RealistikDash#0077
+async def rate(ctx : CommandContext, level : int, star : str):
+    """Rates a level right??"""
+    print(f"Level: {level}, stars: {star}")
+
+client.create_command("rate", rate, None)

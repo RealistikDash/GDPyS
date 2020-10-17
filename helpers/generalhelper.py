@@ -5,6 +5,7 @@ import logging
 import json
 import os
 from typing import Union
+from helpers.timehelper import Timer
 
 def dict_keys(dictioary: dict) -> tuple:
     """Returns a tuple of all the dictionary keys."""
@@ -98,6 +99,24 @@ def select_obj_id(table : list, where):
             return i
     
     return None
+
+def time_function(function, args : tuple = ()):
+    """Times and logs the execution of a function."""
+    timer = Timer()
+    timer.start()
+    a = function(*args)
+    timer.end()
+    logging.debug(f"Execution of function {function.__name__} took {timer.ms_return()}")
+    return a
+
+async def time_coro(coro, args : tuple = ()):
+    """Times the execution of a coroutine"""
+    timer = Timer()
+    timer.start()
+    a = await coro(*args)
+    timer.end()
+    logging.debug(f"Execution of coroutine {coro.__name__} took {timer.ms_return()}")
+    return a
 
 class JsonFile():
     def __init__(self, file_name: str):

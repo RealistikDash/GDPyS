@@ -16,6 +16,7 @@ from helpers.songhelper import songs
 from helpers.ratelimit import rate_limiter
 from helpers.priveliegehelper import priv_helper
 from helpers.lang import lang
+from helpers.generalhelper import time_coro
 from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
@@ -47,7 +48,7 @@ def config_routes(app: web.Application) -> None:
 
     for r, h in routes:
         logging.debug(lang.debug("adding_handler", r, h.__name__))
-        app.router.add_post(r, h)
+        app.router.add_post(r, time_coro(h))
     
     #app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)

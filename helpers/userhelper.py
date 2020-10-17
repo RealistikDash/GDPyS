@@ -1,5 +1,5 @@
 from helpers.auth import auth
-from helpers.generalhelper import dict_keys
+from helpers.generalhelper import dict_keys, time_coro
 from helpers.timehelper import get_timestamp, Timer
 from helpers.crypthelper import decode_base64, hash_bcrypt, encode_base64
 from helpers.lang import lang
@@ -111,7 +111,8 @@ class UserHelper():
     async def recache_object(self, account_id: int) -> None:
         """Forces a user object to recache."""
         account_id = int(account_id)
-        obj = await self._create_user_object(account_id)
+        #obj = await self._create_user_object(account_id)
+        obj = await time_coro(self._create_user_object, (account_id,))
         self.object_cache[account_id] = obj
     
     async def get_object(self, account_id: int) -> Account:
@@ -323,14 +324,9 @@ class UserHelper():
             else:
                 friends.append(friend[0])
         return friends
-    
-    async def get_friend_requests_to(self, account_id : int) -> list: # May add some pagination system directly to the sql for speed ig.
-        """Returns a list of friendrequest objs to account_id passed."""
-        # TODO: split up when the from version of this function is added.
-        async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE toAccountID = %s", (account_id,))
-            requests_db = await mycursor.fetchall()
-        
+
+    def _req_list_to_objects(self, requests_db : list) -> list:
+        """Converts a list of db tuples in order accountID, toAccountID, comment, uploadDate, ID, isNew to requests objects."""
         requests = []
 
         for req in requests_db:
@@ -347,5 +343,21 @@ class UserHelper():
             )
         
         return requests
+    
+    async def get_friend_requests_to(self, account_id : int) -> list: # May add some pagination system directly to the sql for speed ig.
+        """Returns a list of friendrequest objs to account_id passed."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE toAccountID = %s", (account_id,))
+            requests_db = await mycursor.fetchall()
+        
+        return self._req_list_to_objects(requests_db)
+    
+    async def get_friend_requests_from(self, account_id : int) -> list:
+        """Returns a list of friendrequest objs from account_id passed."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE accountID = %s", (account_id,))
+            requests_db = await mycursor.fetchall()
+        
+        return self._req_list_to_objects(requests_db)
 
 user_helper = UserHelper() # This has to be a common class.

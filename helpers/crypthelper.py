@@ -55,19 +55,19 @@ def cipher_xor(data: str, key: str):
 
 def decode_gjp(text: str) -> str:
     """Decodes GJP (Geometry Dash's password encryption method) and returns in plaintext."""
-    return cipher_xor(decode_base64(text), XorKeys.password)
+    return cipher_xor(decode_base64(text), XorKeys.PASSWORD)
 
 
 def encode_chk(text: str) -> str:
     """Encodes a Geometry Dash chunk."""
-    return cipher_xor(encode_base64(text[5:]), XorKeys.chk)
+    return cipher_xor(encode_base64(text[5:]), XorKeys.CHK)
 
 
 def decode_chk(text: str) -> str:
     """Decodes a GD chunk."""
-    return cipher_xor(decode_base64(text[5:]), XorKeys.chk)
+    return cipher_xor(decode_base64(text[5:]), XorKeys.CHK)
 
 
-def solo_gen3(string: str):
-    """Port of genSolo3 from Cvolton's GMDPrivateServer."""
-    return hash_sha1(string + CryptKeys.solo3)
+def SOLO_gen3(string: str):
+    """Port of genSOLO3 from Cvolton's GMDPrivateServer."""
+    return hash_sha1(string + CryptKeys.SOLO3)

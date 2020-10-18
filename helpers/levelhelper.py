@@ -101,18 +101,18 @@ class LevelHelper:
 
             Hash += f"{str(level.ID)[0]}{str(level.ID)[len(str(level.ID))-1]}{level.stars}{int(level.verified_coins)}"
 
-        return hash_sha1(Hash + CryptKeys.solo)
+        return hash_sha1(Hash + CryptKeys.SOLO)
 
-    def solo_gen(self, level_str: str):
-        """Port of genSolo from Cvolton's GMDPrivateServer."""
+    def SOLO_gen(self, level_str: str):
+        """Port of genSOLO from Cvolton's GMDPrivateServer."""
         return_str = ""
         str_len = len(level_str) // 40
         for i in range(40):
             return_str += level_str[i * str_len]
-        return hash_sha1(return_str + CryptKeys.solo)
+        return hash_sha1(return_str + CryptKeys.SOLO)
 
-    def solo_gen2(self, level_string: str) -> str:
-        return hash_sha1(level_string + CryptKeys.solo)
+    def SOLO_gen2(self, level_string: str) -> str:
+        return hash_sha1(level_string + CryptKeys.SOLO)
 
     async def bump_download(self, level_id: int):
         """Bumps a level's download count by one."""

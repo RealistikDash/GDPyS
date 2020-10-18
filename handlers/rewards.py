@@ -1,6 +1,6 @@
 from helpers.rewardshelper import rewards_helper
 from helpers.userhelper import user_helper
-from helpers.crypthelper import decode_chk, cipher_xor, encode_base64, solo_gen3
+from helpers.crypthelper import decode_chk, cipher_xor, encode_base64, SOLO_gen3
 from helpers.timehelper import tomorrow, get_timestamp
 from objects.quests import Quest
 from constants import XorKeys
@@ -37,10 +37,10 @@ async def quests_handler(request: aiohttp.web.Request):
     resp1 = encode_base64(
         cipher_xor(
             f"bruhh:{user.user_id}:{chk_decoded}:{device_id}:{user.account_id}:{tomorrow()-get_timestamp()}:{quest_str[0]}:{quest_str[1]}:{quest_str[2]}",
-            XorKeys.quests,
+            XorKeys.QUESTS,
         )
     )
-    hashed = solo_gen3(resp1)
+    hashed = SOLO_gen3(resp1)
     response = f"bruhh{resp1}|{hashed}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

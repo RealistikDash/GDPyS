@@ -9,7 +9,7 @@ async def cron_calc_ranks() -> None:
     async with myconn.conn.cursor() as mycursor:
         await mycursor.execute(
             "SELECT extID FROM users WHERE extID IN (SELECT accountID FROM accounts WHERE privileges & %s AND isBot = 0) ORDER BY stars DESC",
-            (Permissions.authenticate,),
+            (Permissions.AUTH,),
         )
         users = await mycursor.fetchall()
 

@@ -50,8 +50,6 @@ from cron.cron import run_cron
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
-
-# from api.main import app as api
 from tools.main import tools
 import os
 import importlib
@@ -105,7 +103,7 @@ def welcome_sequence(no_ascii: bool = False):
     if not no_ascii:
         print(
             ASCII_ART.format(
-                reset=Colours.reset,
+                reset=Colours.RESET,
                 col1=random.choice(Colours.all_col),
                 col2=random.choice(Colours.all_col),
                 col3=random.choice(Colours.all_col),

@@ -15,7 +15,7 @@ Commands are built into the Client class of GDPyS plugins and can be used like t
             self.set_metadata(name="commandexample", author="spook", description="command example plugin", version="1.0.0", dependencies=[])
             super().__init__()
 
-        @client.command(name="rate", permission=permissions.mod_rate)
+        @client.command(name="rate", permission=Permissions.MOD_RATE)
         async def rate(self): # arguments are not yet implemented
             pass # do stuff on [prefix]rate
 

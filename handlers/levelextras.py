@@ -101,13 +101,13 @@ async def post_comment_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
 
     # Couple of checks to ensure security
     if not await auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
-    if not user_helper.has_privilege(user, Permissions.post_comment):
-        return aiohttp.web.Response(text=ResponseCodes.comment_ban)
+    if not user_helper.has_privilege(user, Permissions.POST_COMMENT):
+        return aiohttp.web.Response(text=ResponseCodes.COMMENT_BAN)
 
     if not check_comment(decode_base64(content)):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     # Creating the object.
     comment_obj = Comment(
@@ -130,7 +130,7 @@ async def post_comment_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
         logging.debug(result)
         if type(result) == bool:
             result = (
-                ResponseCodes.generic_success if result else ResponseCodes.generic_fail
+                ResponseCodes.GENERIC_SUCCESS if result else ResponseCodes.GENERIC_FAIL
             )
             logging.debug(result)
             return aiohttp.web.Response(text=result)
@@ -140,7 +140,7 @@ async def post_comment_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
         return aiohttp.web.Response(text=result)
     # Now we add it to the database.
     await comment_helper.insert_comment(comment_obj)
-    return aiohttp.web.Response(text=ResponseCodes.generic_success)
+    return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS)
 
 
 async def rate_level_handler(request: aiohttp.web.Request):
@@ -154,13 +154,13 @@ async def rate_level_handler(request: aiohttp.web.Request):
     user = await user_helper.get_object(account_id)
     # Permission checks
     if not await auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    if not user_helper.has_privilege(user, Permissions.mod_rate):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail2)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
+    if not user_helper.has_privilege(user, Permissions.MOD_RATE):
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL2)
 
     rating = Rating(level_id, stars, featured, 0, 1, 0)
     await level_helper.rate_level(rating)
-    return aiohttp.web.Response(text=ResponseCodes.generic_success)
+    return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS)
 
 
 async def level_scores_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -172,7 +172,7 @@ async def level_scores_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
         post_data["accountID"]
     )  # Lets declare this as we will re-use it later
     if not auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     # Creating the current score object.
     level_id = int(post_data["levelID"])

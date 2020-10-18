@@ -28,7 +28,7 @@ async def get_songinfo_handler(request: aiohttp.web.Request):
 
     # Checks
     if song is None:
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     response = songs.song_string(song)
     logging.debug(response)

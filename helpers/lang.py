@@ -16,10 +16,10 @@ class Lang:
         self.text_find_msg = "Failed to find translated text for {}|{}"
         self.main_lang = language
         self.english_lang = JsonFile(
-            Paths.lang_packs + "en.json"
+            Paths.LANG_PACKS + "en.json"
         ).get_file()  # English as a backup for when the main lang does not contain the str you're looking for.
 
-        self.lang = JsonFile(Paths.lang_packs + language + ".json").get_file()
+        self.lang = JsonFile(Paths.LANG_PACKS + language + ".json").get_file()
 
         # Check if lang is valid.
         if self.lang is None:

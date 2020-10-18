@@ -231,9 +231,9 @@ class UserHelper:
 
     def mod_badge_level(self, privileges: int) -> int:
         """Converts privileges to mod badge level."""
-        if privileges & Permissions.mod_elder:
+        if privileges & Permissions.MOD_ELDER:
             return 2
-        elif privileges & Permissions.mod_regular:
+        elif privileges & Permissions.MOD_REGULAR:
             return 1
         return 0
 
@@ -280,7 +280,7 @@ class UserHelper:
         timestamp = get_timestamp()
 
         if (
-            not self.has_privilege(user, Permissions.post_acc_comment)
+            not self.has_privilege(user, Permissions.POST_ACC_COMMENT)
             and run_privilege_check
         ):
             return False

@@ -67,7 +67,7 @@ async def level_search_modular_hanlder(
             logging.debug(
                 lang.debug("gauntlet_not_found", gauntlet_req)
             )  # TODO: Incooperate this with the lang system.
-            return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+            return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
         levels = await level_helper.level_list_objs(gauntlet.level_list())
 
     # Getting final reponse
@@ -149,7 +149,7 @@ async def download_level(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     level = await level_helper.get_level_obj(level_id)
     if level is None:
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
     # Bump dl
     await level_helper.bump_download(level_id)
 
@@ -167,7 +167,7 @@ async def download_level(request: aiohttp.web.Request) -> aiohttp.web.Response:
         ]
     )
     password_xor = (
-        cipher_xor(level.password, XorKeys.level_password)
+        cipher_xor(level.password, XorKeys.LEVEL_PASSWORD)
         if level.password != 0
         else level.password
     )
@@ -182,7 +182,7 @@ async def download_level(request: aiohttp.web.Request) -> aiohttp.web.Response:
                 user_config["level_path"] + str(level.ID),
             )
         )
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
     response = (
         joint_string(
             {
@@ -224,8 +224,8 @@ async def download_level(request: aiohttp.web.Request) -> aiohttp.web.Response:
                 41: fea_id,
             }
         )
-        + f"#{level_helper.solo_gen(await level.load_string())}#"
-        + level_helper.solo_gen2(yo_idk)
+        + f"#{level_helper.SOLO_gen(await level.load_string())}#"
+        + level_helper.SOLO_gen2(yo_idk)
         + f"#{yo_idk}"
     )
 
@@ -240,7 +240,7 @@ async def upload_level_handler(request: aiohttp.web.Request):
     account_id = int(post_data["accountID"])
 
     if not await auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     user_obj = await user_helper.get_object(account_id)
 
@@ -330,7 +330,7 @@ async def get_map_packs_handler(request: aiohttp.web.Request):
         )  # So we don't have to convert every time in the formatted str
         hashed += f"{id_str[0]}{id_str[len(id_str)-1]}{pack.stars}{pack.coins}"
 
-    hashed = hash_sha1(hashed + CryptKeys.solo)
+    hashed = hash_sha1(hashed + CryptKeys.SOLO)
     response = f"{response[:-1]}#{len(map_packs)}:{offset}:10#{hashed}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)
@@ -350,6 +350,6 @@ async def get_gauntlets_handler(request: aiohttp.web.Request):
         )
         hashed += str(gauntlet.ID) + list_comma_string(gauntlet.level_list())
 
-    response = f"{gautnlet_resp[:-1]}#{level_helper.solo_gen2(hashed)}"
+    response = f"{gautnlet_resp[:-1]}#{level_helper.SOLO_gen2(hashed)}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

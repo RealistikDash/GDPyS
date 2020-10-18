@@ -1,64 +1,68 @@
 class XorKeys:
-    password = 37526
-    chk = 19847
-    level_password = 26364
-    quests = 19847
-    chests = 59182
+    """XOR keys for GD specific responses."""
+
+    PASSWORD = 37526
+    CHK = 19847
+    LEVEL_PASSWORD = 26364
+    QUESTS = 19847
+    CHESTS = 59182
 
 
 class Permissions:
-    authenticate = 2 << 0
-    upload_level = 2 << 1
-    post_comment = 2 << 2
-    post_acc_comment = 2 << 3
-    mod_regular = 2 << 6
-    mod_elder = 2 << 7
-    mod_rate = 2 << 8
+    """GDPyS action permissions."""
+
+    AUTH = 2 << 0
+    UPLOAD_LEVEL = 2 << 1
+    POST_COMMENT = 2 << 2
+    POST_ACC_COMMENT = 2 << 3
+    MOD_REGULAR = 2 << 6
+    MOD_ELDER = 2 << 7
+    MOD_RATE = 2 << 8
 
 
 class Secrets:
     """All the GeometryDash secret values"""
 
-    normal = "Wmfd2893gb7"
+    NORMAL = "Wmfd2893gb7"
 
 
 class ResponseCodes:
     """All the web response codes."""
 
-    generic_fail = "-1"
-    generic_success = "1"
-    generic_fail2 = "-2"
-    generic_success2 = "2"
-    login_contact_rob = "-12"
-    empty_list = "#0:0:0"
-    comment_ban = "-10"
+    GENERIC_FAIL = "-1"
+    GENERIC_SUCCESS = "1"
+    GENERIC_FAIL2 = "-2"
+    GENERIC_SUCCESS2 = "2"
+    LOGIN_CONTACT_ROB = "-12"
+    EMPTY_LIST = "#0:0:0"
+    COMMENT_BAN = "-10"
 
 
 class Colours:
     """ALL THE COLOURS IN THE SKY"""
 
-    reset = u"\u001b[0m"
-    red = u"\u001b[31m"
-    black = u"\u001b[30m"
-    green = u"\u001b[32m"
-    yellow = u"\u001b[33m"
-    blue = u"\u001b[34m"
-    magenta = u"\u001b[35m"
-    cyan = u"\u001b[36m"
-    white = u"\u001b[37m"
-    all_col = [red, green, yellow, blue, magenta, cyan, white]
+    RESET = u"\u001b[0m"
+    RED = u"\u001b[31m"
+    BLACK = u"\u001b[30m"
+    GREEN = u"\u001b[32m"
+    YELLOW = u"\u001b[33m"
+    BLUE = u"\u001b[34m"
+    MAGENTA = u"\u001b[35m"
+    CYAN = u"\u001b[36m"
+    WHITE = u"\u001b[37m"
+    ALL_COL = [RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE]
 
 
 class CryptKeys:
-    solo = "xI25fpAapCQg"
-    solo3 = "oC36fpYaPtdg"
-    solo4 = "pC26fpYaQCtg"
+    SOLO = "xI25fpAapCQg"
+    SOLO3 = "oC36fpYaPtdg"
+    SOLO4 = "pC26fpYaQCtg"
 
 
 class Paths:
     """File paths."""
 
-    lang_packs = "lang/"
+    LANG_PACKS = "lang/"
 
 
 ASCII_ART = r"""

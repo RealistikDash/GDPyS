@@ -16,10 +16,10 @@ async def register_handler(request: aiohttp.web.Request):
     email = post_data["email"]
     ip = get_ip(request)
     if not rate_limiter.bump_and_check(ip, "register"):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
     if not check_username(username):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
     if await user_helper.get_accountid_from_username(username):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail2)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL2)
     await user_helper.create_user(username, password, email, ip)
-    return aiohttp.web.Response(text=ResponseCodes.generic_success)
+    return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS)

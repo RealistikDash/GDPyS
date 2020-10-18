@@ -24,7 +24,7 @@ async def profile_comment_handler(request: aiohttp.web.Request):
 
     # CHECKS
     if comment_count == 0:
-        return aiohttp.web.Response(text=ResponseCodes.empty_list)
+        return aiohttp.web.Response(text=ResponseCodes.EMPTY_LIST)
 
     # I might make this a separate helper function however since account comments aare only ever used in one place I'll make the struct here.
     response = ""
@@ -41,7 +41,7 @@ async def profile_handler(request: aiohttp.web.Request):
     post_data = await request.post()
 
     if not await auth.check_gjp(post_data["accountID"], post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     # Define variables that will be used in the handler
     account_id = int(post_data["accountID"])
@@ -142,14 +142,14 @@ async def post_account_comment_handler(request: aiohttp.web.Request):
     post_data = await request.post()
 
     if not await auth.check_gjp(post_data["accountID"], post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     response = await user_helper.post_account_comment(
         int(post_data["accountID"]), post_data["comment"]
     )
     logging.debug(response)
     return aiohttp.web.Response(
-        text=ResponseCodes.generic_success if response else ResponseCodes.generic_fail
+        text=ResponseCodes.GENERIC_SUCCESS if response else ResponseCodes.GENERIC_FAIL
     )
 
 
@@ -159,7 +159,7 @@ async def update_profile_stats_handler(request: aiohttp.web.Request):
     account_id = int(post_data["accountID"])
 
     if not await auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     user = await user_helper.get_object(account_id)
 
@@ -194,12 +194,12 @@ async def save_user_data_handler(request: aiohttp.web.Request):
     post_data = await request.post()
 
     if not await auth.check_password(post_data["userName"], post_data["password"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
     await user_helper.save_user_data(
         await user_helper.get_accountid_from_username(post_data["userName"]),
         post_data["saveData"],
     )
-    return aiohttp.web.Response(text=ResponseCodes.generic_success)
+    return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS)
 
 
 async def get_account_url_handler(request: aiohttp.web.Request):
@@ -214,7 +214,7 @@ async def load_save_data_handler(request: aiohttp.web.Response):
     post_data = await request.post()
 
     if not await auth.check_password(post_data["userName"], post_data["password"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     save_data = (
         await user_helper.load_user_data(
@@ -231,7 +231,7 @@ async def update_acc_settings_handler(request: aiohttp.web.Response):
 
     account_id = int(post_data["accountID"])
     if not await auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     # TODO: Some filters of these.
     await user_helper.update_profile_settings(
@@ -243,7 +243,7 @@ async def update_acc_settings_handler(request: aiohttp.web.Response):
         int(post_data["frS"]),
         int(post_data.get("cs", 0)),
     )
-    return aiohttp.web.Response(text=ResponseCodes.generic_success)
+    return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS)
 
 
 async def leaderboards_handler(request: aiohttp.web.Response):
@@ -296,15 +296,15 @@ async def mod_check_handler(request: aiohttp.web.Response):
 
     account_id = int(post_data["accountID"])
     if not await auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     user = await user_helper.get_object(account_id)
 
-    if user_helper.has_privilege(user, Permissions.mod_elder):
-        return aiohttp.web.Response(text=ResponseCodes.generic_success2)
-    elif user_helper.has_privilege(user, Permissions.mod_regular):
-        return aiohttp.web.Response(text=ResponseCodes.generic_success2)
-    return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+    if user_helper.has_privilege(user, Permissions.MOD_ELDER):
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS2)
+    elif user_helper.has_privilege(user, Permissions.MOD_REGULAR):
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_SUCCESS2)
+    return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
 
 async def friends_list_handler(request: aiohttp.web.Response):
@@ -315,7 +315,7 @@ async def friends_list_handler(request: aiohttp.web.Response):
     friends_type = int(post_data["type"])
 
     if not auth.check_gjp(account_id, post_data["gjp"]):
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     id_function = {  # Coro to get a list of friends ids.
         0: user_helper.get_friends  # Regular friends.

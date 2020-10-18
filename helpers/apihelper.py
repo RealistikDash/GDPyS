@@ -17,7 +17,7 @@ class BoomlingsAPI:
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 self.URL + "getGJSongInfo.php",
-                data={"songID": song_id, "secret": Secrets.normal},
+                data={"songID": song_id, "secret": Secrets.NORMAL},
             ) as resp:
                 response = await resp.text()
         logging.debug(response)

@@ -7,12 +7,14 @@ from constants import Permissions
 from exceptions import GDPySCommandError
 from config import user_config
 
+
 class CommentHelper():
     """Class containing most things regarding level comments."""
-    def __init__(self):
-        self.comments = {} # Placeholder for maybe cache.
 
-    async def get_comments(self, level_id : int, page : int = 0, amount : int = 10, order : str = "likes") -> QueryResponse:
+    def __init__(self):
+        self.comments = {}  # Placeholder for maybe cache.
+
+    async def get_comments(self, level_id: int, page: int = 0, amount: int = 10, order: str = "likes") -> QueryResponse:
         """Returns a list of comment objects.
         [WARNING] Order param is not SQLi safe. You have to manually sanetise that."""
         offset = create_offsets_from_page(page, amount)
@@ -22,7 +24,7 @@ class CommentHelper():
             # Count query
             await mycursor.execute("SELECT COUNT(*) FROM comments WHERE levelID = %s", (level_id,))
             count = (await mycursor.fetchone())[0]
-        
+
         comment_list = []
 
         for comment in comments_db:
@@ -38,17 +40,18 @@ class CommentHelper():
                 comment[1],
                 comment[8]
             ))
-        
+
         return QueryResponse(
             count,
             comment_list
         )
-    
-    async def insert_comment(self, comment : Comment) -> None:
+
+    async def insert_comment(self, comment: Comment) -> None:
         """Adds comment to database from object."""
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("INSERT INTO comments (userID, userName, comment, levelID, timestamp, likes, percent, isSpam) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            (comment.user_id, comment.username, comment.comment_base64, comment.level_id, comment.timestamp, comment.likes, comment.percent, int(comment.spam)))
+                                   (comment.user_id, comment.username, comment.comment_base64, comment.level_id, comment.timestamp, comment.likes, comment.percent, int(comment.spam)))
             await myconn.conn.commit()
-    
+
+
 comment_helper = CommentHelper()

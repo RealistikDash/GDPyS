@@ -12,13 +12,14 @@ from objects.levels import Level, Rating, DailyLevel
 
 COMMANDS = {}
 
+
 class Client:
     def __init__(self):
         self.permissions = Permissions
-    
+
     ############################
     #           User           #
-    ############################ 
+    ############################
 
     async def username_to_id(self, username: str) -> int:
         """Convert a username to an id"""
@@ -34,7 +35,7 @@ class Client:
 
     ############################
     #           Level          #
-    ############################ 
+    ############################
 
     async def get_level(self, id: int) -> Level:
         """Get a level object"""
@@ -60,38 +61,38 @@ class Client:
         """Get the current daily level"""
         return await level_helper.get_daily_level()
 
-    #async def get_weekly_level(self) -> WeeklyLevel:
+    # async def get_weekly_level(self) -> WeeklyLevel:
     #    """Get the current weekly level"""
     #    return await level_helper.get_weekly_level()
 
     ############################
     #         Commands         #
-    ############################ 
+    ############################
 
-    def command(self, name: str=None, permission: Permissions=None):
+    def command(self, name: str = None, permission: Permissions = None):
         """Decorator to create commands"""
         def decorator(coro):
             if not coro.__code__.co_flags & 0x0080 or getattr(coro, '_is_coroutine', False):
                 raise Exception("Function is not a coroutine function!")
-            if name is None: # noqa
-                name = coro.__name__.lower() # noqa
-                self.create_command(name, coro, permission) # noqa
+            if name is None:  # noqa
+                name = coro.__name__.lower()  # noqa
+                self.create_command(name, coro, permission)  # noqa
 
         return decorator
 
     def create_command(self, name: str, coro: asyncio.coroutine, permission: Permissions):
         """Create a command"""
-        COMMANDS[name]= {
+        COMMANDS[name] = {
             "handler": coro,
             "permission": permission
         }
 
-    def _command_exists(self, command : str) -> bool:
+    def _command_exists(self, command: str) -> bool:
         """Checks if a given comment is a valid command."""
         command = command.split(" ")[0].lower()
         return command[len(user_config["command_prefix"]):] in dict_keys(COMMANDS)
-    
-    async def _create_context(self, comment : Comment) -> CommandContext:
+
+    async def _create_context(self, comment: Comment) -> CommandContext:
         """Creates a context object for a command."""
         level = await level_helper.get_level_obj(comment.level_id)
         account = await user_helper.get_object(await user_helper.accid_userid(comment.user_id))
@@ -101,12 +102,14 @@ class Client:
             account
         )
 
-    async def _execute_command(self, command_obj : Comment):
+    async def _execute_command(self, command_obj: Comment):
         """Executes a GDPyS command comment command. Returns a bool or commentban object."""
-        command_args = command_obj.comment[len(user_config["command_prefix"]):].split(" ")
+        command_args = command_obj.comment[len(
+            user_config["command_prefix"]):].split(" ")
         command = COMMANDS[command_args[0].lower()]
         ctx = await self._create_context(command_obj)
-        account = await user_helper.get_object(await user_helper.accid_userid(command_obj.user_id)) # SHOULD be already cached.
+        # SHOULD be already cached.
+        account = await user_helper.get_object(await user_helper.accid_userid(command_obj.user_id))
         # Create command args
         passed_args = command_args[1:]
         if not user_helper.has_privilege(account, command["permission"]):
@@ -115,17 +118,21 @@ class Client:
             await command["handler"](ctx, *passed_args)
         except GDPySCommandError as e:
             return CommentBan(
-                0, # /shrug
+                0,  # /shrug
                 get_timestamp(),
-                f"GDPyS Command Exception in {command['handler'].__name__.replace('_', '-')}:\n{e}" # Replace as _s mess up the response
+                # Replace as _s mess up the response
+                f"GDPyS Command Exception in {command['handler'].__name__.replace('_', '-')}:\n{e}"
             )
         return True
+
 
 client = Client()
 
 # Testing commands
 # If this isnt removed and youre reading this i did forgot this. kindly mass tag me on discord https://discord.gg/Un42FEV RealistikDash#0077
-async def rate(ctx : CommandContext, level : int, star : str):
+
+
+async def rate(ctx: CommandContext, level: int, star: str):
     """Rates a level right??"""
     print(f"Level: {level}, stars: {star}")
 

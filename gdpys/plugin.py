@@ -1,5 +1,9 @@
 from time import sleep
-import os, asyncio, time, json
+import os
+import asyncio
+import time
+import json
+
 
 class Plugin:
     def __init__(self):
@@ -12,14 +16,17 @@ class Plugin:
                     if p == f:
                         depend_check.append(p)
             if depend_check != self.dependencies:
-                print(f"Dependencies could not be found for \"{self.__class__}\".")
+                print(
+                    f"Dependencies could not be found for \"{self.__class__}\".")
         except AttributeError:
             print("Dependencies is disabled for " + str(self.__class__))
         self.stopped = False
         loop = asyncio.new_event_loop()
-        configpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins/config"
+        configpath = os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__))) + "/plugins/config"
         try:
-            self.config = json.load(open(configpath + "/" + self.name + "/config.json", "r"))
+            self.config = json.load(
+                open(configpath + "/" + self.name + "/config.json", "r"))
         except AttributeError:
             print("Warning: Config is disabled for " + str(self.__class__))
         except FileNotFoundError:
@@ -27,13 +34,15 @@ class Plugin:
         if self.metadata == False:
             print(f"Warning: Plugin {self.__class__} has invalid metadata!")
         while True:
-            if self.stopped: break
+            if self.stopped:
+                break
             loop.run_until_complete(self.loop())
             sleep(1)
 
     def create_config(self, template):
         """Create config for plugins"""
-        configpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/plugins/config"
+        configpath = os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__))) + "/plugins/config"
         if os.path.exists(configpath + "/" + self.name + "/config.json"):
             return
         if self.metadata == False:
@@ -43,7 +52,8 @@ class Plugin:
             os.mkdir(configpath)
         if not os.path.exists(configpath + "/" + self.name):
             os.mkdir(configpath + "/" + self.name)
-        config = json.dump(template, open(configpath + "/" + self.name + "/config.json", "w"))
+        config = json.dump(template, open(
+            configpath + "/" + self.name + "/config.json", "w"))
 
     def set_metadata(self, name="", author="", description="", version="", dependencies=[]):
         """Set metadata, will be given a warning if this is not done at startup."""
@@ -52,7 +62,7 @@ class Plugin:
         self.description = description
         self.version = version
         self.dependencies = dependencies
-    
+
     def stop(self):
         """Stop the plugin"""
         self.stopped = True

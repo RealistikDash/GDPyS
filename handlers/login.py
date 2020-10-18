@@ -6,6 +6,7 @@ from helpers.generalhelper import get_ip
 from constants import Permissions, ResponseCodes
 import logging
 
+
 async def login_handler(request: aiohttp.web.Request):
     """Handles the login request sent by the Geometry Dash client. Takes an aiohttp request arg."""
     post_data = await request.post()

@@ -5,13 +5,16 @@ from helpers.lang import lang
 import logging
 import math
 
-PAGE_SIZE = 100 # You may make it larger to speed things up if you have a lot of free memory. Default should be fine.
+# You may make it larger to speed things up if you have a lot of free memory. Default should be fine.
+PAGE_SIZE = 100
+
 
 async def cron_calc_cp():
     """Server CP calculation."""
     # So I may make this more GDPyS style (using all of the level objects etc) but in this case, speed matters
     # a LOT more than usual. I have found this way to be MUCH faster and therefore decided to implement it as such here.
-    cp_users = {} # Dict (with keys being account IDs) that store user's final CP count.
+    # Dict (with keys being account IDs) that store user's final CP count.
+    cp_users = {}
     async with myconn.conn.cursor() as mycursor:
         # We wipe the whole server's CP values in case a person lost all their levels ratings (as he won't be recalculated for efficiency reasons).
         await mycursor.execute("UPDATE users SET creatorPoints = 0")
@@ -29,13 +32,14 @@ async def cron_calc_cp():
             for level in levels_db:
                 if level[0] not in dict_keys(cp_users):
                     cp_users[level[0]] = 0
-                
+
                 # Checks for each CP condition.
-                for i in range(1,6): # The SQL condition columns are 1-5. Just did this so I don't have to write 5 if statements separately
+                # The SQL condition columns are 1-5. Just did this so I don't have to write 5 if statements separately
+                for i in range(1, 6):
                     if level[i]:
                         cp_users[level[0]] += 1
-            del levels_db # Not sure how much this helps
-        
+            del levels_db  # Not sure how much this helps
+
         # Now we set the new values to the users
         for user in dict_keys(cp_users):
             await mycursor.execute("UPDATE users SET creatorPoints = %s WHERE userID = %s LIMIT 1", (cp_users[user], user))

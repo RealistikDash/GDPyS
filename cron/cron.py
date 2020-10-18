@@ -8,7 +8,7 @@ import logging
 import traceback
 import asyncio
 
-CRON_JOBS = [ # 
+CRON_JOBS = [
     cron_calc_ranks,
     cron_calc_cp,
     cron_top_stars,
@@ -17,12 +17,13 @@ CRON_JOBS = [ #
     cron_cache_gauntlets
 ]
 
+
 async def run_cron():
     """Runs all of the cron jobs."""
     total_t = Timer()
     total_t.start()
     for job in CRON_JOBS:
-        logging.debug(lang.debug("cron_job_running",job.__name__))
+        logging.debug(lang.debug("cron_job_running", job.__name__))
         t = Timer()
         t.start()
         try:
@@ -33,12 +34,12 @@ async def run_cron():
         # So we dont  gett 32846238746238ms or 0.0s
         t_str = time_str(t)
         logging.info(lang.info("CRON_FINISH", job.__name__, t_str))
-    
+
     # Don't copy paste code now watch me not follow my own advice. If I have to use this somewhere else, I will move this to timehelper.
     t_str = time_str(total_t)
     logging.info(lang.info("CRON_ALL_FINISH", t_str))
 
-#async def cron_gather():
+# async def cron_gather():
 #    """An experimental way of running all of the cron jobs simultaniously async style."""
 #    logging.debug(f"Queueing {len(CRON_JOBS_CORO)} cron jobs.")
 #    t = Timer()

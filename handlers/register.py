@@ -5,6 +5,7 @@ from helpers.generalhelper import get_ip
 from helpers.ratelimit import rate_limiter
 from constants import ResponseCodes
 
+
 async def register_handler(request: aiohttp.web.Request):
     """Handles the Geometry Dash register event."""
     post_data = await request.post()

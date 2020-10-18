@@ -14,7 +14,9 @@ from cron.cachempgauntlets import map_packs, gauntlets
 from constants import XorKeys, ResponseCodes, CryptKeys
 from config import user_config
 
-async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp.web.Response: # Kinda stole the name for the function from osu lol
+
+# Kinda stole the name for the function from osu lol
+async def level_search_modular_hanlder(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handles the get levels endpoint."""
     post_data = await request.post()
 
@@ -30,7 +32,7 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         query = SearchQuery(
             int(post_data["type"]),
             offset,
-            None, # Uncertain if order is used.
+            None,  # Uncertain if order is used.
             int(post_data.get("gauntlet", 0)),
             string_bool(post_data.get("featured", "0")),
             string_bool(post_data.get("original", "0")),
@@ -47,12 +49,14 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
         logging.debug(query)
 
         levels = await search_helper.get_levels(query)
-    
+
     else:
         # We are getting gauntlets
-        gauntlet : Gauntlet = select_obj_id(gauntlets, gauntlet_req) # Select gauntlet from known list.
-        if gauntlet is None: # Not Found
-            logging.debug(lang.debug("gauntlet_not_found", gauntlet_req)) # TODO: Incooperate this with the lang system.
+        # Select gauntlet from known list.
+        gauntlet: Gauntlet = select_obj_id(gauntlets, gauntlet_req)
+        if gauntlet is None:  # Not Found
+            # TODO: Incooperate this with the lang system.
+            logging.debug(lang.debug("gauntlet_not_found", gauntlet_req))
             return aiohttp.web.Response(text=ResponseCodes.generic_fail)
         levels = await level_helper.level_list_objs(gauntlet.level_list())
 
@@ -63,50 +67,51 @@ async def level_search_modular_hanlder(request : aiohttp.web.Request) -> aiohttp
     user_str = ""
     gauntlet_append = "" if not gauntlet_req else f"44:{gauntlet_req}:"
     for level in levels.results if not gauntlet_req else levels:
-        level : Level
+        level: Level
         response += gauntlet_append
         lvls_list.append(level.ID)
         user_str += await user_helper.get_user_string(level.user_id) + "|"
         if level.song_id:
             song_str += songs.song_string(await songs.get_song_obj(level.song_id)) + "~:~"
-        #THIS IS WHERE THE **FUN** BEGINS
+        # THIS IS WHERE THE **FUN** BEGINS
         response += joint_string(
             {
-                1 : level.ID,
-                2 : level.name,
-                5 : level.version,
-                6 : level.user_id,
+                1: level.ID,
+                2: level.name,
+                5: level.version,
+                6: level.user_id,
                 8: 10,
-                9 : level_helper.star_to_difficulty(level.stars),
-                10 : level.downloads,
-                12 : level.track,
-                13 : level.game_version,
-                14 : level.likes,
-                17 : 1 if level.stars == 10 else 0,
-                25 : 1 if level.stars == 1 else 0,
-                18 : level.stars,
-                19 : int(level.featured),
-                42 : int(level.epic),
-                45 : level.objects,
-                3 : level.description,
-                15 : level.length,
-                30 : int(level.original),
-                31 : 0,
-                37 : level.coins,
-                38 : int(level.verified_coins),
-                39 : level.requested_stars,
-                #41 : 1,
-                47 : 2,
-                40 : int(level.ldm),
-                35 : level.song_id
+                9: level_helper.star_to_difficulty(level.stars),
+                10: level.downloads,
+                12: level.track,
+                13: level.game_version,
+                14: level.likes,
+                17: 1 if level.stars == 10 else 0,
+                25: 1 if level.stars == 1 else 0,
+                18: level.stars,
+                19: int(level.featured),
+                42: int(level.epic),
+                45: level.objects,
+                3: level.description,
+                15: level.length,
+                30: int(level.original),
+                31: 0,
+                37: level.coins,
+                38: int(level.verified_coins),
+                39: level.requested_stars,
+                # 41 : 1,
+                47: 2,
+                40: int(level.ldm),
+                35: level.song_id
             }
         ) + "|"
-    
+
     response = response[:-1] + "#" + user_str[:-1] + "#" + song_str[:-3] + f"#{levels.total_results if not gauntlet_req else len(gauntlets)}:{offset}:10#" + await level_helper.multi_gen(lvls_list)
     logging.debug(response)
     return aiohttp.web.Response(text=response)
 
-async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
+
+async def download_level(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Responsivle for downloading levels"""
     post_data = await request.post()
 
@@ -122,63 +127,67 @@ async def download_level(request : aiohttp.web.Request) -> aiohttp.web.Response:
     level = await level_helper.get_level_obj(level_id)
     if level is None:
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    # Bump dl 
+    # Bump dl
     await level_helper.bump_download(level_id)
 
     # Creating variables to be used.
     yo_idk = list_comma_string([
-        level.user_id, level.stars, 1 if level.stars == 10 else 0, level.ID, int(level.verified_coins), int(level.featured), level.password, fea_id
+        level.user_id, level.stars, 1 if level.stars == 10 else 0, level.ID, int(
+            level.verified_coins), int(level.featured), level.password, fea_id
     ])
-    password_xor = cipher_xor(level.password, XorKeys.level_password) if level.password != 0 else level.password
+    password_xor = cipher_xor(
+        level.password, XorKeys.level_password) if level.password != 0 else level.password
     logging.debug(password_xor)
     try:
         level_str = await level.load_string()
     except FileNotFoundError:
-        logging.error(lang.error("LEVEL_FILE_NOT_FOUND", level.ID,user_config["level_path"] + str(level.ID)))
+        logging.error(lang.error("LEVEL_FILE_NOT_FOUND", level.ID,
+                                 user_config["level_path"] + str(level.ID)))
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     response = joint_string({
-        1 : level.ID,
-        2 : level.name,
-        3 : level.description if level.description else "0",
-        4 : level_str,
-        5 : level.version,
-        6 : level.user_id,
-        8 : 10,
-        9 : level_helper.star_to_difficulty(level.stars),
-        10 : level.downloads,
-        11 : 1,
-        12 : level.track,
-        13 : level.game_version,
-        14 : level.likes,
-        17 : 1 if level.stars == 10 else 0,
-        43 : level.demon_diff,
-        25 : 1 if level.stars == 1 else 0,
-        18 : level.stars,
-        19 : int(level.featured),
-        42 : int(level.epic),
-        45 : level.objects,
-        15 : level.length,
-        30 : int(level.original),
-        31 : 1,
-        28 : level.upload_timestamp,
-        29 : level.update_timestamp,
-        35 : level.song_id,
-        36 : level.extra,
-        37 : level.coins,
-        38 : int(level.verified_coins),
-        39 : level.requested_stars,
-        46 : 1,
-        47 : 2,
-        48 : 1,
-        40 : int(level.ldm),
-        27 : password_xor,
-        41 : fea_id
+        1: level.ID,
+        2: level.name,
+        3: level.description if level.description else "0",
+        4: level_str,
+        5: level.version,
+        6: level.user_id,
+        8: 10,
+        9: level_helper.star_to_difficulty(level.stars),
+        10: level.downloads,
+        11: 1,
+        12: level.track,
+        13: level.game_version,
+        14: level.likes,
+        17: 1 if level.stars == 10 else 0,
+        43: level.demon_diff,
+        25: 1 if level.stars == 1 else 0,
+        18: level.stars,
+        19: int(level.featured),
+        42: int(level.epic),
+        45: level.objects,
+        15: level.length,
+        30: int(level.original),
+        31: 1,
+        28: level.upload_timestamp,
+        29: level.update_timestamp,
+        35: level.song_id,
+        36: level.extra,
+        37: level.coins,
+        38: int(level.verified_coins),
+        39: level.requested_stars,
+        46: 1,
+        47: 2,
+        48: 1,
+        40: int(level.ldm),
+        27: password_xor,
+        41: fea_id
     }) + f"#{level_helper.solo_gen(await level.load_string())}#" + level_helper.solo_gen2(yo_idk) + f"#{yo_idk}"
 
     logging.debug(response)
     return aiohttp.web.Response(text=response)
 
-async def upload_level_handler(request : aiohttp.web.Request):
+
+async def upload_level_handler(request: aiohttp.web.Request):
     """Level upload handler."""
     post_data = await request.post()
 
@@ -186,14 +195,14 @@ async def upload_level_handler(request : aiohttp.web.Request):
 
     if not await auth.check_gjp(account_id, post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    
+
     user_obj = await user_helper.get_object(account_id)
 
     new_level = Level(
         game_version=int(post_data.get("gameVersion", 0)),
         binary_version=int(post_data.get("binaryVersion", 0)),
         username=user_obj.username,
-        ID = None,
+        ID=None,
         name=post_data.get("levelName", "Unnamed"),
         description=post_data.get("levelDesc", ""),
         version=int(post_data.get("levelVersion", 0)),
@@ -227,7 +236,8 @@ async def upload_level_handler(request : aiohttp.web.Request):
 
     return aiohttp.web.Response(text=str(level_id))
 
-async def get_daily_handler(request : aiohttp.web.Request):
+
+async def get_daily_handler(request: aiohttp.web.Request):
     """Daily level handler."""
     post_data = await request.post()
 
@@ -242,36 +252,40 @@ async def get_daily_handler(request : aiohttp.web.Request):
     logging.debug(response)
     return aiohttp.web.Response(text=response)
 
-async def get_map_packs_handler(request : aiohttp.web.Request):
+
+async def get_map_packs_handler(request: aiohttp.web.Request):
     """Handles getting in-game map packs."""
     post_data = await request.post()
 
     page = int(post_data["page"])
-    offset = create_offsets_from_page(post_data["page"]) # Used for server resposne
+    offset = create_offsets_from_page(
+        post_data["page"])  # Used for server resposne
 
     packs = paginate_list(map_packs, page)
     response = ""
     hashed = ""
     for pack in packs:
         response += joint_string({
-            1 : pack.ID,
-            2 : pack.name,
-            3 : list_comma_string(pack.levels),
-            4 : pack.stars,
-            5 : pack.coins,
-            6 : pack.difficulty,
-            7 : str(pack.colour),
-            8 : str(pack.colour)
+            1: pack.ID,
+            2: pack.name,
+            3: list_comma_string(pack.levels),
+            4: pack.stars,
+            5: pack.coins,
+            6: pack.difficulty,
+            7: str(pack.colour),
+            8: str(pack.colour)
         }) + "|"
-        id_str = str(pack.ID) # So we don't have to convert every time in the formatted str
+        # So we don't have to convert every time in the formatted str
+        id_str = str(pack.ID)
         hashed += f"{id_str[0]}{id_str[len(id_str)-1]}{pack.stars}{pack.coins}"
-    
+
     hashed = hash_sha1(hashed+CryptKeys.solo)
     response = f"{response[:-1]}#{len(map_packs)}:{offset}:10#{hashed}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)
 
-async def get_gauntlets_handler(request : aiohttp.web.Request):
+
+async def get_gauntlets_handler(request: aiohttp.web.Request):
     """Responsible for serving the guantlets to the client."""
     # The Soviet Union has changed their diplomatic status on us: Declare War
     # No need for postdata here.
@@ -280,11 +294,11 @@ async def get_gauntlets_handler(request : aiohttp.web.Request):
     hashed = ""
     for gauntlet in gauntlets:
         gautnlet_resp += joint_string({
-            1 : gauntlet.ID,
-            3 : list_comma_string(gauntlet.level_list())
+            1: gauntlet.ID,
+            3: list_comma_string(gauntlet.level_list())
         }) + "|"
         hashed += str(gauntlet.ID) + list_comma_string(gauntlet.level_list())
-    
+
     response = f"{gautnlet_resp[:-1]}#{level_helper.solo_gen2(hashed)}"
     logging.debug(response)
     return aiohttp.web.Response(text=response)

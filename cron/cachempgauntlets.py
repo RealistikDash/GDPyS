@@ -8,23 +8,25 @@ import logging
 map_packs = []
 gauntlets = []
 
+
 async def cron_cache_mappacks():
     """Cron job that caches the map packs."""
     map_packs.clear()
     # We get all of the map packs from the database.
     async with myconn.conn.cursor() as mycursor:
-        await mycursor.execute("SELECT ID, name, levels, stars, coins, difficulty, rgbcolors FROM mappacks") # Shouldnt be too much I think.
+        # Shouldnt be too much I think.
+        await mycursor.execute("SELECT ID, name, levels, stars, coins, difficulty, rgbcolors FROM mappacks")
         packs_db = await mycursor.fetchall()
-    
+
     for pack in packs_db:
         # Create the necessary variables and maybe error handle.
         level_list = pack[2].split(",")
         colour_list = pack[6].split(",")
         try:
-            colour = RGB(colour_list[0],colour_list[1],colour_list[2])
+            colour = RGB(colour_list[0], colour_list[1], colour_list[2])
         except IndexError:
             logging.warn(lang.warn("pack_invalid_colour", pack[1]))
-            colour = RGB(255,255,255)
+            colour = RGB(255, 255, 255)
         map_packs.append(MapPack(
             pack[0],
             pack[1],
@@ -35,6 +37,7 @@ async def cron_cache_mappacks():
             colour
         ))
 
+
 async def cron_cache_gauntlets():
     """Caches the in-game gauntlets."""
     gauntlets.clear()
@@ -42,8 +45,8 @@ async def cron_cache_gauntlets():
     async with myconn.conn.cursor() as mycursor:
         await mycursor.execute("SELECT ID, level1,level2,level3,level4,level5 FROM gauntlets")
         gauntlets_db = await mycursor.fetchall()
-    
+
     for gauntlet in gauntlets_db:
         gauntlets.append(Gauntlet(
-            gauntlet[0],gauntlet[1],gauntlet[2],gauntlet[3],gauntlet[4],gauntlet[5]
+            gauntlet[0], gauntlet[1], gauntlet[2], gauntlet[3], gauntlet[4], gauntlet[5]
         ))

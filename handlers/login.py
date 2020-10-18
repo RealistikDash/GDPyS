@@ -6,13 +6,16 @@ from helpers.generalhelper import get_ip
 from constants import Permissions, ResponseCodes
 import logging
 
+
 async def login_handler(request: aiohttp.web.Request):
     """Handles the login request sent by the Geometry Dash client. Takes an aiohttp request arg."""
     post_data = await request.post()
     if not rate_limiter.bump_and_check(get_ip(request), "login"):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     try:
-        account_id = await user_helper.get_accountid_from_username(post_data["userName"])
+        account_id = await user_helper.get_accountid_from_username(
+            post_data["userName"]
+        )
     except AssertionError:
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     user_obj = await user_helper.get_object(account_id)

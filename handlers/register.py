@@ -5,6 +5,7 @@ from helpers.generalhelper import get_ip
 from helpers.ratelimit import rate_limiter
 from constants import ResponseCodes
 
+
 async def register_handler(request: aiohttp.web.Request):
     """Handles the Geometry Dash register event."""
     post_data = await request.post()
@@ -20,9 +21,5 @@ async def register_handler(request: aiohttp.web.Request):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail)
     if await user_helper.get_accountid_from_username(username):
         return aiohttp.web.Response(text=ResponseCodes.generic_fail2)
-    await user_helper.create_user(
-        username,
-        password, email,
-        ip
-    )
+    await user_helper.create_user(username, password, email, ip)
     return aiohttp.web.Response(text=ResponseCodes.generic_success)

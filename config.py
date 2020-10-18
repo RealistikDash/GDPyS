@@ -6,26 +6,27 @@ __name__ = "ConfigModule"
 __author__ = "RealistikDash"
 
 default_config = {
-    "port" : 80,
-    "sql_server" : "localhost",
-    "sql_user" : "root",
-    "sql_db" : "gdpys",
-    "sql_password" : "",
-    "debug" : False,
-    "level_path" : "data/levels/",
-    "save_path" : "data/saves/",
-    "command_prefix" : "!",
-    "default_priv" : 30,
-    "cache_level_strs" : True,
-    "lang" : "en",
-    "gdpysbot_enabled": "true"
+    "port": 80,
+    "sql_server": "localhost",
+    "sql_user": "root",
+    "sql_db": "gdpys",
+    "sql_password": "",
+    "debug": False,
+    "level_path": "data/levels/",
+    "save_path": "data/saves/",
+    "command_prefix": "!",
+    "default_priv": 30,
+    "cache_level_strs": True,
+    "lang": "en",
+    "gdpysbot_enabled": "true",
 }
 
 user_config = {}
 
 config_options = list(default_config.keys())
 
-def load_config(location : str = "config.json"):
+
+def load_config(location: str = "config.json"):
     config = JsonFile(location)
     user_config_temp = config.get_file()
 
@@ -46,8 +47,10 @@ def load_config(location : str = "config.json"):
 
     if updated_conf:
         config.write_file(user_config_temp)
-        print("Your config has been updated! Please change the new vaulues to your liking.")
+        print(
+            "Your config has been updated! Please change the new vaulues to your liking."
+        )
         raise SystemExit
-    
+
     for key in dict_keys(user_config_temp):
         user_config[key] = user_config_temp[key]

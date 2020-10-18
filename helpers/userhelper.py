@@ -13,8 +13,10 @@ from cron.rankcalc import ranks
 import logging
 import os
 
-class UserHelper():
+
+class UserHelper:
     """Responsible for caching and getting user objects and other user-related actions."""
+
     def __init__(self):
         # Caches
         self.object_cache = {}
@@ -23,23 +25,43 @@ class UserHelper():
         self.userid_accid_cache = {}
         self.relationships = {}
         self.user_str_cache = {}
-    
+
     async def _create_user_object(self, account_id: int) -> Account:
         """Creates a user object."""
         account_id = int(account_id)
         user_id = await self.accid_userid(account_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userName, email, registerDate, privileges, youtubeurl, twitter, twitch, frS, mS, cS FROM accounts WHERE accountID = %s LIMIT 1", (account_id,))
+            await mycursor.execute(
+                "SELECT userName, email, registerDate, privileges, youtubeurl, twitter, twitch, frS, mS, cS FROM accounts WHERE accountID = %s LIMIT 1",
+                (account_id,),
+            )
             account_data = await mycursor.fetchone()
-            await mycursor.execute("SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1", (account_id,))
+            await mycursor.execute(
+                "SELECT stars,demons,icon,color1,color2,iconType, coins,userCoins,accShip,accBall,accBird,accDart,accRobot,accGlow,creatorPoints,diamonds,orbs,accSpider,accExplosion,isBanned FROM users WHERE extID = %s LIMIT 1",
+                (account_id,),
+            )
             user_data = await mycursor.fetchone()
-            await mycursor.execute("SELECT userID, userName, comment, timestamp, likes, isSpam, commentID FROM acccomments WHERE userID = %s ORDER BY timestamp DESC", (user_id,))
+            await mycursor.execute(
+                "SELECT userID, userName, comment, timestamp, likes, isSpam, commentID FROM acccomments WHERE userID = %s ORDER BY timestamp DESC",
+                (user_id,),
+            )
             comments = await mycursor.fetchall()
         acc_comments = []
 
         for comment in comments:
-            acc_comments.append(AccountComment(comment[0], comment[2], decode_base64(comment[2]), comment[3], comment[4], bool(comment[5]), comment[1], comment[6]))
-        
+            acc_comments.append(
+                AccountComment(
+                    comment[0],
+                    comment[2],
+                    decode_base64(comment[2]),
+                    comment[3],
+                    comment[4],
+                    bool(comment[5]),
+                    comment[1],
+                    comment[6],
+                )
+            )
+
         return Account(
             account_data[0],
             account_data[1],
@@ -73,48 +95,52 @@ class UserHelper():
             account_data[6],
             bool(account_data[7]),
             bool(account_data[8]),
-            bool(account_data[9])
+            bool(account_data[9]),
         )
-    
+
     async def _cache_aid_uid(self, account_id: int) -> None:
         """Caches an account id to user id value."""
-        account_id =int(account_id)
+        account_id = int(account_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userID FROM users WHERE extID = %s LIMIT 1", (account_id,))
+            await mycursor.execute(
+                "SELECT userID FROM users WHERE extID = %s LIMIT 1", (account_id,)
+            )
             user_id = await mycursor.fetchone()
         assert user_id is not None
         self.accid_userid_cache[account_id] = user_id[0]
-    
-    async def accid_userid(self, account_id : int) -> int:
+
+    async def accid_userid(self, account_id: int) -> int:
         """Returns the userID of a user with given accountID."""
         account_id = int(account_id)
         if account_id not in dict_keys(self.accid_userid_cache):
             await self._cache_aid_uid(account_id)
         return self.accid_userid_cache[account_id]
-    
+
     async def _cache_uid_aid(self, user_id: int) -> None:
         """Caches an account id to user id value."""
-        user_id =int(user_id)
+        user_id = int(user_id)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT extID FROM users WHERE userID = %s LIMIT 1", (user_id,))
+            await mycursor.execute(
+                "SELECT extID FROM users WHERE userID = %s LIMIT 1", (user_id,)
+            )
             acc_id = await mycursor.fetchone()
         assert acc_id is not None
         self.userid_accid_cache[user_id] = acc_id[0]
-    
-    async def userid_accid(self, user_id : int) -> int:
+
+    async def userid_accid(self, user_id: int) -> int:
         """Returns the accountID of a user with given userID."""
         user_id = int(user_id)
         if user_id not in dict_keys(self.userid_accid_cache):
             await self._cache_uid_aid(user_id)
         return self.userid_accid_cache[user_id]
-    
+
     async def recache_object(self, account_id: int) -> None:
         """Forces a user object to recache."""
         account_id = int(account_id)
-        #obj = await self._create_user_object(account_id)
+        # obj = await self._create_user_object(account_id)
         obj = await time_coro(self._create_user_object, (account_id,))
         self.object_cache[account_id] = obj
-    
+
     async def get_object(self, account_id: int) -> Account:
         """Gets user object from cache or caches and returns it."""
         account_id = int(account_id)
@@ -128,51 +154,81 @@ class UserHelper():
         if privileges is None:
             return True
         return bool(user_obj.privileges & privileges)
-    
-    async def get_accountid_from_username(self, username:str) -> int:
+
+    async def get_accountid_from_username(self, username: str) -> int:
         """Gets an account ID from username."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT accountID FROM accounts WHERE userName LIKE %s LIMIT 1", (username,))
+            await mycursor.execute(
+                "SELECT accountID FROM accounts WHERE userName LIKE %s LIMIT 1",
+                (username,),
+            )
             accountID = await mycursor.fetchone()
         return accountID[0] if accountID is not None else False
-    
-    async def create_user(self, username: str, password: str, email : str, ip : str = "127.0.0.1") -> None:
+
+    async def create_user(
+        self, username: str, password: str, email: str, ip: str = "127.0.0.1"
+    ) -> None:
         """Inserts a user into db."""
         timestamp = get_timestamp()
         hashed_password = hash_bcrypt(password)
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey, privileges) VALUES (%s, %s, %s, '', '', %s, '', %s)", (username, hashed_password, email, timestamp, user_config["default_priv"]))
-            await mycursor.execute("INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)", (mycursor.lastrowid, username, ip))
+            await mycursor.execute(
+                "INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey, privileges) VALUES (%s, %s, %s, '', '', %s, '', %s)",
+                (
+                    username,
+                    hashed_password,
+                    email,
+                    timestamp,
+                    user_config["default_priv"],
+                ),
+            )
+            await mycursor.execute(
+                "INSERT INTO users (isRegistered, extID, userName, IP) VALUES (1, %s, %s, %s)",
+                (mycursor.lastrowid, username, ip),
+            )
             await myconn.conn.commit()
-    
+
     async def _create_account_extra(self, account_id: int) -> AccountExtras:
         """Creates an account extra object for user."""
         async with myconn.conn.cursor() as mycursor:
             # TODO: Replace these count queries with simple len of friend request object
-            await mycursor.execute("SELECT COUNT(*) FROM friendreqs WHERE toAccountID = %s AND isNew = 1", (account_id,))
+            await mycursor.execute(
+                "SELECT COUNT(*) FROM friendreqs WHERE toAccountID = %s AND isNew = 1",
+                (account_id,),
+            )
             friend_reqs = await mycursor.fetchone()
-            await mycursor.execute("SELECT COUNT(*) FROM messages WHERE toAccountID = %s AND isNew = 0", (account_id,))
+            await mycursor.execute(
+                "SELECT COUNT(*) FROM messages WHERE toAccountID = %s AND isNew = 0",
+                (account_id,),
+            )
             new_messages = await mycursor.fetchone()
-            await mycursor.execute("SELECT COUNT(*) FROM friendships WHERE (person1 = %s AND isNew2 = 1) OR  (person2 = %s AND isNew1 = 1)", (account_id,account_id))
+            await mycursor.execute(
+                "SELECT COUNT(*) FROM friendships WHERE (person1 = %s AND isNew2 = 1) OR  (person2 = %s AND isNew1 = 1)",
+                (account_id, account_id),
+            )
             new_friends = await mycursor.fetchone()
         return AccountExtras(
             friend_reqs[0],
             new_messages[0],
             new_friends[0],
-            [],[],[] # TODO: Finish all the lists when friendship system is fully implemented.
+            [],
+            [],
+            [],  # TODO: Finish all the lists when friendship system is fully implemented.
         )
-    
+
     async def _cache_account_extra(self, account_id: int) -> None:
         """Caches an account extra object."""
-        self.extra_object_cache[account_id] = await self._create_account_extra(account_id)
-    
+        self.extra_object_cache[account_id] = await self._create_account_extra(
+            account_id
+        )
+
     async def get_account_extra(self, account_id: int) -> AccountExtras:
         """Returns an account extra object for specified user."""
         account_id = int(account_id)
         if account_id not in dict_keys(self.extra_object_cache):
             await self._cache_account_extra(account_id)
         return self.extra_object_cache[account_id]
-    
+
     def mod_badge_level(self, privileges: int) -> int:
         """Converts privileges to mod badge level."""
         if privileges & Permissions.mod_elder:
@@ -180,59 +236,74 @@ class UserHelper():
         elif privileges & Permissions.mod_regular:
             return 1
         return 0
-    
-    def get_rank(self, account_id : int) -> int:
+
+    def get_rank(self, account_id: int) -> int:
         """Gets a users rank if cached, else returns 0."""
         if account_id not in ranks:
             return 0
         return ranks[account_id]
 
-    async def _create_user_string(self, user_id : int) -> str:
+    async def _create_user_string(self, user_id: int) -> str:
         """Creates user sting which is used in level search."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT userName, extID FROM users WHERE userID = %s LIMIT 1", (user_id,))
+            await mycursor.execute(
+                "SELECT userName, extID FROM users WHERE userID = %s LIMIT 1",
+                (user_id,),
+            )
             user_data = await mycursor.fetchone()
         if user_data is None:
             return None
         return f"{user_id}:{user_data[0]}:{user_data[1]}"
-    
-    async def _cache_user_string(self, user_id : int) -> None:
+
+    async def _cache_user_string(self, user_id: int) -> None:
         """Caches a user string."""
         self.user_str_cache[user_id] = await self._create_user_string(user_id)
-    
-    async def get_user_string(self, user_id : int) -> str:
+
+    async def get_user_string(self, user_id: int) -> str:
         """Gets a user sting which is used in level search."""
         user_id = int(user_id)
         if user_id not in dict_keys(self.user_str_cache):
             await self._cache_user_string(user_id)
         return self.user_str_cache[user_id]
-    
-    async def post_account_comment(self, account_id : int, comment: str, is_base64 : bool = True, run_privilege_check : bool = True) -> bool:
+
+    async def post_account_comment(
+        self,
+        account_id: int,
+        comment: str,
+        is_base64: bool = True,
+        run_privilege_check: bool = True,
+    ) -> bool:
         """Posts a comment to one's account."""
         if not is_base64:
             comment = encode_base64(comment)
         user = await self.get_object(int(account_id))
         timestamp = get_timestamp()
 
-        if not self.has_privilege(user, Permissions.post_acc_comment) and run_privilege_check:
+        if (
+            not self.has_privilege(user, Permissions.post_acc_comment)
+            and run_privilege_check
+        ):
             return False
         if user is None:
             return False
-        
+
         # Inserting it into db
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("INSERT INTO acccomments (userID,userName,comment,timestamp) VALUES (%s,%s,%s,%s)",
-            (user.user_id, user.username, comment, timestamp))
+            await mycursor.execute(
+                "INSERT INTO acccomments (userID,userName,comment,timestamp) VALUES (%s,%s,%s,%s)",
+                (user.user_id, user.username, comment, timestamp),
+            )
             await myconn.conn.commit()
         # We need to re-cache the user object due to how the current system works. (Someone please remind me to change this as yes.)
         await self.recache_object(account_id)
         return True
-    
-    async def update_user_stats(self, new_obj : Account) -> None:
+
+    async def update_user_stats(self, new_obj: Account) -> None:
         """Sets user's new statistics to db (such as star count)."""
         async with myconn.conn.cursor() as mycursor:
-            #TODO : Maybe some anticheat?
-            await mycursor.execute("""UPDATE users SET
+            # TODO : Maybe some anticheat?
+            await mycursor.execute(
+                """UPDATE users SET
                                         stars = %s,
                                         demons = %s,
                                         icon = %s,
@@ -255,38 +326,39 @@ class UserHelper():
                                     WHERE
                                         extID = %s
                                         LIMIT 1""",
-                                        (
-                                            new_obj.stars,
-                                            new_obj.demons,
-                                            new_obj.icon,
-                                            new_obj.colour1,
-                                            new_obj.colour2,
-                                            new_obj.icon_type,
-                                            new_obj.coins,
-                                            new_obj.user_coins,
-                                            new_obj.ship,
-                                            new_obj.ball,
-                                            new_obj.ufo,
-                                            new_obj.wave,
-                                            new_obj.robot,
-                                            int(new_obj.glow),
-                                            new_obj.cp,
-                                            new_obj.diamonds,
-                                            new_obj.orbs,
-                                            new_obj.spider,
-                                            new_obj.explosion,
-                                            new_obj.account_id
-                                        ))
+                (
+                    new_obj.stars,
+                    new_obj.demons,
+                    new_obj.icon,
+                    new_obj.colour1,
+                    new_obj.colour2,
+                    new_obj.icon_type,
+                    new_obj.coins,
+                    new_obj.user_coins,
+                    new_obj.ship,
+                    new_obj.ball,
+                    new_obj.ufo,
+                    new_obj.wave,
+                    new_obj.robot,
+                    int(new_obj.glow),
+                    new_obj.cp,
+                    new_obj.diamonds,
+                    new_obj.orbs,
+                    new_obj.spider,
+                    new_obj.explosion,
+                    new_obj.account_id,
+                ),
+            )
             await myconn.conn.commit()
         await self.recache_object(new_obj.account_id)
-    
-    async def save_user_data(self, account_id : int, save_data : str) -> None:
+
+    async def save_user_data(self, account_id: int, save_data: str) -> None:
         """Saves/overwrites user's data."""
         # TODO : Password removal.
         async with AIOFile(user_config["save_path"] + str(account_id), "w+") as file:
             await file.write(save_data)
             await file.fsync()
-    
+
     async def load_user_data(self, account_id: int) -> str:
         """Returns save data for user."""
         save_data = ""
@@ -294,27 +366,52 @@ class UserHelper():
             async with AIOFile(user_config["save_path"] + str(account_id), "r") as file:
                 save_data = await file.read()
         return save_data
-    
-    async def update_profile_settings(self, account_id : int, youtube : str, twitter : str, twitch : str, ms : int, frs : int, cs : int) -> None:
+
+    async def update_profile_settings(
+        self,
+        account_id: int,
+        youtube: str,
+        twitter: str,
+        twitch: str,
+        ms: int,
+        frs: int,
+        cs: int,
+    ) -> None:
         """Update the user's socials stored in the database."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("UPDATE accounts SET youtubeurl = %s, twitter = %s, twitch = %s, mS = %s, frS = %s, cS = %s WHERE accountID = %s LIMIT 1", (youtube, twitch, twitch, ms, frs, cs, account_id))
+            await mycursor.execute(
+                "UPDATE accounts SET youtubeurl = %s, twitter = %s, twitch = %s, mS = %s, frS = %s, cS = %s WHERE accountID = %s LIMIT 1",
+                (youtube, twitch, twitch, ms, frs, cs, account_id),
+            )
             await myconn.conn.commit()
-        
-        await self.recache_object(account_id) # May make this func just edit the current obj
-    
-    async def give_cp(self, account_id : int, cp : int = 1):
+
+        await self.recache_object(
+            account_id
+        )  # May make this func just edit the current obj
+
+    async def give_cp(self, account_id: int, cp: int = 1):
         """Gives a user an amount of CP."""
         logging.debug(lang.debug("cp_gain", account_id, cp))
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("UPDATE users SET creatorPoints = creatorPoints + %s WHERE extID = %s LIMIT 1", (cp, account_id,))
+            await mycursor.execute(
+                "UPDATE users SET creatorPoints = creatorPoints + %s WHERE extID = %s LIMIT 1",
+                (
+                    cp,
+                    account_id,
+                ),
+            )
             await myconn.conn.commit()
-            await self.recache_object(account_id) # May make this func just edit the current obj
-    
-    async def get_friends(self, account_id : int) -> list:
+            await self.recache_object(
+                account_id
+            )  # May make this func just edit the current obj
+
+    async def get_friends(self, account_id: int) -> list:
         """Returns a list of account IDs that are friends with the user."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT person1, person2 FROM friendships WHERE person1 = %s OR person2 = %s", (account_id, account_id))
+            await mycursor.execute(
+                "SELECT person1, person2 FROM friendships WHERE person1 = %s OR person2 = %s",
+                (account_id, account_id),
+            )
             friendships_db = await mycursor.fetchall()
         friends = []
         for friend in friendships_db:
@@ -325,39 +422,50 @@ class UserHelper():
                 friends.append(friend[0])
         return friends
 
-    def _req_list_to_objects(self, requests_db : list) -> list:
+    def _req_list_to_objects(self, requests_db: list) -> list:
         """Converts a list of db tuples in order accountID, toAccountID, comment, uploadDate, ID, isNew to requests objects."""
         requests = []
 
         for req in requests_db:
-            requests.append( # How to trigger people 101
+            requests.append(  # How to trigger people 101
                 FriendRequest(
-                    id = req[4],
+                    id=req[4],
                     account_id=req[0],
                     target_id=req[1],
                     content_base64=req[2],
-                    content=decode_base64(req[2]), # To make them easier to work with outside the game.
+                    content=decode_base64(
+                        req[2]
+                    ),  # To make them easier to work with outside the game.
                     timestamp=req[3],
-                    new=bool(req[5])
+                    new=bool(req[5]),
                 )
             )
-        
+
         return requests
-    
-    async def get_friend_requests_to(self, account_id : int) -> list: # May add some pagination system directly to the sql for speed ig.
+
+    async def get_friend_requests_to(
+        self, account_id: int
+    ) -> list:  # May add some pagination system directly to the sql for speed ig.
         """Returns a list of friendrequest objs to account_id passed."""
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE toAccountID = %s", (account_id,))
+            await mycursor.execute(
+                "SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE toAccountID = %s",
+                (account_id,),
+            )
             requests_db = await mycursor.fetchall()
-        
-        return self._req_list_to_objects(requests_db)
-    
-    async def get_friend_requests_from(self, account_id : int) -> list:
-        """Returns a list of friendrequest objs from account_id passed."""
-        async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute("SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE accountID = %s", (account_id,))
-            requests_db = await mycursor.fetchall()
-        
+
         return self._req_list_to_objects(requests_db)
 
-user_helper = UserHelper() # This has to be a common class.
+    async def get_friend_requests_from(self, account_id: int) -> list:
+        """Returns a list of friendrequest objs from account_id passed."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute(
+                "SELECT accountID, toAccountID, comment, uploadDate, ID, isNew FROM friendreqs WHERE accountID = %s",
+                (account_id,),
+            )
+            requests_db = await mycursor.fetchall()
+
+        return self._req_list_to_objects(requests_db)
+
+
+user_helper = UserHelper()  # This has to be a common class.

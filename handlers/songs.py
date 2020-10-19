@@ -4,7 +4,8 @@ from constants import ResponseCodes
 import aiohttp
 import logging
 
-async def featured_artists_handler(request : aiohttp.web.Request):
+
+async def featured_artists_handler(request: aiohttp.web.Request):
     """Handles the featured artists page."""
     post_data = await request.post()
 
@@ -13,14 +14,13 @@ async def featured_artists_handler(request : aiohttp.web.Request):
     response = ""
 
     for artist in artists:
-        response += joint_string({
-            4 : artist
-        }) + "|"
+        response += joint_string({4: artist}) + "|"
     response = response[:-1] + f"#{len(songs.top_artists)}:{offset*-1}:20"
     logging.debug(response)
     return aiohttp.web.Response(text=response[:-1])
 
-async def get_songinfo_handler(request : aiohttp.web.Request):
+
+async def get_songinfo_handler(request: aiohttp.web.Request):
     """Gets song info for GD songs."""
     post_data = await request.post()
 
@@ -28,8 +28,8 @@ async def get_songinfo_handler(request : aiohttp.web.Request):
 
     # Checks
     if song is None:
-        return aiohttp.web.Response(text=ResponseCodes.generic_fail)
-    
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
+
     response = songs.song_string(song)
     logging.debug(response)
 

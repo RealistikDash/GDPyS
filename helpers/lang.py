@@ -5,73 +5,80 @@ from constants import Paths
 from exceptions import LangNotFound
 import logging
 
-class Lang():
+
+class Lang:
     def __init__(self):
         """Idk how else to make it wait for config."""
         pass
-    def load_langs(self, language : str = "en"):
+
+    def load_langs(self, language: str = "en"):
         """Loads the given language."""
         self.text_find_msg = "Failed to find translated text for {}|{}"
         self.main_lang = language
-        self.english_lang = JsonFile(Paths.lang_packs + "en.json").get_file() # English as a backup for when the main lang does not contain the str you're looking for.
+        self.english_lang = JsonFile(
+            Paths.LANG_PACKS + "en.json"
+        ).get_file()  # English as a backup for when the main lang does not contain the str you're looking for.
 
-        self.lang = JsonFile(Paths.lang_packs + language + ".json").get_file()
+        self.lang = JsonFile(Paths.LANG_PACKS + language + ".json").get_file()
 
         # Check if lang is valid.
         if self.lang is None:
             raise LangNotFound
 
-        logging.info(self.info("LOADED_LANG", self.lang.get("formal_name", f"{language}.json")))
+        logging.info(
+            self.info("LOADED_LANG", self.lang.get("formal_name", f"{language}.json"))
+        )
 
-    def _format_string(self, text : str, format_args : tuple) -> str:
+    def _format_string(self, text: str, format_args: tuple) -> str:
         """Formats a string according to the format args provided."""
         return text.format(*format_args)
-    
-    def _fail_find(self, type : str, text : str) -> str:
+
+    def _fail_find(self, type: str, text: str) -> str:
         """Creates a fail find str."""
         return self.text_find_msg.format(type, text)
-    
-    def _get_from_json(self, type : str, text : str) -> str:
+
+    def _get_from_json(self, type: str, text: str) -> str:
         """Returns a string of given type from json."""
         text_category = self.lang.get(type)
         if text_category is None:
             text_category = self.english_lang.get(type)
             if text_category is None:
                 return self._fail_find(type, text)
-        
+
         new_text = text_category.get(text)
         if new_text is None:
             new_text = self.english_lang[type].get(text)
             if new_text is None:
                 return self._fail_find(type, text)
-        
+
         return new_text
 
-    def _get_full(self, type : str, text : str, format_args : tuple = ()) -> str:
+    def _get_full(self, type: str, text: str, format_args: tuple = ()) -> str:
         """Gets full formatted translation from lang pack."""
         new_text = self._get_from_json(type, text)
         if len(format_args) > 0:
             new_text = self._format_string(new_text, format_args)
         return new_text
-    
-    def warn(self, text : str, *args) -> str:
+
+    def warn(self, text: str, *args) -> str:
         """Translates a warn message."""
         return self._get_full("warning", text, args)
-    
-    def info(self, text : str, *args) -> str:
+
+    def info(self, text: str, *args) -> str:
         """Translates a info message."""
         return self._get_full("info", text, args)
-    
-    def error(self, text : str, *args) -> str:
+
+    def error(self, text: str, *args) -> str:
         """Translates a error message."""
         return self._get_full("errors", text, args)
-    
-    def debug(self, text : str, *args) -> str:
+
+    def debug(self, text: str, *args) -> str:
         """Translates a debug message."""
         return self._get_full("debug", text, args)
-    
-    def runtime(self, text : str, *args) -> str:
+
+    def runtime(self, text: str, *args) -> str:
         """Translates a runtime message."""
         return self._get_full("runtime", text, args)
-        
+
+
 lang = Lang()

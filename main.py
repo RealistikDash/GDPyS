@@ -167,9 +167,8 @@ async def init(loop):
     )  # One IP may only try to login ten times a day.
     return app
 
-
-if __name__ == "__main__":
-    load_config()
+def main(debug=False):
+    load_config(debug=debug)
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     logging.basicConfig(level=logging_level)
@@ -185,3 +184,6 @@ if __name__ == "__main__":
         web.run_app(app, port=user_config["port"])
     except RuntimeError:
         print("Shutting down! Bye!")
+
+if __name__ == "__main__":
+    main()

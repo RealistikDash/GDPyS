@@ -26,7 +26,7 @@ user_config = {}
 config_options = list(default_config.keys())
 
 
-def load_config(location: str = "config.json"):
+def load_config(location: str = "config.json", debug=False):
     config = JsonFile(location)
     user_config_temp = config.get_file()
 
@@ -54,3 +54,6 @@ def load_config(location: str = "config.json"):
 
     for key in dict_keys(user_config_temp):
         user_config[key] = user_config_temp[key]
+
+    if debug:
+        user_config["debug"] = debug

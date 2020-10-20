@@ -6,7 +6,7 @@ from helpers.lang import lang
 from objects.accounts import Account, AccountExtras, FriendRequest
 from objects.comments import AccountComment
 from conn.mysql import myconn
-from constants import Permissions
+from constants import Permissions, Relationships
 from config import user_config
 from aiofile import AIOFile
 from cron.rankcalc import ranks
@@ -443,9 +443,7 @@ class UserHelper:
 
         return requests
 
-    async def get_friend_requests_to(
-        self, account_id: int
-    ) -> list:  # May add some pagination system directly to the sql for speed ig.
+    async def get_friend_requests_to(self, account_id: int) -> list:
         """Returns a list of friendrequest objs to account_id passed."""
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute(
@@ -466,6 +464,63 @@ class UserHelper:
             requests_db = await mycursor.fetchall()
 
         return self._req_list_to_objects(requests_db)
+    
+    async def get_blocked(self, account_id : int) -> list:
+        """Returns a list of accountIDs the user blocked."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT person2 FROM blocks WHERE person1 = %s", (account_id,))
+            blocks_db = await mycursor.fetchall()
+        return [i[0] for i in blocks_db]
+    
+    async def block_user(self, account_id : int, target_id : int) -> None:
+        """Blocks the targeted user on behalf of the passed user."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("INSERT INTO blocks (person1,person2) VALUES (%s,%s)",
+            (
+                account_id,
+                target_id
+            ))
+            await myconn.conn.commit()
+    
+    # This is SLOW... Perhaps I may look into caching this cause like 4 queries per profile is ouch.
+    async def get_relationship(self, account_id : int, target_id : int) -> int:
+        """[SLOW] Returns a relationship enum for a user->user relationship."""
+        # It is the user himself. Avoid any extra unnecessary checks and queries.
+        if account_id == target_id:
+            return Relationships.NONE
+        
+        async with myconn.conn.cursor() as mycursor:
+            # Get friendship statuses from db.
+            await mycursor.execute("SELECT COUNT(*) FROM friendships WHERE (person1 = %s AND person2 = %s) OR (person1 = %s AND person2 = %s)", (
+                account_id,
+                target_id,
+                target_id,
+                account_id
+            ))
+            # If a friendship does exist. Messy but eh.
+            if (await mycursor.fetchone())[0]:
+                return Relationships.FRIENDS
 
+            # Checking if there is a friend req.
+            await mycursor.execute("SELECT accountID, toAccountID FROM friendreqs WHERE (accountID = %s OR toAccountID = %s) OR (accountID = %s OR toAccountID = %s) LIMIT 1",
+            (
+                account_id,
+                target_id,
+                target_id,
+                account_id
+            ))
+            friend_req_db = await mycursor.fetchone()
+        
+        # No such thing found.
+        if friend_req_db is None:
+            return Relationships.NONE
+
+        #Its coming from him
+        if friend_req_db[0] == account_id:
+            return Relationships.OUTGOING_REQ
+        elif friend_req_db[1] == account_id:
+            return Relationships.INCOMING_REQ
+        else:
+            return Relationships.NONE
 
 user_helper = UserHelper()  # This has to be a common class.

@@ -65,6 +65,15 @@ class Paths:
     LANG_PACKS = "lang/"
 
 
+class Relationships:
+    """Relationship status enums."""
+
+    NONE = 0
+    FRIENDS = 1
+    INCOMING_REQ = 3
+    OUTGOING_REQ = 4
+
+
 ASCII_ART = r"""
 {col1}          _____          {col2}          _____          {col3}          _____          {col4}      _____          {col5}          _____            {reset}      
 {col1}         /\    \         {col2}         /\    \         {col3}         /\    \         {col4}     |\    \         {col5}         /\    \           {reset}      

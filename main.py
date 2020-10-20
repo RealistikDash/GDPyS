@@ -92,7 +92,7 @@ def config_routes(app: web.Application) -> None:
 
     for r, h in routes:
         logging.debug(lang.debug("adding_handler", r, h.__name__))
-        app.router.add_post(r, time_coro(h))
+        app.router.add_post(r, h)
 
     # app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
@@ -104,11 +104,11 @@ def welcome_sequence(no_ascii: bool = False):
         print(
             ASCII_ART.format(
                 reset=Colours.RESET,
-                col1=random.choice(Colours.all_col),
-                col2=random.choice(Colours.all_col),
-                col3=random.choice(Colours.all_col),
-                col4=random.choice(Colours.all_col),
-                col5=random.choice(Colours.all_col),
+                col1=random.choice(Colours.ALL_COL),
+                col2=random.choice(Colours.ALL_COL),
+                col3=random.choice(Colours.ALL_COL),
+                col4=random.choice(Colours.ALL_COL),
+                col5=random.choice(Colours.ALL_COL),
             )
         )
     # No cache warning

@@ -49,7 +49,7 @@ async def profile_handler(request: aiohttp.web.Request):
     checking_self = account_id == target_id
     user = await user_helper.get_object(target_id)
     response = ""
-    friend_state = 0
+    friend_state = await user_helper.get_relationship(account_id, target_id)
 
     logging.debug(friend_state)
     logging.debug(response)
@@ -318,7 +318,8 @@ async def friends_list_handler(request: aiohttp.web.Response):
         return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     id_function = {  # Coro to get a list of friends ids.
-        0: user_helper.get_friends  # Regular friends.
+        0: user_helper.get_friends,  # Regular friends.
+        1: user_helper.get_blocked   # Blocked
     }.get(friends_type, user_helper.get_friends)
 
     friend_ids = await id_function(account_id)

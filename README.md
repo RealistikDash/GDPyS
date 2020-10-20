@@ -1,11 +1,11 @@
 [![Documentation Status](https://readthedocs.org/projects/gdpys/badge/?version=latest)](https://gdpys.readthedocs.io/en/latest/?badge=latest) [![Actions Status](https://github.com/RealistikDash/GDPyS/workflows/build/badge.svg)](https://github.com/RealistikDash/GDPyS/actions) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 # GDPyS (Rewrite)
 
-GDPyS is a modern Geometry Dash Custom Server which can be utilised in the creation of Private Servers. It is written using Python, amking it fast and capable.
+GDPyS is a modern Geometry Dash Custom Server which can be utilised in the creation of Private Servers. It is written using Python, making it fast and capable.
 
 ## Why GDPyS?
-
-When designing GDPyS, we have decided on a set of key principles to follow. Firstly, it has to be simple to set up. This has been achieved by having a simple setup procedure only requiring the users to set up MySQL and Python. The next principle was the commitment to keep things as fast as possible. This was achieved through the use of caching. Thanks to the object oriented design, we were able to limit the amount of SQL queries required, increasing the speed and relieving load off the database (especially during surge scenarios).
+ 
+When designing GDPyS, we decided on a set of key principles to follow. It had to be simple to set up. We achieved this by having a short and easy setup procedure only requiring the users to set up MySQL and Python. The next principle was the commitment to keeping things as fast as possible. This was achieved through the use of caching. Thanks to the object oriented design, we were able to limit the amount of SQL queries required, increasing the speed and relieving load off the database (especially during surge scenarios).
 
 Furthermore, GDPyS provides a unique range of features, ranging from plugins to custom magic sections. This makes GDPyS perfect for any type of GDPS, no matter the size
 

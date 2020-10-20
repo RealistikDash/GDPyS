@@ -168,9 +168,11 @@ async def init(loop):
     return app
 
 def main(debug=False):
-    load_config(debug=debug)
+    load_config()
     # Configures the logger.
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
+    if debug:
+        logging_level = logging.DEBUG
     logging.basicConfig(level=logging_level)
     lang.load_langs(user_config["lang"])
     start_plugins()

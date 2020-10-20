@@ -5,11 +5,9 @@ from constants import Paths
 from exceptions import LangNotFound
 import logging
 
-
 class Lang:
     def __init__(self):
-        """Idk how else to make it wait for config."""
-        pass
+        self.loaded = False
 
     def load_langs(self, language: str = "en"):
         """Loads the given language."""
@@ -28,6 +26,7 @@ class Lang:
         logging.info(
             self.info("LOADED_LANG", self.lang.get("formal_name", f"{language}.json"))
         )
+        self.loaded = True
 
     def _format_string(self, text: str, format_args: tuple) -> str:
         """Formats a string according to the format args provided."""

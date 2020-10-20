@@ -3,10 +3,12 @@ from .cpcalc import cron_calc_cp
 from .cachelb import cron_top_stars, cron_top_cp
 from .cachempgauntlets import cron_cache_mappacks, cron_cache_gauntlets
 from helpers.timehelper import Timer, time_str
-from helpers.lang import lang
+from helpers.lang import lang, Lang
+from config import user_config, load_config
 import logging
 import traceback
 import asyncio
+import conn
 
 CRON_JOBS = [  #
     cron_calc_ranks,
@@ -20,6 +22,11 @@ CRON_JOBS = [  #
 
 async def run_cron():
     """Runs all of the cron jobs."""
+    if lang.loaded == False or lang.loaded == None:
+        loop = asyncio.get_event_loop()
+        load_config()
+        lang.load_langs()
+        await conn.mysql.create_connection(loop, user_config)
     total_t = Timer()
     total_t.start()
     for job in CRON_JOBS:
@@ -31,7 +38,7 @@ async def run_cron():
         except Exception as e:
             logging.error(lang.error("CRON_FAIL", job.__name__, e))
             logging.debug(traceback.format_exc())
-        # So we dont  gett 32846238746238ms or 0.0s
+        # So we don't get 32846238746238ms or 0.0s
         t_str = time_str(t)
         logging.info(lang.info("CRON_FINISH", job.__name__, t_str))
 

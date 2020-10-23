@@ -38,7 +38,7 @@ class Cache():
         curr_obj = self._cache.get(cache_id)
         if curr_obj is None:
             return None
-        return curr_obj
+        return curr_obj["object"]
     
     def _get_cached_ids(self) -> list:
         """Returns a list of all cache IDs currently cached."""
@@ -79,3 +79,8 @@ class Cache():
         throw_away_ids = self._get_cached_ids()[:throw_away_count]
         for cache_id in throw_away_ids:
             self.remove_cache_object(cache_id)
+    
+    def run_checks(self) -> None:
+        """Runs checks on the cache."""
+        self._remove_expired_cache()
+        self._remove_limit_cache()

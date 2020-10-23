@@ -3,6 +3,7 @@ from helpers.timehelper import get_timestamp
 from helpers.crypthelper import hash_sha1
 from helpers.userhelper import user_helper
 from helpers.lang import lang
+from .cache import Cache
 from conn.mysql import myconn
 from objects.levels import Level, Rating, DailyLevel
 from config import user_config
@@ -17,7 +18,10 @@ class LevelHelper:
 
     def __init__(self):
         """Inits the level helper."""
-        self.level_cache = {}
+        self.level_cache = Cache(
+            cache_length=45,
+            cache_limit=250
+        )
         self.daily = None  # is DailyLevel object if cached.
 
     async def _create_level_obj(self, level_id: int) -> Level:
@@ -64,19 +68,21 @@ class LevelHelper:
             string=None,
         )
 
-    async def _cache_level_obj(self, level_id: int) -> None:
+    async def _cache_level_obj(self, level_id: int) -> Level:
         """Caches a level ID."""
         level_obj = await self._create_level_obj(level_id)
         if level_obj is None:
             return
-        self.level_cache[level_id] = level_obj
+        self.level_cache.cache_object(level_id, level_obj)
+        return level_obj
 
     async def get_level_obj(self, level_id: int):
         """Returns a level object."""
         level_id = int(level_id)
-        if level_id not in dict_keys(self.level_cache):
-            await self._cache_level_obj(level_id)
-        return self.level_cache[level_id]
+        level = self.level_cache.get_cache_object(level_id)
+        if level is None:
+            level = await self._cache_level_obj(level_id)
+        return level
 
     def star_to_difficulty(self, star_count: int) -> int:
         """Converts star count to in-game difficultry values."""
@@ -124,26 +130,30 @@ class LevelHelper:
             await myconn.conn.commit()
 
         # Bump cached downloads if exists
-        if level_id in dict_keys(self.level_cache):
-            self.level_cache[level_id].downloads += 1
+        level = self.level_cache.get_cache_object(level_id)
+        if level is not None:
+            level.downloads += 1
+            self.level_cache.remove_cache_object(level_id)
+            self.level_cache.cache_object(level_id, level)
 
     async def bump_likes(self, level_id: int):
         """Bumps a level's like count by one."""
-        if level_id in dict_keys(self.level_cache):
+        level = self.level_cache.get_cache_object(level_id)
+        if level is not None:
             # Only run this check if already cached so we dont cache only for this tiny action.
             if (
-                self.level_cache[level_id].downloads < self.level_cache[level_id].likes
+                level.downloads < level.likes
             ):  # More likes than downloads is impossible. Check for it.
                 return
-            self.level_cache[level_id].likes += 1
+            level.likes += 1
+            self.level_cache.remove_cache_object(level_id)
+            self.level_cache.cache_object(level_id, level)
+
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute(
                 "UPDATE levels SET likes = likes + 1 WHERE levelID = %s", (level_id,)
             )
             await myconn.conn.commit()
-
-        if level_id in dict_keys(self.level_cache):
-            self.level_cache[level_id].likes += 1
 
     async def upload_level(self, level: Level) -> int:
         """Uploads a level from level object, returns levelID."""

@@ -1,6 +1,7 @@
 from helpers.crypthelper import compare_bcrypt, decode_gjp
 from helpers.generalhelper import dict_keys
 from helpers.lang import lang
+from .cache import Cache
 from conn.mysql import myconn
 from dataclasses import dataclass
 import logging
@@ -16,9 +17,12 @@ class AuthHelper:
     """Class responsible for managing GJP authentication."""
 
     def __init__(self):
-        self.cached_credentials = {}
+        self.cache = Cache(
+            cache_length=60,
+            cache_limit=500
+        )
 
-    async def _cache_bcrypt(self, account_id: int):
+    async def _cache_bcrypt(self, account_id: int) -> Credentials:
         """Caches a person's bcrypt into an object."""
         logging.debug(lang.debug("cache_bcrypt", account_id))
         async with myconn.conn.cursor() as mycursor:
@@ -28,24 +32,30 @@ class AuthHelper:
             )
             response = await mycursor.fetchone()
         assert response is not None
-        self.cached_credentials[int(account_id)] = Credentials(
+        credential = Credentials(
             response[0], ""
         )  # no known gjp yet
+        self.cache.cache_object(int(account_id),credential)
+        return credential
 
     async def check_gjp(self, account_id: int, gjp: str) -> bool:
         """Verifies gjp authentication."""
         account_id = int(account_id)  # Making sure it's the correct type
-        if not account_id in dict_keys(self.cached_credentials):
-            await self._cache_bcrypt(account_id)
+        credential = self.cache.get_cache_object(account_id) 
+        if credential is None:
+            credential = await self._cache_bcrypt(account_id)
 
-        if self.cached_credentials[account_id].known_gjp == gjp:
+        if credential.known_gjp == gjp:
             return True
-        elif self.cached_credentials[account_id].known_gjp == "":
+        elif credential.known_gjp == "": # No GJP cached yet.
             logging.debug(lang.debug("no_gjp"))
             if compare_bcrypt(
-                decode_gjp(gjp), self.cached_credentials[account_id].bcrypt
+                decode_gjp(gjp), credential.bcrypt
             ):
-                self.cached_credentials[account_id].known_gjp = gjp
+                credential.known_gjp = gjp
+                # Overwrite cached gjp
+                self.cache.remove_cache_object(account_id)
+                self.cache.cache_object(account_id, credential)
                 return True
         logging.debug(lang.debug("bcrypt_fail"))
         return False

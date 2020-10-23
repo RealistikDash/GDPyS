@@ -148,7 +148,14 @@ def start_plugins():
                     "." + plugin, "plugins"
                 ).setup()()
             ).start()
-
+            
+def start_gdpysbot():
+    print("Starting GDPySBot")
+    Thread(
+        target=lambda: importlib.import_module(
+            ".bot", "helpers"
+        ).setup()
+    ).start()
 
 async def init(loop):
     """Initialises the app and MySQL connection and all the other systems."""
@@ -173,6 +180,8 @@ def main(debug=False):
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     if debug:
         logging_level = logging.DEBUG
+    if user_config["gdpysbot_enabled"]:
+        start_gdpysbot()
     logging.basicConfig(level=logging_level)
     lang.load_langs(user_config["lang"])
     start_plugins()

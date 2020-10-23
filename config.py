@@ -18,7 +18,11 @@ default_config = {
     "default_priv": 30,
     "cache_level_strs": True,
     "lang": "en",
-    "gdpysbot_enabled": "true",
+    "gdpysbot_enabled": True,
+    "cheatless": {
+        "enabled": True,
+        "minimum_attempts_extreme_demon": 100,
+    },
 }
 
 user_config = {}

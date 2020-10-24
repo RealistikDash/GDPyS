@@ -52,7 +52,6 @@ async def profile_handler(request: aiohttp.web.Request):
     friend_state = await user_helper.get_relationship(account_id, target_id)
 
     logging.debug(friend_state)
-    logging.debug(response)
 
     response += joint_string(
         {
@@ -170,7 +169,7 @@ async def update_profile_stats_handler(request: aiohttp.web.Request):
     user.icon = int(post_data.get("icon", 0))
     user.diamonds = int(post_data.get("diamonds", 0))
     user.colour1 = int(post_data.get("color1", 0))
-    user.colour2 = int(post_data.get("colour2", 0))
+    user.colour2 = int(post_data.get("color2", 0))
     user.ship = int(post_data.get("accShip", 0))
     user.ball = int(post_data.get("accBall", 0))
     user.ufo = int(post_data.get("accBird", 0))
@@ -349,3 +348,6 @@ async def friends_list_handler(request: aiohttp.web.Response):
     response = response[:-1]
     logging.debug(response)
     return aiohttp.web.Response(text=response)
+
+async def friend_req_handler(request: aiohttp.web.Response):
+    """Handles friend requests ."""

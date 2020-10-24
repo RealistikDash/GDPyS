@@ -9,7 +9,7 @@ class GDPySBot(gdpys.Plugin):
     def send_message(self, accountid: int, subject: str, body: str):
         pass # send message
 
-gdpysbot = GDPySBot()
+#gdpysbot = GDPySBot()
 
-def setup():
-    return gdpysbot
+#def setup():
+#    return gdpysbot

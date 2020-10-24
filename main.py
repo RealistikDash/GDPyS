@@ -180,8 +180,8 @@ def main(debug=False):
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     if debug:
         logging_level = logging.DEBUG
-    if user_config["gdpysbot_enabled"]:
-        start_gdpysbot()
+    #if user_config["gdpysbot_enabled"]:
+    #    start_gdpysbot() # TODO: Re-enable once its working
     logging.basicConfig(level=logging_level)
     lang.load_langs(user_config["lang"])
     start_plugins()

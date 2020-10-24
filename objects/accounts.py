@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from helpers.crypthelper import decode_base64, encode_base64
 
 
 @dataclass
@@ -63,3 +64,24 @@ class FriendRequest:
     content: str
     timestamp: int
     new: bool
+
+@dataclass
+class Message:
+    """Message dataclass."""
+    user_id : int
+    username : str
+    content_base64 : str
+    subject_base64 : str
+    account_id : int
+    id : int
+    target_id : int
+    timestamp : int
+    read : bool
+
+    @property
+    def content(self) -> str:
+        return decode_base64(self.content_base64)
+    
+    @content.setter
+    def content_setter(self, set_to : str):
+        self.content_base64 = encode_base64(set_to)

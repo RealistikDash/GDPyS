@@ -3,12 +3,20 @@ from objects.comments import AccountComment
 from objects.accounts import (
     Account,
 )  # Makes it WAY easier to work with the objects inside VSCode
-from helpers.generalhelper import create_offsets_from_page, joint_string, pipe_string
+from helpers.generalhelper import (
+    create_offsets_from_page,
+    joint_string,
+    pipe_string,
+    string_bool,
+    paginate_list,
+    create_offsets_from_page
+)
 from helpers.timehelper import time_ago
 from helpers.auth import auth
 from helpers.searchhelper import search_helper
 from constants import ResponseCodes, Permissions
 from cron.cachelb import top_stars, top_cp
+from objects.accounts import FriendRequest, Message # To be nicer to PyLint
 import aiohttp
 import logging
 
@@ -313,7 +321,7 @@ async def friends_list_handler(request: aiohttp.web.Response):
     account_id = int(post_data["accountID"])
     friends_type = int(post_data["type"])
 
-    if not auth.check_gjp(account_id, post_data["gjp"]):
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     id_function = {  # Coro to get a list of friends ids.
@@ -350,4 +358,78 @@ async def friends_list_handler(request: aiohttp.web.Response):
     return aiohttp.web.Response(text=response)
 
 async def friend_req_handler(request: aiohttp.web.Response):
-    """Handles friend requests ."""
+    """Handles friend requests."""
+
+    post_data = await request.post()
+    account_id = int(post_data["accountID"])
+
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
+    
+    sent = string_bool(post_data.get("getSent", "0"))
+    page = int(post_data["page"])
+    offset = create_offsets_from_page(page, 10)
+    requests = []
+    response = ""
+
+    if sent:
+        requests = await user_helper.get_friend_requests_from(account_id)
+    else:
+        requests = await user_helper.get_friend_requests_to(account_id)
+    
+    for req in paginate_list(requests, page, 10):
+        req : FriendRequest
+        user = await user_helper.get_object(req.target_id if sent else req.account_id)
+        response += joint_string({
+            1: user.username,
+            2: user.user_id,
+            9: user.icon,
+            10: user.colour1,
+            11: user.colour2,
+            14: user.icon_type,
+            15: 0,
+            16: user.account_id,
+            32: req.id,
+            35: req.content_base64,
+            37: req.timestamp,
+            41: req.new
+        }) + "|"
+    
+    response = f"{response[:-1]}#{len(requests)}:{offset}:10"
+    logging.debug(response)
+    return aiohttp.web.Response(text=response)
+
+async def message_list_handler(request: aiohttp.web.Response):
+    """Handles message list."""
+
+    # Looks familiar huh??
+    post_data = await request.post()
+    account_id = int(post_data["accountID"])
+
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
+
+    sent = string_bool(post_data.get("getSent", "0"))
+    page = int(post_data["page"])
+    offset = create_offsets_from_page(page, 10)
+    messages = await user_helper.get_messages(account_id, sent, page)
+    message_count = await user_helper.get_message_count(account_id, sent)
+    response = ""
+
+    for msg in messages:
+        msg: Message
+        user = await user_helper.get_object(msg.target_id if not sent else msg.account_id)
+        response += joint_string({
+            1: msg.id,
+            2: user.account_id,
+            3: user.user_id,
+            4: msg.subject_base64,
+            6: user.username,
+            7: time_ago(msg.timestamp),
+            8: msg.read,
+            9: int(sent)
+        }) + "|"
+    
+    response = f"{response[:-1]}#{message_count}:{offset}:10"
+    logging.debug(response)
+    return aiohttp.web.Response(text=response)

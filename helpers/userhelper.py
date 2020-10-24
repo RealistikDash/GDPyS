@@ -3,7 +3,7 @@ from helpers.generalhelper import dict_keys, time_coro
 from helpers.timehelper import get_timestamp, Timer
 from helpers.crypthelper import decode_base64, hash_bcrypt, encode_base64
 from helpers.lang import lang
-from objects.accounts import Account, AccountExtras, FriendRequest
+from objects.accounts import Account, AccountExtras, FriendRequest, Message
 from objects.comments import AccountComment
 from conn.mysql import myconn
 from constants import Permissions, Relationships
@@ -552,5 +552,33 @@ class UserHelper:
 
             await mycursor.execute("DELETE FROM comments WHERE userID = %s", (user.user_id,))
         await myconn.conn.commit()
+    
+    async def get_messages(self, account_id : int, get_from : bool = False, page : int = 0):
+        """Gets list of message objects for user"""
+        offset = page * 10
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute(f"SELECT userID, userName, body, subject, accID, messageID, toAccountID, timestamp, isNew FROM messages WHERE {'accID' if not get_from else 'toAccountID'} = %s LIMIT 10 OFFSET %s", (account_id, offset))
+            messages_db = await mycursor.fetchall()
+        
+        return [
+            Message(
+                user_id = i[0],
+                username=i[1],
+                content_base64=i[2],
+                subject_base64=i[3],
+                account_id=i[4],
+                id = i[5],
+                target_id=i[6],
+                timestamp=int(i[7]),
+                read= i[8]
+            )
+            for i in messages_db
+        ]
+    
+    async def get_message_count(self, account_id : int, get_from : bool = False) -> int:
+        """Returns the number of messages a user has."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute(f"SELECT COUNT(*) FROM messages WHERE {'accID' if not get_from else 'toAccountID'} = %s", (account_id,))
+            return (await mycursor.fetchall())[0]
 
 user_helper = UserHelper()  # This has to be a common class.

@@ -171,7 +171,7 @@ async def level_scores_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
     account_id = int(
         post_data["accountID"]
     )  # Lets declare this as we will re-use it later
-    if not auth.check_gjp(account_id, post_data["gjp"]):
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
         return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
 
     # Creating the current score object.

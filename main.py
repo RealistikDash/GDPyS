@@ -21,6 +21,8 @@ from handlers.profiles import (
     leaderboards_handler,
     mod_check_handler,
     friends_list_handler,
+    friend_req_handler,
+    message_list_handler
 )
 from handlers.songs import featured_artists_handler, get_songinfo_handler
 from handlers.levels import (
@@ -88,6 +90,8 @@ def config_routes(app: web.Application) -> None:
         ("/database/getGJAccountComments20.php", profile_comment_handler),
         ("/database/accounts/registerGJAccount.php", register_handler),
         ("/database/accounts/loginGJAccount.php", login_handler),
+        ("/database/getGJFriendRequests20.php", friend_req_handler),
+        ("/database/getGJMessages20.php", message_list_handler)
     ]
 
     for r, h in routes:

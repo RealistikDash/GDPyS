@@ -522,5 +522,35 @@ class UserHelper:
             return Relationships.INCOMING_REQ
         else:
             return Relationships.NONE
+    
+    async def gdpr_delete(self, account_id : int) -> None:
+        """GDPR Compliant account deletion function."""
+
+        # Essentially, what we are going to do is nuke every sign of the user ever.
+        # Firstly, we are getting rid of them from the cache.
+        # TODO : Cache wipe (do once userhelper caching system is done).
+        user = await self.get_object(account_id) # To get data such as the user_id
+        async with myconn.conn.cursor() as mycursor:
+            # NUKE THEIR ACCOUNT AND STATS.
+            # List of stuf to look for and what table
+            deletions = [
+                # Table       x = account_id
+                ("accounts", "accountID"),
+                ("users", "extID"),
+                ("blocks", "person1"),
+                ("blocks", "person2"),
+                ("friendreqs", "accountID"),
+                ("friendreqs", "toAccountID"),
+                ("levels", "extID"),
+                ("levelscores", "accountID"),
+                ("links", "accountID"),
+                ("messages", "accID"),
+                ("messages", "toAccountID")
+            ]
+            for deletion in deletions:
+                await mycursor.execute(f"DELETE FROM {deletion[0]} WHERE {deletion[1]} = {account_id}")
+
+            await mycursor.execute("DELETE FROM comments WHERE userID = %s", (user.user_id,))
+        await myconn.conn.commit()
 
 user_helper = UserHelper()  # This has to be a common class.

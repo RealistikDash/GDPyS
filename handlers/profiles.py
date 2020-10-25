@@ -14,6 +14,7 @@ from helpers.generalhelper import (
 from helpers.timehelper import time_ago
 from helpers.auth import auth
 from helpers.searchhelper import search_helper
+from helpers.lang import lang
 from constants import ResponseCodes, Permissions
 from cron.cachelb import top_stars, top_cp
 from objects.accounts import FriendRequest, Message # To be nicer to PyLint
@@ -432,4 +433,42 @@ async def message_list_handler(request: aiohttp.web.Response):
     
     response = f"{response[:-1]}#{message_count}:{offset}:10"
     logging.debug(response)
+    return aiohttp.web.Response(text=response)
+
+async def download_message_handler(request: aiohttp.web.Response):
+    """Handles fetching a message for the client."""
+
+    post_data = await request.post()
+    account_id = int(post_data["accountID"])
+
+    if not await auth.check_gjp(account_id, post_data["gjp"]):
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
+
+    message_id = int(post_data["messageID"])
+    sender = int(post_data.get("isSender", 0))
+
+    message = await user_helper.get_message(message_id, account_id)
+
+    if message is None:
+        logging.debug(lang.debug("message_not_found", message_id))
+        return aiohttp.web.Response(text=ResponseCodes.GENERIC_FAIL)
+    
+    # Get the user object.
+    user = await user_helper.get_object(account_id if sender else message.target_id)
+
+    response = joint_string({
+        2: user.account_id,
+        5: message.content_base64,
+        6: user.username,
+        1: message.id,
+        3: user.user_id,
+        4: message.subject_base64,
+        8: message.read,
+        9: sender,
+        7: time_ago(message.timestamp)
+    })
+
+    await user_helper.mark_message_as_read(message_id)
+    logging.debug(response)
+
     return aiohttp.web.Response(text=response)

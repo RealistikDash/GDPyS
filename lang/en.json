@@ -41,7 +41,8 @@
     "level_scores_gotten" : "Fetched level leaderboards for level {0}.",
     "no_score" : "This user has not set a score on this level.",
     "overwrite_score" : "Overwriting this score.",
-    "adding_handler" : "Adding handler: {0} | {1}"
+    "adding_handler" : "Adding handler: {0} | {1}",
+    "message_not_found" : "The message with the ID of {0} could not be found! It either does not exist or the user lacks the sufficient privileges to access it."
   },
   "runtime": {
     "shutdown": "Shutting down! Bye!",

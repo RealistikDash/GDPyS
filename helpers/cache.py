@@ -22,6 +22,7 @@ class Cache():
             "expire" : get_timestamp() + self._lenght,
             "object" : cache_obj
         }
+        self.run_checks()
     
     def remove_cache_object(self, cache_id : int) -> None:
         """Removes an object from cache."""

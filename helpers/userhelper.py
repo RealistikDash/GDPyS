@@ -557,7 +557,7 @@ class UserHelper:
         """Gets list of message objects for user"""
         offset = page * 10
         async with myconn.conn.cursor() as mycursor:
-            await mycursor.execute(f"SELECT userID, userName, body, subject, accID, messageID, toAccountID, timestamp, isNew FROM messages WHERE {'accID' if not get_from else 'toAccountID'} = %s LIMIT 10 OFFSET %s", (account_id, offset))
+            await mycursor.execute(f"SELECT userID, userName, body, subject, accID, messageID, toAccountID, timestamp, isNew FROM messages WHERE {'toAccountID' if not get_from else 'accID'} = %s LIMIT 10 OFFSET %s", (account_id, offset))
             messages_db = await mycursor.fetchall()
         
         return [
@@ -580,5 +580,46 @@ class UserHelper:
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute(f"SELECT COUNT(*) FROM messages WHERE {'accID' if not get_from else 'toAccountID'} = %s", (account_id,))
             return (await mycursor.fetchall())[0]
+    
+    async def get_message(self, message_id: int, filter: int = None) -> Message:
+        """Returns a message obj from message_id.
+        Params:
+        message_id: The int ID of the message you are trying to fetch.
+        filters: The int of account ID that the message can be send by or to. This is to prevent users from accessing others' messages."""
+
+        async with myconn.conn.cursor() as mycursor:
+            # We will do filter check
+            await mycursor.execute("SELECT userID, userName, body, subject, accID, messageID, toAccountID, timestamp, isNew FROM messages WHERE messageID = %s LIMIT 1", (message_id))
+            message_db = await mycursor.fetchone()
+        
+        # No message like that exists.
+        if message_db is None:
+            return None
+        
+        # Object creation
+        obj = Message(
+            user_id = message_db[0],
+            username=message_db[1],
+            content_base64=message_db[2],
+            subject_base64=message_db[3],
+            account_id=message_db[4],
+            id = message_db[5],
+            target_id=message_db[6],
+            timestamp=int(message_db[7]),
+            read= message_db[8]
+        )
+
+        # There is a filter given.
+        if filter:
+            if obj.account_id != filter and obj.target_id != filter:
+                return None
+        
+        return obj
+    
+    async def mark_message_as_read(self, message_id: int) -> None:
+        """Marks a message as read."""
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE messages SET isNew = 1 WHERE messageID = %s LIMIT 1", (message_id,))
+        await myconn.conn.commit()
 
 user_helper = UserHelper()  # This has to be a common class.

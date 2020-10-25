@@ -14,7 +14,7 @@ default_config = {
     "debug": False,
     "level_path": "data/levels/",
     "save_path": "data/saves/",
-    "command_prefix": "!",
+    "command_prefix": "/",
     "default_priv": 30,
     "cache_level_strs": True,
     "lang": "en",

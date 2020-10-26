@@ -468,7 +468,8 @@ async def download_message_handler(request: aiohttp.web.Response):
         7: time_ago(message.timestamp)
     })
 
-    await user_helper.mark_message_as_read(message_id)
+    if not sender:
+        await user_helper.mark_message_as_read(message_id)
     logging.debug(response)
 
     return aiohttp.web.Response(text=response)

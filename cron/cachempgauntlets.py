@@ -1,5 +1,4 @@
 # Couldn't think of a good name for the file but this just caches the gauntlets and map-packs. Bunched them up as they are REALLY similar.
-from conn.mysql import myconn
 from objects.levels import Gauntlet, MapPack
 from objects.misc import RGB
 from helpers.lang import lang
@@ -9,11 +8,11 @@ map_packs = []
 gauntlets = []
 
 
-async def cron_cache_mappacks():
+async def cron_cache_mappacks(conn):
     """Cron job that caches the map packs."""
     map_packs.clear()
     # We get all of the map packs from the database.
-    async with myconn.conn.cursor() as mycursor:
+    async with conn.cursor() as mycursor:
         await mycursor.execute(
             "SELECT ID, name, levels, stars, coins, difficulty, rgbcolors FROM mappacks"
         )  # Shouldnt be too much I think.
@@ -33,11 +32,11 @@ async def cron_cache_mappacks():
         )
 
 
-async def cron_cache_gauntlets():
+async def cron_cache_gauntlets(conn):
     """Caches the in-game gauntlets."""
     gauntlets.clear()
     # Getting all of the gauntlets from the database.
-    async with myconn.conn.cursor() as mycursor:
+    async with conn.cursor() as mycursor:
         await mycursor.execute(
             "SELECT ID, level1,level2,level3,level4,level5 FROM gauntlets"
         )

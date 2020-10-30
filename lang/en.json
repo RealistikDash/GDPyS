@@ -42,7 +42,9 @@
     "no_score" : "This user has not set a score on this level.",
     "overwrite_score" : "Overwriting this score.",
     "adding_handler" : "Adding handler: {0} | {1}",
-    "message_not_found" : "The message with the ID of {0} could not be found! It either does not exist or the user lacks the sufficient privileges to access it."
+    "message_not_found" : "The message with the ID of {0} could not be found! It either does not exist or the user lacks the sufficient privileges to access it.",
+    "cron_loop_start": "Cron loop started. Set to run every {0} minutes.",
+    "cron_next_due": "The next cron job will run in {0} minutes."
   },
   "runtime": {
     "shutdown": "Shutting down! Bye!",

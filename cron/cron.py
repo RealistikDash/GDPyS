@@ -8,7 +8,11 @@ from config import user_config, load_config
 import logging
 import traceback
 import asyncio
-import conn
+from conn.mysql import (
+    myconn,
+    create_connection,
+    conn_cleanup
+)
 
 CRON_JOBS = [  #
     cron_calc_ranks,
@@ -26,15 +30,16 @@ async def run_cron():
         loop = asyncio.get_event_loop()
         load_config()
         lang.load_langs()
-        await conn.mysql.create_connection(loop, user_config)
+        await create_connection(loop, user_config)
     total_t = Timer()
     total_t.start()
+    conn = await myconn.pool.acquire()
     for job in CRON_JOBS:
         logging.debug(lang.debug("cron_job_running", job.__name__))
         t = Timer()
         t.start()
         try:
-            await job()
+            await job(conn)
         except Exception as e:
             logging.error(lang.error("CRON_FAIL", job.__name__, e))
             logging.debug(traceback.format_exc())
@@ -42,10 +47,22 @@ async def run_cron():
         t_str = time_str(t)
         logging.info(lang.info("CRON_FINISH", job.__name__, t_str))
 
+    # Close the connection and free the pool.
+    conn_cleanup(conn)
+
     # Don't copy paste code now watch me not follow my own advice. If I have to use this somewhere else, I will move this to timehelper.
     t_str = time_str(total_t)
     logging.info(lang.info("CRON_ALL_FINISH", t_str))
 
+async def cron_loop():
+    """Creates a loop for cron to run every x minutes."""
+    logging.debug(lang.debug("cron_loop_start", user_config["cron_delay"]))
+    while True:
+        await run_cron()
+        # Compute it here in case of a config reload.
+        loop_delay = user_config["cron_delay"] * 60 # Time between cron job in minutes.
+        logging.debug(lang.debug("cron_next_due", user_config["cron_delay"]))
+        await asyncio.sleep(loop_delay)
 
 # async def cron_gather():
 #    """An experimental way of running all of the cron jobs simultaniously async style."""

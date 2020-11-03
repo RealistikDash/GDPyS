@@ -4,3 +4,6 @@ bcrypt == 3.2.0
 timeago == 1.0.14
 aiofile == 3.1.0 
 click >= 7.1.0
+aiohttp_jinja2
+jinja2
+aiohttp_session

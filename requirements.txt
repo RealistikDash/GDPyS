@@ -7,3 +7,4 @@ click >= 7.1.0
 aiohttp_jinja2
 jinja2
 aiohttp_session
+fernet

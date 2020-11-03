@@ -19,6 +19,7 @@ default_config = {
     "cache_level_strs": True,
     "lang": "en",
     "gdpysbot_enabled": True,
+    "cron_delay": 20, # In minutes.
     "cheatless": {
         "enabled": True,
         "minimum_attempts_extreme_demon": 100,

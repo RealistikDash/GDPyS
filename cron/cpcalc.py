@@ -1,4 +1,3 @@
-from conn.mysql import myconn
 from helpers.generalhelper import create_offsets_from_page, dict_keys
 from helpers.userhelper import user_helper
 from helpers.lang import lang
@@ -8,14 +7,14 @@ import math
 PAGE_SIZE = 100  # You may make it larger to speed things up if you have a lot of free memory. Default should be fine.
 
 
-async def cron_calc_cp():
+async def cron_calc_cp(conn):
     """Server CP calculation."""
     # So I may make this more GDPyS style (using all of the level objects etc) but in this case, speed matters
     # a LOT more than usual. I have found this way to be MUCH faster and therefore decided to implement it as such here.
     cp_users = (
         {}
     )  # Dict (with keys being account IDs) that store user's final CP count.
-    async with myconn.conn.cursor() as mycursor:
+    async with conn.cursor() as mycursor:
         # We wipe the whole server's CP values in case a person lost all their levels ratings (as he won't be recalculated for efficiency reasons).
         await mycursor.execute("UPDATE users SET creatorPoints = 0")
         # Now we get all the levels that would give cp.

@@ -49,7 +49,7 @@ from helpers.ratelimit import rate_limiter
 from helpers.priveliegehelper import priv_helper
 from helpers.lang import lang
 from helpers.generalhelper import time_coro
-from cron.cron import run_cron
+from cron.cron import cron_loop
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
@@ -168,8 +168,10 @@ async def init(loop):
     app = web.Application(loop=loop)
     await create_connection(loop, user_config)
     await priv_helper.cache_privs()
-    await run_cron()
+    # await run_cron()
     # await cron_gather()
+    # Make cron loop in the background.
+    asyncio.create_task(cron_loop())
     songs.top_artists = await songs._top_artists()
     # Setting up rate limiter
     rate_limiter.add_to_struct(

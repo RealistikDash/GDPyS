@@ -2,7 +2,6 @@ from .rankcalc import cron_calc_ranks
 from .cpcalc import cron_calc_cp
 from .cachelb import cron_top_stars, cron_top_cp
 from .cachempgauntlets import cron_cache_mappacks, cron_cache_gauntlets
-from .cheatless import cheatless_score_check
 from helpers.timehelper import Timer, time_str
 from helpers.lang import lang, Lang
 from config import user_config, load_config
@@ -22,7 +21,6 @@ CRON_JOBS = [  #
     cron_top_cp,
     cron_cache_mappacks,
     cron_cache_gauntlets,
-    cheatless_score_check,
 ]
 
 

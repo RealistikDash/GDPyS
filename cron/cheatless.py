@@ -3,7 +3,7 @@ from helpers.levelhelper import level_helper
 from config import user_config
 from helpers.bot import gdpysbot
 
-def CheatlessScoreCheck(score: dict) -> bool:
+def cheatless_score_check(score: dict) -> bool:
     """Runs a score validity verification."""
     # score example
     {

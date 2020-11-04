@@ -1,8 +1,10 @@
 import click, asyncio
+from outdated import warn_if_outdated
+from constants import version
 
 @click.group(name="gdpys")
 def gdpys():
-    pass
+    warn_if_outdated("gdpys", version)
 
 @gdpys.command(name="start")
 @click.option("--debug", default=False, is_flag=True)
@@ -11,7 +13,6 @@ def start(debug):
 
 @gdpys.command(name="cron")
 def cron():
-    #click.echo("Not implemented yet.");return
     cron = __import__("cron.cron").cron
     loop = asyncio.get_event_loop()
     loop.run_until_complete(cron.run_cron())

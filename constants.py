@@ -1,3 +1,6 @@
+
+version = "v0.1.0"
+
 class XorKeys:
     """XOR keys for GD specific responses."""
 

@@ -8,3 +8,4 @@ aiohttp_jinja2
 jinja2
 aiohttp_session
 fernet
+outdated

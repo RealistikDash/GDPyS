@@ -58,6 +58,7 @@ import os
 import importlib
 from threading import Thread
 
+homepath = path.dirname(path.realpath(__file__))
 
 def config_routes(app: web.Application) -> None:
     """Configures all of the routes and handlers."""
@@ -124,22 +125,17 @@ def welcome_sequence(no_ascii: bool = False):
 
 def pre_run_checks():
     """Runs checks before startup to make sure all runs smoothly."""
-    if not path.exists(user_config["level_path"]) or not path.exists(
-        user_config["save_path"]
-    ):
-        logging.error(lang.error("START_LVLPATH"))
-        logging.info(
-            lang.info(
-                "SET_LVLPATH", user_config["level_path"], user_config["save_path"]
-            )
-        )
-        raise SystemExit
+    if not path.exists(user_config["level_path"]):
+        os.mkdir(user_config["level_path"])
+    if not path.exists(user_config["save_path"]):
+        os.mkdir(user_config["save_path"])
 
 
 def start_plugins():
     """Start plugins"""
     plugins = []
-    homepath = path.dirname(path.realpath(__file__))
+    if not path.exists(homepath + "/plugins/"):
+        os.mkdir(homepath + "/plugins/")
     for plugin in os.listdir(homepath + "/plugins/"):
         if (
             not path.isdir(homepath + "/plugins/" + plugin)

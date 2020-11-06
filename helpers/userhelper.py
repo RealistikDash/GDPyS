@@ -12,7 +12,7 @@ from aiofile import AIOFile
 from cron.rankcalc import ranks
 import logging
 import os
-
+import time
 
 class UserHelper:
     """Responsible for caching and getting user objects and other user-related actions."""
@@ -620,5 +620,39 @@ class UserHelper:
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute("UPDATE messages SET isNew = 1 WHERE messageID = %s LIMIT 1", (message_id,))
         await myconn.conn.commit()
+
+    async def send_message(self, subject, body, secret, fromuser, touser) -> None:
+        """Posts a message to user."""
+        async with myconn.conn.cursor() as mycursor:
+            mycursor.execute("SELECT COUNT(*) FROM blocks WHERE person1 = %s AND person2 = %s LIMIT 1", (touser, fromuser))
+            user = mycursor.fetchone()
+            if user[0] > 0:
+                return "-1"
+            async with myconn.conn.cursor() as mycursor:
+                mycursor.execute("SELECT mS, userName FROM accounts WHERE accountID = %s", (touser)) #ill also squeeze the username in here
+                username = mycursor.fetchone()
+
+        timestamp = round(time.time())
+        username = username[1]
+        userid = self.aid_to_uid(fromuser)
+
+        async with myconn.conn.cursor() as mycursor:
+            mycursor.execute("""INSERT INTO messages 
+                                    (accID, toAccountID, userName, userID, secret, subject, body, timestamp, isNew)
+                                    VALUES
+                                    (%s, %s, %s, %s, %s, %s, %s, %s, 0)
+                                    """,
+                                    (
+                                        fromuser,
+                                        touser,
+                                        username,
+                                        userid,
+                                        secret,
+                                        subject,
+                                        body,
+                                        timestamp
+                                    ))
+        await myconn.conn.commit()
+        return "1"
 
 user_helper = UserHelper()  # This has to be a common class.

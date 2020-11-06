@@ -70,9 +70,9 @@ async def home(request:web.Request):
 
 app.router.add_get("/", home)
 
-@routes.get("/user/{userid}")
+@routes.get("/user/{user}")
 async def user(request:aiohttp.web.Request):
-    """GET /api/user/{userid}
+    """GET /api/user/{user}
     Description:
         Get a user by id
     Example:
@@ -83,11 +83,19 @@ async def user(request:aiohttp.web.Request):
     Return Type:
         application/json
     """
-    userid = request.match_info["userid"]
+    user = request.match_info["user"]
+    try: 
+        int(user)
+        is_int = True
+    except ValueError:
+        is_int = False
+    if not is_int:
+        user = user_helper.get_accountid_from_username(user)
     try:
-        user = await user_helper.get_object(int(userid))
+        userobj = await user_helper.get_object(int(user))
     except AssertionError:
-        return web.HTTPNotFound()
-    return json_resp(json.dumps(user.__dict__))
+        return web.HTTPNotFound("User not found")
+    return json_resp(json.dumps(userobj.__dict__))
+
 
 app.add_routes(routes)

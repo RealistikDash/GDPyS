@@ -4,12 +4,16 @@ client = gdpys.client
 
 class GDPySBot(gdpys.Plugin):
     def __init__(self):
+        self.isgdpysbot = True
         super().__init__()
 
     def send_message(self, accountid: int, subject: str, body: str):
         pass # send message
 
-#gdpysbot = GDPySBot()
+    async def loop(self):
+        pass
 
-#def setup():
-#    return gdpysbot
+gdpysbot = GDPySBot()
+
+def setup():
+    return gdpysbot

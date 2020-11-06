@@ -143,7 +143,6 @@ class UserHelper:
 
     async def get_object(self, account_id: int) -> Account:
         """Gets user object from cache or caches and returns it."""
-        account_id = int(account_id)
         if account_id not in dict_keys(self.object_cache):
             logging.debug(lang.debug("obj_caching"))
             await self.recache_object(account_id)

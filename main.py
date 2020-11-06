@@ -57,6 +57,7 @@ from tools.main import tools
 import os
 import importlib
 from threading import Thread
+from api.main import app as api
 
 homepath = path.dirname(path.realpath(__file__))
 
@@ -101,7 +102,7 @@ def config_routes(app: web.Application) -> None:
         logging.debug(lang.debug("adding_handler", r, h.__name__))
         app.router.add_post(r, h)
 
-    # app.add_subapp("/api/", api)
+    app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
 
 
@@ -196,7 +197,7 @@ def main(debug=False):
     app = loop.run_until_complete(init(loop))
     config_routes(app)
     try:
-        web.run_app(app, port=user_config["port"])
+        web.run_app(app, port=user_config["port"], access_log=None)
     except RuntimeError:
         print("Shutting down! Bye!")
 

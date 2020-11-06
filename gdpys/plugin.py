@@ -7,39 +7,45 @@ class Plugin:
         """Start main loop"""
         depend_check = []
         try:
-            for p in self.dependencies:
-                for f in os.listdir(
-                    os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-                    + "/plugins"
-                ):
-                    f = f.strip(".py")
-                    if p == f:
-                        depend_check.append(p)
-            if depend_check != self.dependencies:
-                print(f'Dependencies could not be found for "{self.__class__}".')
+            self.isgdpysbot
         except AttributeError:
-            print("Dependencies is disabled for " + str(self.__class__))
+            self.isgdpysbot = False
+        if not self.isgdpysbot:
+            try:
+                for p in self.dependencies:
+                    for f in os.listdir(
+                        os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+                        + "/plugins"
+                    ):
+                        f = f.strip(".py")
+                        if p == f:
+                            depend_check.append(p)
+                if depend_check != self.dependencies:
+                    print(f'Dependencies could not be found for "{self.__class__}".')
+            except AttributeError:
+                print("Dependencies is disabled for " + str(self.__class__))
         self.stopped = False
         loop = asyncio.new_event_loop()
         configpath = (
             os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
             + "/plugins/config"
         )
-        try:
-            self.config = json.load(
-                open(configpath + "/" + self.name + "/config.json", "r")
-            )
-        except AttributeError:
-            print("Warning: Config is disabled for " + str(self.__class__))
-        except FileNotFoundError:
-            print("Warning: Config is disabled for " + str(self.__class__))
-        if self.metadata == False:
-            print(f"Warning: Plugin {self.__class__} has invalid metadata!")
-        while True:
-            if self.stopped:
-                break
-            loop.run_until_complete(self.loop())
-            sleep(1)
+        if not self.isgdpysbot:
+            try:
+                self.config = json.load(
+                    open(configpath + "/" + self.name + "/config.json", "r")
+                )
+            except AttributeError:
+                print("Warning: Config is disabled for " + str(self.__class__))
+            except FileNotFoundError:
+                print("Warning: Config is disabled for " + str(self.__class__))
+            if self.metadata == False:
+                print(f"Warning: Plugin {self.__class__} has invalid metadata!")
+            while True:
+                if self.stopped:
+                    break
+                loop.run_until_complete(self.loop())
+                sleep(1)
 
     def create_config(self, template):
         """Create config for plugins"""
@@ -87,3 +93,6 @@ class Plugin:
             }
         except AttributeError:
             return False
+
+    async def loop(self):
+        pass

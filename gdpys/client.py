@@ -69,7 +69,7 @@ class Client:
         """Get the current daily level"""
         return await level_helper.get_daily_level()
 
-    async def get_weekly_level(self) -> WeeklyLevel:
+    async def get_weekly_level(self) -> DailyLevel:
        """Get the current weekly level"""
        return await level_helper.get_weekly_level()
 

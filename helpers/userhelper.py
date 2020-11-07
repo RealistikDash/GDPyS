@@ -655,4 +655,20 @@ class UserHelper:
         await myconn.conn.commit()
         return "1"
 
+    async def ban_user(self, userid: int):
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE isBanned = 1 FROM users WHERE extID = %s")
+        await myconn.conn.commit()
+
+    async def unban_user(self, userid: int):
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("UPDATE isBanned = 0 FROM users WHERE extID = %s")
+        await myconn.conn.commit()
+
+    async def user_is_banned(self, userid: int):
+        async with myconn.conn.cursor() as mycursor:
+            await mycursor.execute("SELECT isBanned FROM users WHERE extID = %s")
+            isbanned = await mycursor.fetchone()
+        return isbanned
+
 user_helper = UserHelper()  # This has to be a common class.

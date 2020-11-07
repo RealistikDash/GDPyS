@@ -50,4 +50,4 @@ def cheatless_ban(accountid: int, offence: str):
     gdpysbot.send_message(accountid, "[CheatlessAC] You have been banned!", 
     f"You have been by the Cheatless AntiCheat! The reason for your ban is {offence}. Please contact the staff team for more info."
     )
-    #user_helper.ban_user(accountid, offence) # this function does not exist yet
+    user_helper.ban_user(accountid, offence)

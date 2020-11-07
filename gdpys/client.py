@@ -33,6 +33,10 @@ class Client:
         """Post an account comment to a user's account"""
         return await user_helper.post_account_comment(id, comment, False, False)
 
+    async def ban_user(self, userid: int) -> None:
+        """Ban a user"""
+        return await user_helper.ban_user(userid)
+
     ############################
     #           Level          #
     ############################

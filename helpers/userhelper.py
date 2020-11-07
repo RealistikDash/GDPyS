@@ -623,7 +623,6 @@ class UserHelper:
 
     async def send_message(self, subject, body, fromuser, touser) -> None:
         """Posts a message to user."""
-        secert = None
         async with myconn.conn.cursor() as mycursor:
             mycursor.execute("SELECT COUNT(*) FROM blocks WHERE person1 = %s AND person2 = %s LIMIT 1", (touser, fromuser))
             user = mycursor.fetchone()
@@ -648,7 +647,7 @@ class UserHelper:
                                         touser,
                                         username,
                                         userid,
-                                        secret,
+                                        None,
                                         subject,
                                         body,
                                         timestamp

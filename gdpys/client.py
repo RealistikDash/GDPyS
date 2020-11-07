@@ -130,14 +130,4 @@ class Client:
             )
         return True
 
-
 client = Client()
-
-# Testing commands
-# If this isnt removed and youre reading this i did forgot this. kindly mass tag me on discord https://discord.gg/Un42FEV RealistikDash#0077
-async def rate(ctx: CommandContext, level: int, star: str):
-    """Rates a level right??"""
-    print(f"Level: {level}, stars: {star}")
-
-
-client.create_command("rate", rate, None)

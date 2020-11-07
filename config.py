@@ -20,6 +20,7 @@ default_config = {
     "lang": "en",
     "gdpysbot_enabled": True,
     "cron_delay": 20, # In minutes.
+    "route_prefix": "",
     "cheatless": {
         "enabled": True,
         "minimum_attempts_extreme_demon": 100,

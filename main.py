@@ -100,7 +100,7 @@ def config_routes(app: web.Application) -> None:
 
     for r, h in routes:
         logging.debug(lang.debug("adding_handler", r, h.__name__))
-        app.router.add_post(r, h)
+        app.router.add_post(user_config["route_prefix"] + r, h)
 
     app.add_subapp("/api/", api)
     app.add_subapp("/tools/", tools)
@@ -185,8 +185,8 @@ def main(debug=False):
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     if debug:
         logging_level = logging.DEBUG
-    #if user_config["gdpysbot_enabled"]:
-    #    start_gdpysbot() # TODO: Re-enable once its working
+    if user_config["gdpysbot_enabled"]:
+        start_gdpysbot()
     logging.basicConfig(level=logging_level)
     lang.load_langs(user_config["lang"])
     start_plugins()

@@ -93,7 +93,6 @@ class DailyLevel:
     timestamp: int
     weekly: bool
 
-
 @dataclass
 class MapPack:
     """Map pack dataclass."""

@@ -37,6 +37,10 @@ class Client:
         """Ban a user"""
         return await user_helper.ban_user(userid)
 
+    async def send_message(self, subject, body, secret, fromuser, touser):
+        """Send a message to a user"""
+        return await user_helper.send_message(subject, body, secret, fromuser, touser)
+
     ############################
     #           Level          #
     ############################
@@ -65,9 +69,9 @@ class Client:
         """Get the current daily level"""
         return await level_helper.get_daily_level()
 
-    # async def get_weekly_level(self) -> WeeklyLevel:
-    #    """Get the current weekly level"""
-    #    return await level_helper.get_weekly_level()
+    async def get_weekly_level(self) -> WeeklyLevel:
+       """Get the current weekly level"""
+       return await level_helper.get_weekly_level()
 
     ############################
     #         Commands         #

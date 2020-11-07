@@ -23,6 +23,7 @@ class LevelHelper:
             cache_limit=250
         )
         self.daily = None  # is DailyLevel object if cached.
+        self.weekly = None  # is DailyLevel object if cached for weekly.
 
     async def _create_level_obj(self, level_id: int) -> Level:
         """Private function that creates a level object from db."""
@@ -323,13 +324,13 @@ class LevelHelper:
             await myconn.conn.commit()
         await self._cache_level_obj(level.ID)
 
-    async def _daily_level_from_db(self) -> DailyLevel:
+    async def _daily_level_from_db(self, type) -> DailyLevel:
         """Gets daily level from database."""
         timestamp = get_timestamp()
         async with myconn.conn.cursor() as mycursor:
             await mycursor.execute(
-                "SELECT feaID, levelID, timestamp, type FROM dailyfeatures WHERE timestamp < %s AND type = 0 ORDER BY timestamp DESC LIMIT 1",
-                (timestamp,),
+                "SELECT feaID, levelID, timestamp, type FROM dailyfeatures WHERE timestamp < %s AND type = %s ORDER BY timestamp DESC LIMIT 1",
+                (timestamp, type),
             )
             daily = await mycursor.fetchone()
         if daily is None:
@@ -341,10 +342,18 @@ class LevelHelper:
     async def get_daily_level(self) -> DailyLevel:
         """Gets the current daily level."""
         if self.daily is None:
-            self.daily = await self._daily_level_from_db()
+            self.daily = await self._daily_level_from_db(0)
         if self.daily.timestamp < get_timestamp():
-            self.daily = await self._daily_level_from_db()
+            self.daily = await self._daily_level_from_db(0)
         return self.daily
+
+    async def get_weekly_level(self) -> DailyLevel:
+        """Gets the current weekly level."""
+        if self.weekly is None:
+            self.weekly = await self._daily_level_from_db(1)
+        if self.weekly.timestamp < get_timestamp():
+            self.weekly = await self._daily_level_from_db(1)
+        return self.weekly
 
     async def level_list_objs(self, level_list: list) -> list:
         """Returns a list of level objects from list of levelIDs."""

@@ -14,7 +14,7 @@ from helpers.songhelper import songs
 from helpers.userhelper import user_helper
 from helpers.crypthelper import cipher_xor, hash_sha1
 from helpers.auth import auth
-from helpers.timehelper import time_since_midnight, get_timestamp
+from helpers.timehelper import time_since_midnight, get_timestamp, week_ago
 from helpers.lang import lang
 from objects.levels import SearchQuery, Level, Gauntlet
 from cron.cachempgauntlets import map_packs, gauntlets
@@ -290,9 +290,12 @@ async def get_daily_handler(request: aiohttp.web.Request):
     weekly = string_bool(post_data["weekly"])
     change_time = 0
 
-    if not weekly:
+    if weekly:
         change_time = get_timestamp() - time_since_midnight()
         level_id = (await level_helper.get_daily_level()).level_id
+    else: # daily
+        change_time = get_timestamp() - week_ago()
+        level_id = (await level_helper.get_weekly_level()).level_id
 
     response = f"{level_id}|{change_time}"
     logging.debug(response)

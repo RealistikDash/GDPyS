@@ -5,6 +5,7 @@ from helpers.levelhelper import level_helper
 from helpers.generalhelper import dict_keys, deprecated
 from helpers.timehelper import get_timestamp
 from objects.comments import CommandContext, Comment, CommentBan
+from objects.account import Account
 from constants import Permissions
 from config import user_config
 from exceptions import GDPySCommandError
@@ -22,8 +23,12 @@ class Client:
     ############################
 
     async def username_to_id(self, username: str) -> int:
-        """Convert a username to an id"""
+        """Convert a username to a user id"""
         return await user_helper.get_accountid_from_username(username)
+
+    async def account_id_to_user_id(self, accountid) -> int:
+        """Convert a user id to an account id"""
+        return await user_helper.get_rank(id)    
 
     async def get_user_rank(self, id: int) -> int:
         """Get the rank of a user"""
@@ -37,9 +42,17 @@ class Client:
         """Ban a user"""
         return await user_helper.ban_user(userid)
 
-    async def send_message(self, subject, body, secret, fromuser, touser):
+    async def send_message(self, subject: str, body: str, fromuser: int, touser: int) -> None:
         """Send a message to a user"""
-        return await user_helper.send_message(subject, body, secret, fromuser, touser)
+        return await user_helper.send_message(subject, body, fromuser, touser)
+    
+    async def get_user_object(self, account_id: int) -> Account:
+        """Get a users object"""
+        return await user_helper.get_object(account_id)
+
+    async def create_user_object(self, account_id: int) -> Account:
+        """Create a users object"""
+        return await user_helper.create_user_object(account_id)
 
     ############################
     #           Level          #

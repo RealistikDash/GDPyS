@@ -92,10 +92,10 @@ class Client:
         return decorator
 
     def create_command(
-        self, name: str, coro: asyncio.coroutine, permission: Permissions
+        self, name: str, coro: asyncio.coroutine, permission: Permissions, type="command"
     ):
         """Create a command"""
-        COMMANDS[name] = {"handler": coro, "permission": permission}
+        COMMANDS[name] = {"handler": coro, "permission": permission, "type": type}
 
     def _command_exists(self, command: str) -> bool:
         """Checks if a given comment is a valid command."""
@@ -124,6 +124,11 @@ class Client:
         passed_args = command_args[1:]
         if not user_helper.has_privilege(account, command["permission"]):
             return False
+        if command["type"] == "on_comment":
+            try:
+                await command["handler"](ctx, *passed_args)
+            except GDPySCommandError:
+                pass
         try:
             await command["handler"](ctx, *passed_args)
         except GDPySCommandError as e:
@@ -133,5 +138,19 @@ class Client:
                 f"GDPyS Command Exception in {command['handler'].__name__.replace('_', '-')}:\n{e}",  # Replace as _s mess up the response
             )
         return True
+
+    def on_comment(self, name: str = None, permission: Permissions = None):
+        """Decorator to create on_comment commands"""
+
+        def decorator(coro):
+            if not coro.__code__.co_flags & 0x0080 or getattr(
+                coro, "_is_coroutine", False
+            ):
+                raise Exception("Function is not a coroutine function!")
+            if name is None:  # noqa
+                name = coro.__name__.lower()  # noqa
+                self.create_command(name, coro, permission, type="on_comment")  # noqa
+
+        return decorator
 
 client = Client()

@@ -20,7 +20,7 @@ class GDPySBot(gdpys.Plugin):
         comment = ctx.comment
         account = ctx.account
         level = ctx.level
-        mentions = re.findall("@[a-zA-Z]+", comment.comment)
+        mentions = re.findall("@([0-9a-zA-Z]+)", comment.comment)
         for m in mentions:
             m.replace("@", "")
             user = client.send_message("Mentioned",

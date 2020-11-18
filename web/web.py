@@ -8,8 +8,8 @@ import base64
 
 __version__ = "v0.1.0"
 app = aiohttp.web.Application()
-templates = aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("./static/templates"))
-app.router.add_static("/static/", path="./static/", name="static")
+templates = aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("./web/static/templates"))
+app.router.add_static("/static/", path="./web/static/", name="static")
 routes = aiohttp.web.RouteTableDef()
 
 def render_template(template, **kwargs) -> aiohttp.web.Response:
@@ -17,7 +17,7 @@ def render_template(template, **kwargs) -> aiohttp.web.Response:
     return aiohttp.web.Response(text=text, content_type="text/html")
 
 @routes.get("/")
-async def HomeToolRoute(request):
+async def tools_home(request):
     session = await get_session(request)
     ServerStatsCache = {
         "registered": 2000

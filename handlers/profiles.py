@@ -15,7 +15,6 @@ from helpers.timehelper import time_ago
 from helpers.auth import auth
 from helpers.searchhelper import search_helper
 from helpers.lang import lang
-from helpers.cheatless import cheatless_score_check
 from constants import ResponseCodes, Permissions
 from cron.cachelb import top_stars, top_cp
 from objects.accounts import FriendRequest, Message # To be nicer to PyLint
@@ -190,18 +189,6 @@ async def update_profile_stats_handler(request: aiohttp.web.Request):
     user.explosion = int(post_data.get("accExplosion", 0))
     user.coins = int(post_data.get("coins", 0))
     user.user_coins = int(post_data.get("userCoints", 0))
-    
-    # run anticheat
-
-    score = {
-        "accountid" : account_id,
-        "levelid" : 222,
-        "percentage" : 100,
-        "attempts" : 10,
-        "coins" : 0
-    }
-
-    cheatless_score_check()
 
     # Set new user obj to db.
     await user_helper.update_user_stats(user)

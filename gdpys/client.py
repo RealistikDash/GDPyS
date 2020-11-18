@@ -1,15 +1,17 @@
 import asyncio
+import os
 from aiohttp.payload_streamer import streamer
 from helpers.userhelper import user_helper
 from helpers.levelhelper import level_helper
 from helpers.generalhelper import dict_keys, deprecated
 from helpers.timehelper import get_timestamp
 from objects.comments import CommandContext, Comment, CommentBan
-from objects.account import Account
+from objects.accounts import Account
 from constants import Permissions
 from config import user_config
 from exceptions import GDPySCommandError
 from objects.levels import Level, Rating, DailyLevel
+from functools import wraps
 
 COMMANDS = {}
 
@@ -92,13 +94,14 @@ class Client:
 
     def command(self, name: str = None, permission: Permissions = None):
         """Decorator to create commands"""
-
+        global realname
+        realname = name
         def decorator(coro):
             if not coro.__code__.co_flags & 0x0080 or getattr(
                 coro, "_is_coroutine", False
             ):
                 raise Exception("Function is not a coroutine function!")
-            if name is None:  # noqa
+            if realname is None:  # noqa
                 name = coro.__name__.lower()  # noqa
                 self.create_command(name, coro, permission)  # noqa
 
@@ -154,16 +157,15 @@ class Client:
 
     def on_comment(self, name: str = None, permission: Permissions = None):
         """Decorator to create on_comment commands"""
-
+        global realname
+        realname = name
         def decorator(coro):
             if not coro.__code__.co_flags & 0x0080 or getattr(
                 coro, "_is_coroutine", False
             ):
                 raise Exception("Function is not a coroutine function!")
-            if name is None:  # noqa
+            if realname is None:  # noqa
                 name = coro.__name__.lower()  # noqa
                 self.create_command(name, coro, permission, type="on_comment")  # noqa
-
-        return decorator
 
 client = Client()

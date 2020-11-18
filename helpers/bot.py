@@ -1,34 +1,30 @@
+import asyncio
 import gdpys
 import re
 
 client = gdpys.client
 
 class GDPySBot(gdpys.Plugin):
-    def __init__(self):
+    def __init__(self, loop):
         self.isgdpysbot = True
-        self.user = client.get_user_object(0)
+        self.user = loop.create_task(client.get_user_object(0))
         super().__init__()
-
-    def send_message(self, accountid: int, subject: str, body: str):
-        pass # send message
 
     async def loop(self):
         pass
 
-    @client.on_comment()
+    @client.on_comment
     async def mention(self, ctx):
         comment = ctx.comment
         account = ctx.account
         level = ctx.level
         mentions = re.findall("@([0-9a-zA-Z]+)", comment.comment)
-        for m in mentions:
-            m.replace("@", "")
-            user = client.send_message("Mentioned",
-            f"You have been mentioned by {account.username}, on {level.name} with id {level.ID}",
-            self.user.user_id,
-            client.username_to_id(m))
-
-gdpysbot = GDPySBot()
+        m = mentions[0] # grab the first mention (stop those spam mentioners)
+        m.replace("@", "")
+        await client.send_message("Mentioned",
+        f"You have been mentioned by {account.username}, on {level.name} with id {level.ID}",
+        self.user.account_id,
+        client.username_to_id(m))
 
 def setup():
-    return gdpysbot
+    return GDPySBot

@@ -53,11 +53,11 @@ from cron.cron import cron_loop
 from constants import ASCII_ART, Colours
 from conn.mysql import create_connection
 from os import path
-from tools.main import tools
 import os
 import importlib
 from threading import Thread
 from api.main import app as api
+from web.web import app as tools
 
 homepath = path.dirname(path.realpath(__file__))
 
@@ -143,7 +143,7 @@ def start_plugins():
             and plugin.endswith(".py")
             and plugin != "__init__.py"
         ):
-            plugin = plugin.strip(".py")
+            plugin = plugin.replace(".py", "") # using replace instead of strip so a plugin called "say.py" isnt registered as "sa"
             print(f'Loading plugin "{plugin}".')
             plugins.append(plugin)
             Thread(
@@ -152,12 +152,12 @@ def start_plugins():
                 ).setup()()
             ).start()
             
-def start_gdpysbot():
+def start_gdpysbot(loop):
     print("Starting GDPySBot")
     Thread(
         target=lambda: importlib.import_module(
             ".bot", "helpers"
-        ).setup()
+        ).setup()(loop)
     ).start()
 
 async def init(loop):
@@ -185,8 +185,6 @@ def main(debug=False):
     logging_level = logging.DEBUG if user_config["debug"] else logging.INFO
     if debug:
         logging_level = logging.DEBUG
-    if user_config["gdpysbot_enabled"]:
-        start_gdpysbot()
     logging.basicConfig(level=logging_level)
     lang.load_langs(user_config["lang"])
     start_plugins()
@@ -196,9 +194,13 @@ def main(debug=False):
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init(loop))
     config_routes(app)
+    #if user_config["gdpysbot_enabled"]: # disabled until we can make a gdpysbot user
+        #start_gdpysbot(loop)
     try:
         web.run_app(app, port=user_config["port"], access_log=None)
     except RuntimeError:
+        print("Shutting down! Bye!")
+    except KeyboardInterrupt:
         print("Shutting down! Bye!")
 
 if __name__ == "__main__":

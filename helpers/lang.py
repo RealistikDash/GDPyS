@@ -4,6 +4,7 @@ from helpers.generalhelper import JsonFile
 from constants import Paths
 from exceptions import LangNotFound
 import logging
+import config
 
 class Lang:
     def __init__(self):

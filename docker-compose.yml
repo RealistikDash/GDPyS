@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+
+  python:
+        build: .
+        ports: 
+            - "851:80"
+        environment:
+         - PGID=1000
+         - PUID=1000
+        volumes:
+          - ./data:/usr/src/app/data
+        links:
+            - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    restart: always
+    command: "mysqld --init-file /data/application/init.sql"
+    volumes:
+      - ./Mariadb/mysql:/var/lib/mysql
+      - ./Mariadb/init.sql:/data/application/init.sql
+      - ./db.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: yourpassword
+      MYSQL_DATABASE: geometry
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8121:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb

@@ -126,10 +126,17 @@ def welcome_sequence(no_ascii: bool = False):
 
 def pre_run_checks():
     """Runs checks before startup to make sure all runs smoothly."""
-    if not path.exists(user_config["level_path"]):
-        os.mkdir(user_config["level_path"])
-    if not path.exists(user_config["save_path"]):
-        os.mkdir(user_config["save_path"])
+    try:
+        if not path.exists(user_config["level_path"]):
+            os.mkdir(user_config["level_path"])
+        if not path.exists(user_config["save_path"]):
+            os.mkdir(user_config["save_path"])
+    except FileNotFoundError:
+        os.mkdir("data") # hopefully using default path
+        if not path.exists(user_config["level_path"]):
+            os.mkdir(user_config["level_path"])
+        if not path.exists(user_config["save_path"]):
+            os.mkdir(user_config["save_path"])
 
 
 def start_plugins():

@@ -1,7 +1,7 @@
 from const import HandlerTypes
 from aiohttp import web
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Union
 from .sql import MySQLPool
 from const import HandlerTypes
 from logger import error, info, debug
@@ -243,6 +243,36 @@ class GDPySWeb:
 
         # Return it
         return final_resp
+    
+    def add_handler(
+        self,
+        path: str,
+        status: Union[HandlerTypes, int],
+        handler: Callable[[Request], str]
+    ) -> None:
+        """Creates a handler object and adds it to handle any request coming
+        to `path`.
+        
+        Note:
+            All `handler` args should be coroutine functions. REGULAR FUNCTIONS
+                WILL NOT WORK AND WILL BREAK THINGS!
+
+        Args:
+            path (str): The URL patch at which the handler should be employed.
+            status (HandlerStatus, int): The core status of the handler, it
+                contains information such as response type (eg JSON or simple
+                plain text, GD authed and DB).
+            handler (Callable): The coroutine function for the handler. Must
+                return str for plaintext handlers and dict/list for JSON
+                ones.
+        """
+
+        # Creating the handler object and setting.
+        self.handlers[path] = Handler(
+            path= path,
+            handler= handler,
+            status= status
+        )
     
     # Server start
     async def start(self, port: int = 8080):

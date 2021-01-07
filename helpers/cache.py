@@ -1,7 +1,7 @@
 from .time_helper import get_timestamp
 from .common import dict_keys
 
-class Cache():
+class Cache:
     """Cache of objects with IDs."""
     # TODO: The caching system can maybe call a function to automatically cache something without the help of a helper class.
 

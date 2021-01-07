@@ -13,3 +13,8 @@ class Glob:
             cache_length= 20,
             cache_limit= 200
         )
+        # Global MySQL connection.
+        self.conn = None
+
+# Define glob here so we can just use it.
+glob = Glob()

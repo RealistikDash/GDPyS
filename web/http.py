@@ -6,6 +6,7 @@ from .sql import MySQLPool
 from const import HandlerTypes
 from logger import error, info, debug
 from helpers.time_helper import Timer
+from exceptions import GDException
 import asyncio
 import traceback
 
@@ -208,11 +209,18 @@ class GDPySWeb:
             # Check if it is authed.
             if handler.has_status(HandlerTypes.AUTHED)\
             and not await self._gd_auth(request.post_data):
-                # Hard code reply for now. TODO
-                return web.Response(text="-1")
+                raise GDException("-1")
             
             resp_str = await handler.handler(*args)
         
+        except GDException as e:
+            # GDExceptions are different, with them being called when the
+            # handler is executed correctly BUT it is sending an error 
+            # code to the client.
+            resp_str = str(e)
+            debug(f"Handler triggered error code {resp_str}") # Temp debug as else it will be triggered a lot.
+        
+        # There has been an actual exception within the handler.
         except Exception:
             # Get the tb as full string
             tb = traceback.format_exc()

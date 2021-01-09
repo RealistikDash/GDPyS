@@ -1,4 +1,5 @@
 from web.http import GDPySWeb
+from objects.glob import glob
 from config import user_config
 import uvloop
 import asyncio

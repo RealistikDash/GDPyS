@@ -14,7 +14,7 @@ class Glob:
             cache_limit= 200
         )
         # Global MySQL connection.
-        self.conn = None
+        self.sql = None
 
 # Define glob here so we can just use it.
 glob = Glob()

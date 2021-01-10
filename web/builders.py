@@ -49,13 +49,15 @@ def gd_builder(resp: List[dict, str], separator: str = "#") -> str:
     # Combine all sectors, dividing them all by #
     return separator.join(final_resp)
 
-def gd_dict_str(d: Dict[int, str]) -> str:
+def gd_dict_str(d: Dict[int, str], separator: str = ":") -> str:
     """Converts the dict `d` into a Geometry Dash-styled HTTP
     response.
     
     Args:
         d (dict): A dictionary of keys to convert. Should be in
             the format `key int: str`.
+        separator (str): The character to separate all elements of
+            the dict.
     
     Returns:
         Returns a string from the dict in the format `1:aaa:2:b`
@@ -69,4 +71,4 @@ def gd_dict_str(d: Dict[int, str]) -> str:
         a += [key, val]
     
     # Combine them all and send off.
-    return ":".join(a)
+    return separator.join(a)

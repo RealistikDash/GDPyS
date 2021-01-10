@@ -7,6 +7,7 @@ from const import HandlerTypes
 from logger import error, info, debug
 from helpers.time_helper import Timer
 from exceptions import GDException
+from objects.glob import glob
 import asyncio
 import traceback
 
@@ -167,6 +168,9 @@ class GDPySWeb:
             database,
             port
         )
+
+        # Set it globally.
+        glob.sql = self.pool
     
     async def _gd_auth(self, post_data: dict) -> bool:
         """Handles authentication for Geometry Dash handlers."""

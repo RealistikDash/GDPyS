@@ -21,3 +21,10 @@ class XorKeys:
     GJP = 37526
     QUESTS = 19847
     CHESTS = 59182
+
+class ReqStats:
+    """Profile statuses on whether eg friend reqs are enabled."""
+
+    MESSAGES = 1 << 0
+    REQUESTS = 1 << 1
+    COMMENTS = 1 << 2

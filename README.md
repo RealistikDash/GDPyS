@@ -1,6 +1,8 @@
 [![Documentation Status](https://readthedocs.org/projects/gdpys/badge/?version=latest)](https://gdpys.readthedocs.io/en/latest/?badge=latest) [![Actions Status](https://github.com/RealistikDash/GDPyS/workflows/build/badge.svg)](https://github.com/RealistikDash/GDPyS/actions) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 # GDPyS (Rewrite)
 
+NOTE: GDPYS V2 HAS BEEN DISCONTINUED IN FAVOUR OF THE NEW V3 VERSION (ACCESSABLE AT THE V3 BRANCH)
+
 GDPyS is a modern Geometry Dash Custom Server which can be utilised in the creation of Private Servers. It is written using Python, making it fast and capable.
 
 ## Why GDPyS?

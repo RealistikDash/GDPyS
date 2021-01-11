@@ -1,14 +1,8 @@
 # Common functions related to simple python-related things.
 from typing import Union
 import os
-# Some systems have issues with orjson (such as my rpi) so this
-# is a necessary step for compatibillity on those devices.
-try:
-    import orjson
-except ImportError:
-    # Luckily the functions of these libraries that we use are basically
-    # identical so we can just switch them. Orjson is just faster.
-    import json as orjson
+# orjson didnt work
+import json
 
 class JsonFile:
     """Assists within working with simple JSON files."""
@@ -25,7 +19,7 @@ class JsonFile:
         self.file_name = file_name
         if os.path.exists(file_name):
             with open(file_name) as f:
-                self.file = orjson.load(f)
+                self.file = json.load(f)
 
     def get_file(self) -> dict:
         """Returns the loaded JSON file as a dict.
@@ -44,7 +38,7 @@ class JsonFile:
         """
 
         with open(self.file_name, "w") as f:
-            orjson.dump(new_content, f, indent=4)
+            json.dump(new_content, f, indent=4)
         self.file = new_content
 
 def dict_keys(d: dict) -> tuple:

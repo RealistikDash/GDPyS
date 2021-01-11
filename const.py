@@ -22,9 +22,15 @@ class XorKeys:
     QUESTS = 19847
     CHESTS = 59182
 
-class ReqStats:
+class ReqStats(IntFlag):
     """Profile statuses on whether eg friend reqs are enabled."""
 
     MESSAGES = 1 << 0
     REQUESTS = 1 << 1
     COMMENTS = 1 << 2
+
+class Privileges(IntFlag):
+    """The GDPyS privileges."""
+
+    LOGIN = 1 << 0
+    # TODO: When not lazy.

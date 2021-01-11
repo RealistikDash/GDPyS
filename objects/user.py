@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from const import ReqStats
+from const import ReqStats, Privileges
 from .glob import glob
 
 @dataclass
@@ -22,11 +22,14 @@ class User:
         """Configures all placeholders for the object. Please
         use classmethods instead."""
 
+        self.id: int = 0
         self.name: str = ""
         self.stats: Stats = Stats()
+        self.registered_timestamp: int = 0
+        self.privileges: Privileges = Privileges(1<<0)
 
         # Details
-        #self.bcrypt_pass: str = "" # Used for auth
+        self.bcrypt_pass: str = "" # Used for auth
         self.email: str = ""
 
         # Socials
@@ -64,17 +67,70 @@ class User:
             User object if user is found within the database.
         """
 
-        # TODO: do this once not tired.
+        # Set acc_id.
+        cls.id = account_id
+
+        # Basic fetch only fetches the stats.
         await cls.stats_db(cls)
-        await cls.messages_db(cls)
-        await cls.friend_reqs_db(cls)
-        await cls.friends_db(cls)
+
+        # These are only for "extensive" or "full" fetches
+        if full:
+            await cls.messages_db(cls)
+            await cls.friend_reqs_db(cls)
+            await cls.friends_db(cls)
         return cls
 
     async def stats_db(self):
-        """Sets the statistics for the user directly from the database."""
+        """Sets the statistics for the user directly from the database.
+        
+        Note:
+            This sets everything contained within the users table.
+        """
 
-        # TODO: do this once not tired.
+        # I am chosing to manually select each columns in case of db order.
+        db_user = await glob.sql.fetchone("""
+            SELECT
+                username,
+                privileges,
+                email,
+                password,
+                timestamp,
+                stars,
+                diamonds,
+                coins,
+                ucoins,
+                demons,
+                cp,
+                yt_url,
+                twitter_url,
+                twitch_url,
+                req_status
+            FROM users
+            WHERE
+                id = %s
+            LIMIT 1
+        """, (self.id,))
+
+        # Check if it is found.
+        if db_user is None:
+            return
+        
+        # Set all the variables.
+        priv = 0 # Idk i got an error without it
+
+        self.name, priv,
+        self.email, self.bcrypt_pass,
+        self.registered_timestamp,
+        self.stats.stars, self.stats.diamonds,
+        self.stats.coins, self.stats.u_coins,
+        self.stats.demons, self.stats.cp,
+        self.youtube_url, self.twitter_url,
+        self.twitch_url, req_status  = db_user
+
+        # Set special objects from data
+        self.privileges = Privileges(priv)
+        self.req_states = ReqStats(req_status)
+        
         return
     
     async def messages_db(self):

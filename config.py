@@ -8,8 +8,8 @@ __name__ = "ConfigModule"
 __author__ = "RealistikDash"
 
 default_config = {
-    "port": 8080,
-    "sql_server": "localhost",
+    "http_port": 8080,
+    "sql_host": "localhost",
     "sql_user": "root",
     "sql_db": "GDPyS",
     "sql_password": ""
@@ -21,6 +21,13 @@ config_options = list(default_config.keys())
 
 
 def load_config(location: str = "config.json"):
+    """Loads a JSON configuration file located at `location`,
+    manages the updating of it to contain all keys located within
+    the `default_config` dict and sets `user_config` to it.
+    
+    Args:
+        location (str): The location of the configuration file.
+    """
     config = JsonFile(location)
     user_config_temp = config.get_file()
 
@@ -46,5 +53,9 @@ def load_config(location: str = "config.json"):
         )
         raise SystemExit
 
-    global user_config
-    user_config = user_config_temp
+    #global user_config
+    #user_config = user_config_temp
+
+    # I wish i could simply use the solution above
+    for key, val in user_config_temp.items():
+        user_config[key] = val

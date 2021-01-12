@@ -57,16 +57,16 @@ def bcrypt_hash(passw: str, difficulty: int = 10) -> str:
         bcrypt.gensalt(difficulty)
     )
 
-def bcrypt_check(plain_pass: str, bc_pass: str) -> bool:
+def bcrypt_check(plain_pass: str, bcrypt_pass: str) -> bool:
     """Compares a plain text password
     `plain_pass` to the BCrypt hashed
-    password `bc_pass`.
+    password `bcrypt_pass`.
     
     Args:
         plain_pass (str): The plain text
             password to be compared to the
             BCrypt hashed one.
-        bc_pass (str): The BCrypt hashed
+        bcrypt_pass (str): The BCrypt hashed
             password to be checked against the
             palin text one.
     
@@ -81,9 +81,9 @@ def bcrypt_check(plain_pass: str, bc_pass: str) -> bool:
     try:
         return bcrypt.checkpw(
             plain_pass.encode(),
-            bc_pass.encode()
+            bcrypt_pass.encode()
         )
-    # Bad bc_pass would raise ValueError
+    # Bad bcrypt_pass would raise ValueError
     except ValueError:
         return False
 
@@ -104,7 +104,7 @@ def xor_cipher(text: str, key: int) -> str:
 
     return "".join(chr(ord(x) ^ ord(y)) for (x, y) in zip(str(text), cycle(str(key))))
 
-def gjp_decodes(gjp: str) -> str:
+def gjp_decode(gjp: str) -> str:
     """Decodes the string `gjp` encoded using the
     "Geometry Jump Password" encryption method.
 

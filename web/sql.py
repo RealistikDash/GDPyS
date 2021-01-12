@@ -122,7 +122,7 @@ class MySQLPool:
                 # Immidiately return it
                 return await cur.fetchall()
         
-    async def execute(self, query: str, args: tuple = ()) -> None:
+    async def execute(self, query: str, args: tuple = ()) -> int:
         """Simply executes `query` and commits all changes made by
         it to database.
         
@@ -134,6 +134,9 @@ class MySQLPool:
             query (str): The MySQL query to be executed.
             args (tuple, list): The list or tuple of arguments to
                 be safely formatted into the query.
+        
+        Returns:
+            The ID of the last row affected.
         """
 
          # Fetch a connection from the pool.
@@ -148,4 +151,7 @@ class MySQLPool:
 
                 # Commit it.
                 await pool.commit()
+
+                # Return it
+                return cur.lastrowid
 

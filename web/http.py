@@ -211,9 +211,12 @@ class GDPySWeb:
                 args.append(self.pool)
             
             # Check if it is authed.
-            if handler.has_status(HandlerTypes.AUTHED)\
-            and not await self._gd_auth(request.post_data):
-                raise GDException("-1")
+            if handler.has_status(HandlerTypes.AUTHED):
+                if not (p := await self._gd_auth(request.post_data)):
+                    raise GDException("-1")
+
+                # Add user as arg.
+                args.append(p)
             
             resp_str = await handler.handler(*args)
         

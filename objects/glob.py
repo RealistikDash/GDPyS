@@ -1,5 +1,6 @@
 # Shared global class.
 from helpers.cache import Cache
+from helpers.auth import Auth
 
 class Glob:
     """The global object shared between most
@@ -13,6 +14,10 @@ class Glob:
             cache_length= 20,
             cache_limit= 200
         )
+
+        # Shared helpers.
+        self.auth: Auth = Auth()
+
         # Global MySQL connection.
         self.sql = None
 

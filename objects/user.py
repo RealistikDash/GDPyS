@@ -1,6 +1,10 @@
+from helpers.crypt import bcrypt_hash
+from helpers.time_helper import get_timestamp
 from dataclasses import dataclass
 from const import ReqStats, Privileges
+from logger import debug
 from .glob import glob
+from exceptions import GDException
 
 @dataclass
 class Stats:
@@ -78,6 +82,105 @@ class User:
             await cls.messages_db(cls)
             await cls.friend_reqs_db(cls)
             await cls.friends_db(cls)
+        return cls
+    
+    @classmethod
+    async def from_id(cls, account_id: int):
+        """Attempts for fetch the account with the ID of `account_id` from
+        multiple sources, which are ordered from fastest to slowest.
+        
+        Note:
+            Currently, the only two sources included are the user cache
+                and MySQL.
+        
+        Args:
+            account_id (int): The account of the user you are fetching.
+        
+        Returns:
+            If user found, instance of the `User` object is returned.
+            If not found, `None` is returned.
+        """
+
+        # First we attempt a cache hit which is the fastest by far.
+        if usr := glob.user_cache.get_cache_object(account_id):
+            debug(f"User {usr.name} ({account_id}) retrieved from cache.")
+            return usr
+        
+        # Maybe not cached... Try the database.
+        if usr := await cls.from_sql(account_id):
+            debug(f"User {usr.name} ({account_id}) retrieved from MySQL.")
+
+            # Add them to the cache for speed later on.
+            glob.user_cache.cache_object(account_id, usr)
+            return usr
+        
+        # They do not exist to our knowledge.
+        debug(f"Unable to find user with the ID of {account_id}")
+        return
+    
+    @classmethod
+    async def register(cls, email: str, username: str, password: str):
+        """Registers the user with the given credentials, adds them to
+        the database and returns an instance of their User object.
+        
+        Note:
+            Any gdpys-related error that occurs within this function
+                will be raised as a `GDException` with the GD response
+                error enum corresponding to the issue.
+        
+        Args:
+            email (str): The email under which to identify the newly
+                registered user.
+            username (str): The name that the user will be registered
+                under.
+            password (str): The password under which the user will be 
+                authenticated. Will be hashed with BCrypt.
+        
+        Returns:
+            Instance of the newly registered user.
+        """
+
+        # Firstly, we set the local variables so the properties work well.
+        cls.name = username
+        cls.bcrypt_pass = bcrypt_hash(password)
+        cls.registered_timestamp = get_timestamp
+        cls.email = email
+
+        # Now we run checks. First, check if the username exists.
+        un_exists = await glob.sql.fetchone("SELECT 1 FROM users WHERE username_safe = %s LIMIT 1", (
+            cls.safe_name
+        ))
+
+        # User with that username already exists in the db.
+        if un_exists:
+            # Raise GDException that will be directly reported to the client.
+            raise GDException("-2")
+        
+        # Check for email.
+        em_exists = await glob.sql.fetchone("SELECT 1 FROM users WHERE email = %s LIMIT 1", (
+            cls.email
+        ))
+        if em_exists:
+            # Im not sure of the proper error but an acc with that email already exists.
+            raise GDException("-1")
+
+        # Check name length
+        if not (3 < len(username) < 16):
+            # Im not sure of the proper error code for this but their name is too long.
+            raise GDException("-1")
+
+        # Insert them into the db ig.
+        cls.id = await glob.sql.execute("""
+            INSERT INTO USERS
+                (username, username_safe, password, timestamp)
+            VALUES
+                (%s,%s,%s,%s)
+        """, (cls.name, cls.safe_name, cls.bcrypt_pass, cls.registered_timestamp))
+
+        # Log.
+        debug(f"{cls.name} ({cls.id}) has registered!")
+
+        # Return obj.
         return cls
 
     async def stats_db(self):

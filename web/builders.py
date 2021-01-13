@@ -1,7 +1,7 @@
 # Extremely simple response builder.
-from typing import List, Dict
+from typing import List, Dict, Union
 
-def gd_builder(resp: List[dict, str], separator: str = "#") -> str:
+def gd_builder(resp: List[Union[dict, str]], separator: str = "#") -> str:
     """Builds a Geometry Dash-styled response string out of
     the list `resp`.
 

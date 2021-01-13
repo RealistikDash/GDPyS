@@ -6,12 +6,13 @@ class HandlerTypes(IntFlag):
     handler types."""
 
     # Args passed.
-    DATABASE   = 1 << 0
-    AUTHED     = 1 << 1
+    DATABASE     = 1 << 0
+    AUTHED       = 1 << 1
+    RATE_LIMITED = 1 << 2
 
     # Response Types
-    PLAIN_TEXT = 1 << 5
-    JSON       = 1 << 6
+    PLAIN_TEXT   = 1 << 5
+    JSON         = 1 << 6
 
 class XorKeys:
     """XOR cipher keys frequently used within Geometry Dash."""
@@ -34,3 +35,10 @@ class Privileges(IntFlag):
 
     LOGIN = 1 << 0
     # TODO: When not lazy.
+
+class GenericResponse:
+    """Common Geometry Dash response codes."""
+
+    COMMON_SUCCESS = "1"
+    COMMON_FAIL = "-1"
+    NOT_FOUND = "-2"

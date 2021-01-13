@@ -1,11 +1,21 @@
 from web.http import GDPySWeb
 from objects.glob import glob
 from config import user_config, load_config
+from const import HandlerTypes
 import uvloop
 import asyncio
 
+# Handler imports.
+from handlers.login import register_account
+
 # Load config
 load_config()
+
+# Local Consts
+DB_PREFIX = "/database"
+HANDLERS = (
+    ("/accounts/registerGJAccount.php", register_account, HandlerTypes.PLAIN_TEXT),
+)
 
 async def main(loop: asyncio.AbstractEventLoop):
     """The main asyncronous function."""
@@ -19,6 +29,14 @@ async def main(loop: asyncio.AbstractEventLoop):
         password= user_config["sql_password"],
         database= user_config["sql_db"]
     )
+
+    # SET ALL THE HANDLERS
+    for handler in HANDLERS:
+        server.add_handler(
+            path= DB_PREFIX + handler[0],
+            status= handler[2],
+            handler= handler[1]
+        )
 
     await server.start(user_config["http_port"])
 

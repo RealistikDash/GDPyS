@@ -3,6 +3,7 @@ from aiohttp import web
 from dataclasses import dataclass
 from typing import Callable, Union
 from .sql import MySQLPool
+from helpers.auth import Auth
 from const import HandlerTypes
 from logger import error, info, debug
 from helpers.time_helper import Timer
@@ -94,6 +95,7 @@ class GDPySWeb:
         self.pool: MySQLPool = None
         self.err_handlers: dict = {}
         self.loop = loop
+        self.auth: Auth = Auth()
 
         # Setting the default err_handlers
         self.err_handlers[404] = Handler(
@@ -175,8 +177,16 @@ class GDPySWeb:
     async def _gd_auth(self, post_data: dict) -> bool:
         """Handles authentication for Geometry Dash handlers."""
 
-        # Not added yet
-        raise NotImplementedError("Geometry Dash authentication has not yet been implemented.")
+        # TODO: Anti-botting checks for vers and binaryver and secrets
+        return await self.auth.gjp_check(
+            int(post_data["accountID"]),
+            post_data["gjp"]
+        )
+    
+    def _rate_limit(self, req: Request) -> bool:
+        """Imposes a rate limit on an endpoint."""
+
+        raise NotImplementedError("Rate limits have not been implemented yet.")
     
     async def _handle_conn(self, req: web.Request) -> web.Response:
         """Handles all requests to the server. Specialised
@@ -198,7 +208,7 @@ class GDPySWeb:
         resp_str = ""
 
         # Grab handler from handler list. Check if none, use the 404 one.
-        if handler := self.handlers.get(request.path) is None:
+        if (handler := self.handlers.get(request.path)) is None:
             # Use the 404 one.
             handler = self.err_handlers[404]
         
@@ -218,6 +228,11 @@ class GDPySWeb:
                 # Add user as arg.
                 args.append(p)
             
+            if handler.has_status(HandlerTypes.RATE_LIMITED)\
+            and not self._rate_limit(request):
+                # Idk what to do here....
+                pass
+            
             resp_str = await handler.handler(*args)
         
         except GDException as e:
@@ -226,6 +241,11 @@ class GDPySWeb:
             # code to the client.
             resp_str = str(e)
             debug(f"Handler triggered error code {resp_str}") # Temp debug as else it will be triggered a lot.
+        
+        # This is so we don't reveal post request required fields to people scouting.
+        except KeyError:
+            resp_str = "Incorrect post data." # Just assume it tbh
+            debug("Request sent incorrect post data.")
         
         # There has been an actual exception within the handler.
         except Exception:
@@ -313,6 +333,7 @@ class GDPySWeb:
         await site.start()
 
         # Log that its started.
+        debug(f"Server starting with {len(self.handlers)} handlers.")
         info(f"GDPyS HTTP: Started listening on http://127.0.0.1:{port}/")
 
         # Keep alive forever.

@@ -13,8 +13,6 @@ async def register_account(req: Request) -> str:
     username = req.post_data["userName"]
     password = req.post_data["password"] # Plaintext
 
-    print(req.post_data)
-
     # This classmethod takes care of the majority of things such as rising GDException
     # that is later handled by the http server itself.
     u = await User.register(

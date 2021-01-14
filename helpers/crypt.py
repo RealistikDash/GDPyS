@@ -55,7 +55,7 @@ def bcrypt_hash(passw: str, difficulty: int = 10) -> str:
     return bcrypt.hashpw(
         passw.encode(),
         bcrypt.gensalt(difficulty)
-    )
+    ).decode()
 
 def bcrypt_check(plain_pass: str, bcrypt_pass: str) -> bool:
     """Compares a plain text password

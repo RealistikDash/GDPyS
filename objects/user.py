@@ -71,17 +71,19 @@ class User:
             User object if user is found within the database.
         """
 
+        cls = cls()
+
         # Set acc_id.
         cls.id = account_id
 
         # Basic fetch only fetches the stats.
-        await cls.stats_db(cls)
+        await cls.stats_db()
 
         # These are only for "extensive" or "full" fetches
         if full:
-            await cls.messages_db(cls)
-            await cls.friend_reqs_db(cls)
-            await cls.friends_db(cls)
+            await cls.messages_db()
+            await cls.friend_reqs_db()
+            await cls.friends_db()
         return cls
     
     @classmethod
@@ -140,10 +142,11 @@ class User:
             Instance of the newly registered user.
         """
 
+        cls = cls()
+
         # Firstly, we set the local variables so the properties work well.
         cls.name = username
-        cls.bcrypt_pass = bcrypt_hash(password)
-        cls.registered_timestamp = get_timestamp
+        cls.registered_timestamp = get_timestamp()
         cls.email = email
 
         # Now we run checks. First, check if the username exists.
@@ -168,14 +171,17 @@ class User:
         if not (3 < len(username) < 16):
             # Im not sure of the proper error code for this but their name is too long.
             raise GDException("-1")
+        
+        # Do this here as its slow as hell.
+        cls.bcrypt_pass = bcrypt_hash(password)
 
         # Insert them into the db ig.
         cls.id = await glob.sql.execute("""
-            INSERT INTO USERS
-                (username, username_safe, password, timestamp)
+            INSERT INTO users
+                (username, username_safe, password, timestamp, email, req_status)
             VALUES
                 (%s,%s,%s,%s)
-        """, (cls.name, cls.safe_name, cls.bcrypt_pass, cls.registered_timestamp))
+        """, (cls.name, cls.safe_name, cls.bcrypt_pass, cls.registered_timestamp, cls.email, cls.req_states))
 
         # Log.
         debug(f"{cls.name} ({cls.id}) has registered!")

@@ -60,6 +60,7 @@ class MySQLPool:
                 one will be created.
         """
 
+        cls = cls()
         cls._loop = asyncio.get_event_loop() if loop is None else loop
 
         # Ok so here we create the pool.

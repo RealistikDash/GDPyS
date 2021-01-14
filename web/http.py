@@ -40,7 +40,6 @@ class Request:
         Returns:
             GDPyS web request object.
         """
-
         # First we set the post_data
         cls.post_data = await aioreq.post()
         # Next we fetch get_args

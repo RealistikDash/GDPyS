@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Callable, Union
 from .sql import MySQLPool
 from helpers.auth import Auth
+from helpers.common import dict_keys
 from const import HandlerTypes
 from logger import error, info, debug
 from helpers.time_helper import Timer
@@ -73,12 +74,38 @@ class Handler:
     path: str
     handler: Callable[[Request], str]
     status: HandlerTypes = HandlerTypes.PLAIN_TEXT
+    req_postargs: Union[list, tuple] = ()
 
     def has_status(self, status: HandlerTypes):
-        """Checks if the handler has the status `status`"""
+        """Checks if the handler has the status `status`.
+        
+        Args:
+            status (HandlerTypes): The status we are checking
+                for within the handler.
+        """
 
         # These are just bitwise operators so we can to this.
         return bool(self.status & status)
+    
+    def verify_postargs(self, args: Union[list, tuple]) -> bool:
+        """Check if the provided post `args` contain the
+        required information for the handler.
+        
+        Args:
+            args (list, tuple): A list or tuple of the
+                post args provided.
+        
+        Returns:
+            A bool of whether all required post args are
+                included.
+        """
+
+        # Iterate through all required post args and see if
+        # they are in the args list.
+        for arg in self.req_postargs:
+            if arg not in args: return False
+        
+        return True
 
 class GDPySWeb:
     """A low level aiohttp server specialised for usage
@@ -220,6 +247,11 @@ class GDPySWeb:
             if handler.has_status(HandlerTypes.DATABASE):
                 args.append(self.pool)
             
+            # Check if they have the required args.
+            if not handler.verify_postargs(dict_keys(request.post_data)):
+                # Idk just use the error handler.
+                raise KeyError
+            
             # Check if it is authed.
             if handler.has_status(HandlerTypes.AUTHED):
                 if not (p := await self._gd_auth(request.post_data)):
@@ -283,7 +315,8 @@ class GDPySWeb:
         self,
         path: str,
         status: Union[HandlerTypes, int],
-        handler: Callable[[Request], str]
+        handler: Callable[[Request], str],
+        req_postargs: tuple = ()
     ) -> None:
         """Creates a handler object and adds it to handle any request coming
         to `path`.
@@ -300,13 +333,16 @@ class GDPySWeb:
             handler (Callable): The coroutine function for the handler. Must
                 return str for plaintext handlers and dict/list for JSON
                 ones.
+            req_postargs (tuple, list): A list of all of the post arguments
+                required for the request.
         """
 
         # Creating the handler object and setting.
         self.handlers[path] = Handler(
             path= path,
             handler= handler,
-            status= status
+            status= status,
+            req_postargs= req_postargs
         )
     
     # Server start

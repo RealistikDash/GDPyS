@@ -13,8 +13,9 @@ load_config()
 
 # Local Consts
 DB_PREFIX = "/database"
+# path, handler coro, handlertype, required_postargs
 HANDLERS = (
-    ("/accounts/registerGJAccount.php", register_account, HandlerTypes.PLAIN_TEXT),
+    ("/accounts/registerGJAccount.php", register_account, HandlerTypes.PLAIN_TEXT, ("userName", "password", "email", "secret")),
 )
 
 async def main(loop: asyncio.AbstractEventLoop):
@@ -35,7 +36,8 @@ async def main(loop: asyncio.AbstractEventLoop):
         server.add_handler(
             path= DB_PREFIX + handler[0],
             status= handler[2],
-            handler= handler[1]
+            handler= handler[1],
+            req_postargs= handler[3]
         )
 
     await server.start(user_config["http_port"])

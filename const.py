@@ -33,8 +33,8 @@ class ReqStats(IntFlag):
 class Privileges(IntFlag):
     """The GDPyS privileges."""
 
-    LOGIN = 1 << 0
-    # TODO: When not lazy.
+    LOGIN   = 1 << 0
+    COMMENT = 1 << 1
 
 class GenericResponse:
     """Common Geometry Dash response codes."""

@@ -2,16 +2,18 @@ from objects.user import User
 from web.http import Request
 from web.builders import gd_builder
 from const import GenericResponse
+from exceptions import GDException
 from logger import info
+from const import Privileges
 
 async def register_account(req: Request) -> str:
     """Handles the account registration endpoint."""
 
     # Get variables and clean up from postdata.
     # TODO: some checks on this data.
-    email = req.post_data["email"]
-    username = req.post_data["userName"]
-    password = req.post_data["password"] # Plaintext
+    email = req.post_args["email"]
+    username = req.post_args["userName"]
+    password = req.post_args["password"] # Plaintext
 
     # This classmethod takes care of the majority of things such as rising GDException
     # that is later handled by the http server itself.
@@ -24,3 +26,34 @@ async def register_account(req: Request) -> str:
     info(f"User {u.name} ({u.id}) registered successfully.")
     # They have been successfully registered.
     return GenericResponse.COMMON_SUCCESS
+
+async def login_account(req: Request) -> str:
+    """Handles the action of user login.
+    
+    Note:
+        Currently, bcrypt for this authentication is
+            not cached due to it being in plain text,
+            rather than GJP. This means that its slow
+            as BCRYPT!!!
+    """
+
+    # Set all required post args to variables.
+    name = req.post_args["userName"]
+    password = req.post_args["password"]
+
+    u = await User.from_name(name)
+
+    # If they are none, return -1.
+    if not u: raise GDException("-1")
+
+    # Check if they are banned.
+    if not u.has_privilege(Privileges.LOGIN):
+        # They are banned!
+        raise GDException("-12") # Account disabled.
+
+    # Check their password last as this slow.
+    if not u.check_pass(password): raise GDException("-1")
+
+    info(f"{u} ({u.id}) has successfully authenticated!")
+    # Since we do not have user ids, we just use the account ids.
+    return f"{u.id},{u.id}"

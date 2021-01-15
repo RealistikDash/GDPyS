@@ -6,7 +6,7 @@ import uvloop
 import asyncio
 
 # Handler imports.
-from handlers.login import register_account
+from handlers.login import register_account, login_account
 
 # Load config
 load_config()
@@ -16,6 +16,7 @@ DB_PREFIX = "/database"
 # path, handler coro, handlertype, required_postargs
 HANDLERS = (
     ("/accounts/registerGJAccount.php", register_account, HandlerTypes.PLAIN_TEXT, ("userName", "password", "email", "secret")),
+    ("/accounts/loginGJAccount.php", login_account, HandlerTypes.PLAIN_TEXT, ("udid", "userName", "password", "secret", "sID"))
 )
 
 async def main(loop: asyncio.AbstractEventLoop):

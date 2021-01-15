@@ -1,7 +1,7 @@
 # Helper that assists with the whole process of authentication.
 from objects.user import User
 from .cache import Cache
-from .crypt import bcrypt_check, gjp_decode
+from .crypt import gjp_decode
 from typing import Union
 from logger import debug
 
@@ -76,10 +76,7 @@ class Auth:
         p_pass = gjp_decode(gjp)
 
         # Now we compare the p_pass with bcrypt.
-        if bcrypt_check(
-            p_pass,
-            p.bcrypt_pass
-        ):
+        if p.check_pass(p_pass):
             # They successfully authed. Store this bcrypt in cache for speed.
             self._correct_gjps.cache_object(account_id, gjp)
 

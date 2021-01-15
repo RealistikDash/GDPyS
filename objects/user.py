@@ -1,4 +1,4 @@
-from helpers.crypt import bcrypt_hash
+from helpers.crypt import bcrypt_hash, bcrypt_check
 from helpers.time_helper import get_timestamp
 from dataclasses import dataclass
 from const import ReqStats, Privileges
@@ -87,6 +87,40 @@ class User:
         return cls
     
     @classmethod
+    async def from_name(cls, name: str):
+        """Attempts to fetch the user object from their name.
+        
+        Note:
+            Currently, this function works by looking up the
+                name within the database and then calling the
+                `from_id` classmethod. While slightly slower,
+                it shouldn't be too much. However, please use
+                `from_id` wherever you can so less stress on
+                the db.
+        
+        Args:
+            name (str): The username of the account we will
+                fetch.
+        
+        Returns:
+            If user found, instance of the `User` object is returned.
+            If not found, `None` is returned.
+        """
+
+        # Use safe_username for a quicker lookup.
+        safe_uname = name.lower().replace(" ", "_")
+
+        # Grab id from db.
+        a_id = await glob.sql.fetchone("SELECT id FROM users WHERE username_safe = %s LIMIT 1", (safe_uname,))
+
+        # Check if they are found.
+        if a_id is None:
+            return
+        
+        # Use the from_id classmethod.
+        return await cls.from_id(a_id[0])
+    
+    @classmethod
     async def from_id(cls, account_id: int):
         """Attempts for fetch the account with the ID of `account_id` from
         multiple sources, which are ordered from fastest to slowest.
@@ -165,7 +199,9 @@ class User:
         ))
         if em_exists:
             # Im not sure of the proper error but an acc with that email already exists.
-            raise GDException("-1")
+            raise GDException("-6")
+        
+        # TODO: Regex check for the email.
 
         # Check name length
         if not (3 < len(username) < 16):
@@ -180,8 +216,8 @@ class User:
             INSERT INTO users
                 (username, username_safe, password, timestamp, email, req_status)
             VALUES
-                (%s,%s,%s,%s)
-        """, (cls.name, cls.safe_name, cls.bcrypt_pass, cls.registered_timestamp, cls.email, cls.req_states))
+                (%s,%s,%s,%s,%s,%s)
+        """, (cls.name, cls.safe_name, cls.bcrypt_pass, cls.registered_timestamp, cls.email, int(cls.req_states)))
 
         # Log.
         debug(f"{cls.name} ({cls.id}) has registered!")
@@ -227,14 +263,14 @@ class User:
         # Set all the variables.
         priv = 0 # Idk i got an error without it
 
-        self.name, priv,
+        (self.name, priv,
         self.email, self.bcrypt_pass,
         self.registered_timestamp,
         self.stats.stars, self.stats.diamonds,
         self.stats.coins, self.stats.u_coins,
         self.stats.demons, self.stats.cp,
         self.youtube_url, self.twitter_url,
-        self.twitch_url, req_status  = db_user
+        self.twitch_url, req_status)  = db_user
 
         # Set special objects from data
         self.privileges = Privileges(priv)
@@ -260,3 +296,45 @@ class User:
 
         # TODO: do this once not tired.
         return
+    
+    def __str__(self) -> str:
+        """Returns the username of the `User` object."""
+
+        return self.name
+    
+    def __repr__(self) -> str:
+        """A string representation of the `User` object."""
+
+        return f"<User {self.name} ({self.id})>"
+    
+    def check_pass(self, password: str) -> bool:
+        """Compares the passed plaintext `password` to the
+        BCrypt hashed password.
+        
+        Note:
+            This does NOT use the GJP cache, meaning it is
+                as slow as BCrypt is. Please consider this.
+        
+        Args:
+            password (str): The plaintext version of the
+                password to compare the BCrypt to.
+        
+        Returns:
+            Bool of whether the passwords match.
+        """
+
+        return bcrypt_check(password, self.bcrypt_pass)
+    
+    def has_privilege(self, priv: Privileges) -> bool:
+        """Check if the user has the permission `priv`.
+        
+        Args:
+            priv (Privileges): The privilege int flag
+                to check for within the user's priv
+                int flag.
+        
+        Returns:
+            Bool whether int flag is present.
+        """
+
+        return bool(self.privileges & priv)

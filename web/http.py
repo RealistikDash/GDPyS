@@ -22,7 +22,7 @@ class Request:
         """Fills all defaults for the object. Please
         use classmethods instead of this."""
 
-        self.post_data: dict = {}
+        self.post_args: dict = {}
         self.get_args: dict = {}
         self.headers: dict = {}
         self.ip: str = "127.0.0.1"
@@ -40,8 +40,8 @@ class Request:
         Returns:
             GDPyS web request object.
         """
-        # First we set the post_data
-        cls.post_data = await aioreq.post()
+        # First we set the post_args
+        cls.post_args = await aioreq.post()
         # Next we fetch get_args
         cls.get_args = aioreq.rel_url.query
         # Set headers
@@ -51,7 +51,6 @@ class Request:
 
         # Now we grab the ip. This requires some logic so we don't
         # get nginx's ip all the time.
-        ip = ""
         if ip := aioreq.headers.get("x-real-ip"):
             cls.ip = ip
             return cls
@@ -200,13 +199,13 @@ class GDPySWeb:
         # Set it globally.
         glob.sql = self.pool
     
-    async def _gd_auth(self, post_data: dict) -> bool:
+    async def _gd_auth(self, post_args: dict) -> bool:
         """Handles authentication for Geometry Dash handlers."""
 
         # TODO: Anti-botting checks for vers and binaryver and secrets
         return await self.auth.gjp_check(
-            int(post_data["accountID"]),
-            post_data["gjp"]
+            int(post_args["accountID"]),
+            post_args["gjp"]
         )
     
     def _rate_limit(self, req: Request) -> bool:
@@ -247,13 +246,13 @@ class GDPySWeb:
                 args.append(self.pool)
             
             # Check if they have the required args.
-            if not handler.verify_postargs(dict_keys(request.post_data)):
+            if not handler.verify_postargs(dict_keys(request.post_args)):
                 # Idk just use the error handler.
                 raise KeyError
             
             # Check if it is authed.
             if handler.has_status(HandlerTypes.AUTHED):
-                if not (p := await self._gd_auth(request.post_data)):
+                if not (p := await self._gd_auth(request.post_args)):
                     raise GDException("-1")
 
                 # Add user as arg.

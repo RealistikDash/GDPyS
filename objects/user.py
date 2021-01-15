@@ -8,14 +8,150 @@ from exceptions import GDException
 
 @dataclass
 class Stats:
-    """An object representation of a user's stats."""
+    """An object representation of a user's stats, Providing
+    storage and assistance for working with stats."""
 
+    user_id: int = 0
     stars: int = 0
     diamonds: int = 0
     coins: int = 0
     u_coins: int = 0
     demons: int = 0
     cp: int = 0
+    rank: int = 0
+
+    # Icons
+    colour1: int = 0
+    colour2: int = 0
+    icon: int = 0
+    ship: int = 0
+    ufo: int = 0
+    wave: int = 0
+    robot: int = 0
+    spider: int = 0
+    explosion: int = 0
+    glow: bool = False
+    display_icon: int = 0
+
+    async def calc_rank(self):
+        """Calculates the leaderboards placement for the user
+        using the MySQL database.
+        """
+
+        # We don't count ranks for users with 0 stars.
+        if not self.stars:
+            # Count how many users are ahead of us that are not banned.
+            stars_db = await glob.sql.fetchone(
+                "SELECT COUNT(*) FROM users WHERE stars > %s AND privileges & %s",
+                (self.stars, Privileges.LOGIN)
+            )
+
+            self.rank = stars_db[0] + 1
+    
+    async def from_sql(self, full: bool = True):
+        """Sets the statistics for user directly from the MySQL
+        database.
+        
+        Args:
+            full (bool): Whether extra details such as rank should
+                be calculated.
+        """
+
+        # Execute the query to fetch data.
+        stats_sql = await glob.sql.fetchone(
+            """
+            SELECT
+                stars,
+                diamonds,
+                coins,
+                ucoins,
+                demons,
+                cp,
+                colour1,
+                colour2,
+                icon,
+                ship,
+                ufo,
+                wave,
+                robot,
+                spider,
+                explosion,
+                glow,
+                display_icon
+            FROM users
+            WHERE
+                id = %s
+            LIMIT 1
+            """,
+            (self.user_id,)
+        )
+
+        # Now we set the data.
+        (self.stars, self.diamonds,
+        self.coins, self.u_coins,
+        self.demons, self.cp,
+        self.colour1, self.colour2,
+        self.icon, self.ship,
+        self.ufo, self.wave,
+        self.robot, self.spider,
+        self.explosion, self.glow,
+        self.display_icon) = stats_sql
+
+        if full:
+            await self.calc_rank()
+    
+    async def set_stats(self, **kwargs):
+        """Sets the statistics for a user from kwargs provided.
+        
+        Note:
+            This affects both the local object and the data
+                stored within the MySQL database.
+
+        Kwargs:
+            stars (int): The new starcount for the user.
+            diamonds (int): The new diamond count for the
+                user.
+            coins (int): The new golden coin count for the
+                user.
+            u_coins (int): The new verified user coin count
+                for the user.
+            demons (int): The new demon count for the user.
+            cp (int): The new creator point count for the user.
+            colour1 (int): The new primary colour of the user.
+            colour2 (int): The new secondary colour of the user.
+            icon (int): The cube icon enum for the user.
+            ship (int): The ship icon enum for the user.
+            ufo (int): The UFO icon enum for the user.
+            wave (int): The wave icon enum for the user.
+            robot (int): The robot icon enum for the user.
+            spider (int): The spider icon enum for the user.
+            explosion (int): The explosion item enum that the
+                user has equipped.
+            display_icon (int): The icon that will be displayed
+                on the leaderboards and profile.
+            glow (bool): Whether the user's icons should have
+                glow around them.
+        """
+
+        self.stars = kwargs.get("stars", self.stars)
+        self.diamonds = kwargs.get("diamonds", self.diamonds)
+        self.coins = kwargs.get("coins", self.coins)
+        self.u_coins = kwargs.get("u_coins", self.u_coins)
+        self.demons = kwargs.get("demons", self.demons)
+        self.cp = kwargs.get("cp", self.cp)
+        self.colour1 = kwargs.get("colour1", self.colour1)
+        self.colour2 = kwargs.get("colour2", self.colour2)
+        self.icon = kwargs.get("icon", self.icon)
+        self.ship = kwargs.get("ship", self.ship)
+        self.ufo = kwargs.get("ufo", self.ufo)
+        self.wave = kwargs.get("wave", self.wave)
+        self.robot = kwargs.get("robot", self.robot)
+        self.spider = kwargs.get("spider", self.spider)
+        self.explosion = kwargs.get("explosion", self.explosion)
+        self.display_icon = kwargs.get("display_icon", self.display_icon)
+        self.glow = kwargs.get("glow", self.glow)
+
+        # TODO: MySQL once not tired.
 
 class User:
     """The primary class for the representation of GDPyS users.
@@ -72,6 +208,9 @@ class User:
         """
 
         cls = cls()
+
+        # Set stats id
+        cls.stats.user_id = account_id
 
         # Set acc_id.
         cls.id = account_id
@@ -240,12 +379,6 @@ class User:
                 email,
                 password,
                 timestamp,
-                stars,
-                diamonds,
-                coins,
-                ucoins,
-                demons,
-                cp,
                 yt_url,
                 twitter_url,
                 twitch_url,
@@ -266,17 +399,15 @@ class User:
         (self.name, priv,
         self.email, self.bcrypt_pass,
         self.registered_timestamp,
-        self.stats.stars, self.stats.diamonds,
-        self.stats.coins, self.stats.u_coins,
-        self.stats.demons, self.stats.cp,
         self.youtube_url, self.twitter_url,
         self.twitch_url, req_status)  = db_user
 
         # Set special objects from data
         self.privileges = Privileges(priv)
         self.req_states = ReqStats(req_status)
-        
-        return
+
+        # Set statistics.
+        await self.stats.from_sql()
     
     async def messages_db(self):
         """Sets the user messages from the database."""

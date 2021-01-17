@@ -1,5 +1,6 @@
 from time import localtime, strftime
 from colorama import Fore, Back
+from helpers.time_helper import formatted_date
 import sys
 import os
 
@@ -21,11 +22,6 @@ if os.name == "nt":
         7
     )
 
-def getDate():
-    """Get timestamp"""
-    
-    return strftime("%Y-%m-%d %H:%M:%S", localtime())
-
 def logMessage(**kwargs):
     """Form message to be logged"""
     # Get kwargs
@@ -42,7 +38,7 @@ def logMessage(**kwargs):
     }.get(back_colour, Back.GREEN)
         
     # Output
-    logConsole = f'{Fore.WHITE}{bg_colour}[{logType}]{CLEAR_BACK} - [{getDate()}] {content}{CLEAR_FORE}'
+    logConsole = f'{Fore.WHITE}{bg_colour}[{logType}]{CLEAR_BACK} - [{formatted_date()}] {content}{CLEAR_FORE}'
     print(logConsole)
 
 def debug(message: str):

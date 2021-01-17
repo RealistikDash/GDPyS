@@ -84,3 +84,9 @@ def time_str(timer: Timer) -> str:
     else:
         time_str = f"{round(time,2)}s"
     return time_str
+
+def formatted_date():
+    """Returns the current fromatted date in the format
+    DD/MM/YYYY HH:MM:SS"""
+    
+    return time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())

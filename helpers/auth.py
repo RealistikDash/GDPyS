@@ -4,6 +4,7 @@ from .cache import Cache
 from .crypt import gjp_decode
 from typing import Union
 from logger import debug
+from const import Privileges
 
 class Auth:
     """A helper that assists with the task of authenticating
@@ -60,6 +61,9 @@ class Auth:
         # Check if they even exist
         if not p:
             return
+        
+        # Banned users are auto denied.
+        if not p.has_privilege(Privileges.LOGIN): return
 
         # Now we check if perhaps we already cached their val.
         if cached_gjp := self._correct_gjps.get_cache_object(account_id):

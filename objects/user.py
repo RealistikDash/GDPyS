@@ -27,6 +27,7 @@ class Stats:
     ship: int = 0
     ufo: int = 0
     wave: int = 0
+    ball: int = 0
     robot: int = 0
     spider: int = 0
     explosion: int = 0
@@ -43,7 +44,7 @@ class Stats:
             # Count how many users are ahead of us that are not banned.
             stars_db = await glob.sql.fetchone(
                 "SELECT COUNT(*) FROM users WHERE stars > %s AND privileges & %s",
-                (self.stars, Privileges.LOGIN)
+                (self.stars, int(Privileges.LOGIN))
             )
 
             self.rank = stars_db[0] + 1
@@ -73,6 +74,7 @@ class Stats:
                 ship,
                 ufo,
                 wave,
+                ball,
                 robot,
                 spider,
                 explosion,
@@ -92,7 +94,7 @@ class Stats:
         self.demons, self.cp,
         self.colour1, self.colour2,
         self.icon, self.ship,
-        self.ufo, self.wave,
+        self.ufo, self.wave, self.ball,
         self.robot, self.spider,
         self.explosion, self.glow,
         self.display_icon) = stats_sql

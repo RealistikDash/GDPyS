@@ -7,6 +7,7 @@ import asyncio
 
 # Handler imports.
 from handlers.login import register_account, login_account
+from handlers.profiles import user_info
 
 # Load config
 load_config()
@@ -16,7 +17,8 @@ DB_PREFIX = "/database"
 # path, handler coro, handlertype, required_postargs
 HANDLERS = (
     ("/accounts/registerGJAccount.php", register_account, HandlerTypes.PLAIN_TEXT, ("userName", "password", "email", "secret")),
-    ("/accounts/loginGJAccount.php", login_account, HandlerTypes.PLAIN_TEXT, ("udid", "userName", "password", "secret", "sID"))
+    ("/accounts/loginGJAccount.php", login_account, HandlerTypes.PLAIN_TEXT, ("udid", "userName", "password", "secret", "sID")),
+    ("/getGJUserInfo20.php", user_info, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("gameVersion", "binaryVersion", "gdw", "accountID", "gjp", "targetAccountID", "secret"))
 )
 
 async def main(loop: asyncio.AbstractEventLoop):

@@ -71,4 +71,4 @@ def gd_dict_str(d: Dict[int, str], separator: str = ":") -> str:
         a += [key, val]
     
     # Combine them all and send off.
-    return separator.join(a)
+    return separator.join(str(i) for i in a)

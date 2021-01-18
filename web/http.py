@@ -290,6 +290,8 @@ class GDPySWeb:
             handler = self.err_handlers[500]
             resp_str = await handler.handler(request, tb)
         
+        # Just ensure it is str.
+        resp_str = str(resp_str)
         # Converting the response we got into aiohttp objects.
 
         # Plaintext responses are simple.

@@ -51,3 +51,16 @@ def dict_keys(d: dict) -> tuple:
 
     # I decided to use tuple as its immutable.
     return tuple(d)
+
+def safe_username(uname: str) -> str:
+    """Generates a "safe username" from a regular username.
+    
+    Args:
+        uname (str): The username to convert to a safe variant.
+    
+    Returns:
+        The username string that is lowercase and ` ` replaced
+            with `_`.
+    """
+
+    return uname.lower().replace(" ", "_")

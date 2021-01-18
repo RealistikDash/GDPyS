@@ -35,8 +35,8 @@ async def user_info(req: Request, user: User):
         16: target.id,
         17: target.stats.u_coins,
         # States.
-        18: 1 if target.req_states & ReqStats.MESSAGES else 0,
-        19: 1 if target.req_states & ReqStats.REQUESTS else 0,
+        18: 0 if target.req_states & ReqStats.MESSAGES else 1,
+        19: 0 if target.req_states & ReqStats.REQUESTS else 1,
         20: target.youtube_url,
         21: target.stats.icon,
         22: target.stats.ship,
@@ -54,7 +54,56 @@ async def user_info(req: Request, user: User):
         46: target.stats.diamonds,
         48: target.stats.explosion,
         49: 0, # TODO: Mod levels (when privileges are done.)
-        50: 1 if target.req_states & ReqStats.COMMENTS else 0
+        50: 0 if target.req_states & ReqStats.COMMENTS else 1
     }
 
     return gd_dict_str(resp_dict)
+
+async def update_stats(req: Request, user: User):
+    """Handles the `updateGJUserScore22.php` endpoint."""
+
+    # TODO: Analyse the data coming in for Cheatless AC.
+    # TODO: Investigate the use of seed and seed2 for anticheat.
+
+    # Converting these to int also ensures proper input is passed.
+    stars        = int(req.post_args.get("stars", 0))
+    demons       = int(req.post_args.get("demons", 0))
+    display_icon = int(req.post_args.get("icon", 0))
+    diamonds     = int(req.post_args.get("diamonds", 0))
+    colour1      = int(req.post_args.get("color1", 0))
+    colour2      = int(req.post_args.get("color2", 1))
+    icon         = int(req.post_args.get("accIcon", 0))
+    ship         = int(req.post_args.get("accShip", 0))
+    ball         = int(req.post_args.get("accBall", 0))
+    ufo          = int(req.post_args.get("accBird", 0))
+    wave         = int(req.post_args.get("accDart", 0))
+    robot        = int(req.post_args.get("accRobot", 0))
+    glow         = int(req.post_args.get("accGlow", 0))
+    spider       = int(req.post_args.get("accSpider", 0))
+    explosion    = int(req.post_args.get("accExplosion", 0))
+    coins        = int(req.post_args.get("coins", 0))
+    u_coins      = int(req.post_args.get("userCoints", 0))
+
+    # Now we set them for the user.
+    await user.stats.set_stats(
+        stars= stars,
+        diamonds= diamonds,
+        coins= coins,
+        u_coins = u_coins,
+        demons= demons,
+        colour1= colour1,
+        colour2= colour2,
+        icon= icon,
+        ship= ship,
+        ufo= ufo,
+        wave= wave,
+        robot= robot,
+        ball= ball,
+        spider= spider,
+        explosion= explosion,
+        display_icon= display_icon,
+        glow= glow
+    )
+
+    # We have to return the users account ID.
+    return user.id

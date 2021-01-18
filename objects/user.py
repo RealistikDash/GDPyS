@@ -1,5 +1,6 @@
 from helpers.crypt import bcrypt_hash, bcrypt_check
 from helpers.time_helper import get_timestamp
+from helpers.common import safe_username
 from dataclasses import dataclass
 from const import ReqStats, Privileges
 from logger import debug
@@ -126,6 +127,7 @@ class Stats:
             ufo (int): The UFO icon enum for the user.
             wave (int): The wave icon enum for the user.
             robot (int): The robot icon enum for the user.
+            ball (int): The ball icon enum for the user.
             spider (int): The spider icon enum for the user.
             explosion (int): The explosion item enum that the
                 user has equipped.
@@ -135,6 +137,7 @@ class Stats:
                 glow around them.
         """
 
+        # Set all values from kwargs, with old values as defaults.
         self.stars = kwargs.get("stars", self.stars)
         self.diamonds = kwargs.get("diamonds", self.diamonds)
         self.coins = kwargs.get("coins", self.coins)
@@ -148,12 +151,43 @@ class Stats:
         self.ufo = kwargs.get("ufo", self.ufo)
         self.wave = kwargs.get("wave", self.wave)
         self.robot = kwargs.get("robot", self.robot)
+        self.ball = kwargs.get("ball", self.ball)
         self.spider = kwargs.get("spider", self.spider)
         self.explosion = kwargs.get("explosion", self.explosion)
         self.display_icon = kwargs.get("display_icon", self.display_icon)
         self.glow = kwargs.get("glow", self.glow)
 
-        # TODO: MySQL once not tired.
+        # Set all the values within the database.
+        await glob.sql.execute("""
+            UPDATE users SET
+                stars = %s,
+                diamonds = %s,
+                coins = %s,
+                ucoins = %s,
+                demons = %s,
+                cp = %s,
+                colour1 = %s,
+                colour2 = %s,
+                icon = %s,
+                ship = %s,
+                ufo = %s,
+                wave = %s,
+                robot = %s,
+                ball = %s,
+                spider = %s,
+                explosion = %s,
+                display_icon = %s,
+                glow = %s
+            WHERE id = %s LIMIT 1                
+        """, (
+            self.stars, self.diamonds, self.coins,
+            self.u_coins, self.demons, self.cp,
+            self.colour1, self.colour2, self.icon,
+            self.ship, self.ufo, self.wave,
+            self.robot, self.ball, self.spider,
+            self.explosion, self.display_icon, int(self.glow),
+            self.user_id
+        ))
 
 class User:
     """The primary class for the representation of GDPyS users.
@@ -192,7 +226,7 @@ class User:
         spaces replaced by underscores. Made to allow quick lookups
         and safe working."""
 
-        return self.name.lower().replace(" ", "_")
+        return safe_username(self.name)
     
     @classmethod
     async def from_sql(cls, account_id: int, full: bool = True):
@@ -249,7 +283,7 @@ class User:
         """
 
         # Use safe_username for a quicker lookup.
-        safe_uname = name.lower().replace(" ", "_")
+        safe_uname = safe_username(name)
 
         # Grab id from db.
         a_id = await glob.sql.fetchone("SELECT id FROM users WHERE username_safe = %s LIMIT 1", (safe_uname,))

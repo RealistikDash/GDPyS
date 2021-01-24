@@ -64,3 +64,22 @@ def safe_username(uname: str) -> str:
     """
 
     return uname.lower().replace(" ", "_")
+
+
+def paginate_list(list_to_paginate: list, page: int, elems_page: int = 10):
+    """Grabs a 'page' out of the given `list_to_paginate`
+    and returns a section `elems_page` large.
+    
+    Args:
+        list_to_paginate (list): The list of items you
+            would like to get the page of.
+        page (int): The number of the page (starting
+            with 0) you would like to fetch.
+        elems_page (int): The number of elements that
+            should be present within a page.
+    
+    Returns:
+        A list of elements.
+    """
+    offset = page * elems_page
+    return list_to_paginate[offset : offset + elems_page]

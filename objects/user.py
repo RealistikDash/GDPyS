@@ -5,7 +5,9 @@ from dataclasses import dataclass
 from const import ReqStats, Privileges
 from logger import debug
 from .glob import glob
+from .comments import AccountComment
 from exceptions import GDException
+from typing import List
 
 @dataclass
 class Stats:
@@ -219,6 +221,7 @@ class User:
         self.messages: list = []
         self.friend_reqs: list = []
         self.friends: list = []
+        self.account_comments: List[AccountComment] = []
     
     @property
     def safe_name(self) -> str:
@@ -259,6 +262,7 @@ class User:
             await cls.messages_db()
             await cls.friend_reqs_db()
             await cls.friends_db()
+            await cls.accomment_db()
         return cls
     
     @classmethod
@@ -444,6 +448,26 @@ class User:
 
         # Set statistics.
         await self.stats.from_sql()
+    
+    async def accomment_db(self):
+        """Sets and populates the account comment list
+        with `AccountComment` objects of the user."""
+
+        # Get rid of possible old comments.
+        self.account_comments.clear()
+
+        # Firstly, we will directly fetch the user's comments from db.
+        acomments_db = await glob.sql.fetchall(
+            "SELECT id, account_id, likes, content, timestamp FROM "
+            "a_comments WHERE account_id = %s ORDER BY timestamp DESC",
+            (self.id,)
+        )
+
+        # These should be already ordered, just create the objects now.
+        for com in acomments_db:
+            self.account_comments.append(
+                AccountComment.from_tuple(com)
+            )
     
     async def messages_db(self):
         """Sets the user messages from the database."""

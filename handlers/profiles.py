@@ -1,7 +1,13 @@
 from objects.user import User
 from web.http import Request # Pylint appeasement.
-from web.builders import gd_dict_str
+from web.builders import gd_dict_str, gd_builder
+from helpers.common import paginate_list
+from helpers.crypt import base64_encode
+from helpers.time_helper import time_ago
 from const import ReqStats
+from exceptions import GDException
+from typing import List
+from objects.comments import AccountComment
 
 async def user_info(req: Request, user: User):
     """Handles the `getGJUserInfo20.php` endpoint."""
@@ -107,3 +113,40 @@ async def update_stats(req: Request, user: User):
 
     # We have to return the users account ID.
     return user.id
+
+async def account_comments(req: Request):
+    """Handles the `getGJAccountComments20.php` endpoint."""
+
+    # We fetch data from post data.
+    page = int(req.post_args["page"])
+    target_id = int(req.post_args["accountID"])
+
+    target_user = await User.from_id(target_id)
+    
+    # Check if user found.
+    if not target_user:
+        raise GDException("-1")
+
+    # Ok so first we have to only grab the specific section
+    # the gd client wants as its only asking for like 10
+    # at a time.
+    a_com = paginate_list(
+        target_user.account_comments,
+        page,
+        10
+    )
+
+
+    f_comments = "|".join([
+        gd_dict_str({
+            2: base64_encode(i.content),
+            4: i.likes,
+            6: i.id,
+            9: time_ago(i.timestamp),
+            12: "255,255,255" # TODO: When privilege groups are added.
+        }, "~") for i in a_com
+    ])
+
+    # We append pagination details.
+    f_comments += f"#{len(target_user.account_comments)}:{page}:10"
+    return f_comments

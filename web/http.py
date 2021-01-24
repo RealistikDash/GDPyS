@@ -291,7 +291,10 @@ class GDPySWeb:
             resp_str = await handler.handler(request, tb)
         
         # Just ensure it is str.
-        resp_str = str(resp_str)
+        resp_str = str(resp_str) if not handler.has_status(HandlerTypes.JSON) else resp_str
+
+        # Debug log the resp.
+        debug(resp_str)
         # Converting the response we got into aiohttp objects.
 
         # Plaintext responses are simple.

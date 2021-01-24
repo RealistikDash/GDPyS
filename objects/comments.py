@@ -7,7 +7,7 @@ class AccountComment:
     def __init__(self):
         """Sets all default values for the object.
         Use classmethods instead."""
-
+        
         self.id: int = -1 # -1 means not in db.
         self.account_id: int = 0 # Thought about making this an acc object but that could lead to ram issues etc.
         self.likes: int = 0
@@ -15,7 +15,7 @@ class AccountComment:
         self.timestamp: int = 0 # UNIX style timestamp.
     
     @classmethod
-    def from_db(cls, comment_id: int):
+    async def from_db(cls, comment_id: int):
         """Fetches the account comment directly
         from the database and creates the
         `AccountComment` object.
@@ -60,17 +60,20 @@ class AccountComment:
         
         Args:
             from_t (tuple): Tuple with date in the order
-                of account_id, likes, content, timestamp.
+                of id, account_id, likes, content, timestamp.
         """
 
         cls = cls()
 
         (
+            cls.id,
             cls.account_id,
             cls.likes,
             cls.content,
             cls.timestamp
         ) = from_t
+
+        return cls
 
     async def insert(self):
         """Inserts the content of the object directly

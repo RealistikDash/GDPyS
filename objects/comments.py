@@ -1,4 +1,5 @@
 from .glob import glob
+from helpers.time_helper import get_timestamp
 
 class AccountComment:
     """An object representation of Geometry Dash
@@ -74,6 +75,32 @@ class AccountComment:
         ) = from_t
 
         return cls
+    
+    @classmethod
+    def from_text(cls, account_id: int, content: str):
+        """Creates a new account comment object from the
+        `content` argument.
+        
+        Note:
+            This is commonly used for the creation of new
+                posts, and therefore is mostly tailored to
+                that function.
+
+        Args:
+            account_id (int): The account ID of the user
+                the comment should be assigned to.
+            content (str): The plaintext contents of the
+                account comment. 
+        """
+
+        cls = cls()
+
+        # Now we set the main details
+        cls.account_id = account_id
+        cls.content = content
+
+        # And we also set the current timestamp.
+        cls.timestamp = get_timestamp()
 
     async def insert(self):
         """Inserts the content of the object directly
@@ -100,6 +127,10 @@ class AccountComment:
 
         # Now we set the id as lastrowid.
         self.id = row
+
+        # If the user is already cached, append the comment to them.
+        if u := glob.user_cache.get_cache_object(self.account_id):
+            u.account_comments.insert(0, self)
     
     async def save(self):
         """Saves the current version of the object to
@@ -122,3 +153,13 @@ class AccountComment:
             "timestamp = %s WHERE id = %s LIMIT 1",
             (self.account_id, self.likes, self.content, self.timestamp, self.id)
         )
+
+        # If the user is already cached, update their 
+        # comments. This is necessary as there isnt a 
+        # global acc comment cache *yet*.
+        if u := glob.user_cache.get_cache_object(self.account_id):
+            # Look for a comment with the matching id.
+            for enu, com in enumerate(u.account_comments):
+                if com.id == self.id:
+                    u.account_comments[enu] = self
+                    break

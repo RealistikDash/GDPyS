@@ -102,6 +102,8 @@ class AccountComment:
         # And we also set the current timestamp.
         cls.timestamp = get_timestamp()
 
+        return cls
+
     async def insert(self):
         """Inserts the content of the object directly
         into the MySQL database.

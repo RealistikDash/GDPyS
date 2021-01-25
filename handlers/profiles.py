@@ -2,7 +2,7 @@ from objects.user import User
 from web.http import Request # Pylint appeasement.
 from web.builders import gd_dict_str, gd_builder
 from helpers.common import paginate_list
-from helpers.crypt import base64_encode
+from helpers.crypt import base64_encode, base64_decode
 from helpers.time_helper import time_ago
 from const import ReqStats
 from exceptions import GDException
@@ -150,3 +150,21 @@ async def account_comments(req: Request):
     # We append pagination details.
     f_comments += f"#{len(target_user.account_comments)}:{page}:10"
     return f_comments
+
+async def upload_acc_comment(req: Request, user: User) -> str:
+    """Handles the `uploadGJAccComment20.php` endpoint."""
+
+    # We grab the content from post args and immidiately decode b64
+    content = base64_decode(req.post_args["comment"])
+
+    # Now we create the account comment object from scratch.
+    com = AccountComment.from_text(
+        account_id= user.id,
+        content= content
+    )
+
+    # And lastly we insert it into the db.
+    await com.insert()
+
+    # Idk just give them a success.
+    return 1

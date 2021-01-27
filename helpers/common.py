@@ -3,12 +3,12 @@ from typing import Union
 import os
 try:
     from orjson import loads as json_load
-    from orjson import dumps as json_dump
+    from json import dump as json_dump
 except ImportError:
     # there is always one person in milion peoples that
     # orjson wont work for them so thats a backup
+    from json import loads as json_load
     from json import dump as json_dump
-    from json import load as json_load
 
 class JsonFile:
     """Assists within working with simple JSON files."""
@@ -25,7 +25,7 @@ class JsonFile:
         self.file_name = file_name
         if os.path.exists(file_name):
             with open(file_name) as f:
-                self.file = json_load(f)
+                self.file = json_load(f.read())
 
     def get_file(self) -> dict:
         """Returns the loaded JSON file as a dict.

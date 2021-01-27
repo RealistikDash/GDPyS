@@ -1,5 +1,5 @@
 from helpers.common import JsonFile, dict_keys
-from logger import info
+from logger import info, debug
 import os
 import json
 
@@ -23,8 +23,6 @@ class ConfigReader:
     
     def __init_subclass__(cls, stop_on_update: bool = False):
         """Sets and reads the config child class."""
-
-        cls.__init__(cls)
 
         # Now we read all of the annotated valiables.
         for var_name, key_type in cls.__annotations__.items():
@@ -55,6 +53,11 @@ class ConfigReader:
             Value of the key.
         """
 
+        # Handle a case where the file is empty/not found.
+        if self.json.file is None:
+            # Set it to an empty dict so it can be handled with the thing below.
+            self.json.file = {}
+
         # Check if the key is present. If not, set it.
         if key not in dict_keys(self.json.file):
             # Set it so we can check if the key was modified.
@@ -82,7 +85,11 @@ class Config(ConfigReader):
     sql_user: str = "root"
     sql_db: str = "GDPyS"
     sql_password: str = ""
-    dadadada: str = "aaaa"
-
 
 conf = Config()
+
+# TODO: Fix this
+if conf.updated:
+    info("The config has just been updated! Please edit according to your preferences!")
+    debug("Keys added: " + ", ".join(conf.updated_keys))
+    raise SystemExit

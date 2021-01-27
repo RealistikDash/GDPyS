@@ -1,6 +1,6 @@
 from web.http import GDPySWeb
 from objects.glob import glob
-from config import user_config, load_config
+from config import conf
 from const import HandlerTypes
 import uvloop
 import asyncio
@@ -15,7 +15,6 @@ from handlers.profiles import (
 )
 
 # Load config
-load_config()
 
 # Local Consts
 DB_PREFIX = "/database"
@@ -36,10 +35,10 @@ async def main(loop: asyncio.AbstractEventLoop):
 
     # Create mysql conn.
     await server.config_sql(
-        host= user_config["sql_host"],
-        user= user_config["sql_user"],
-        password= user_config["sql_password"],
-        database= user_config["sql_db"]
+        host= conf.sql_host,
+        user= conf.sql_user,
+        password= conf.sql_password,
+        database= conf.sql_db
     )
 
     # SET ALL THE HANDLERS
@@ -51,7 +50,7 @@ async def main(loop: asyncio.AbstractEventLoop):
             req_postargs= handler[3]
         )
 
-    await server.start(user_config["http_port"])
+    await server.start(conf.http_port)
 
 if __name__ == "__main__":
     # Here we are using uvloop rather than the defauly

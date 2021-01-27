@@ -1,61 +1,88 @@
-# This is like the 50th time i re-use this
-from helpers.common import JsonFile
+from helpers.common import JsonFile, dict_keys
 from logger import info
 import os
 import json
 
 __name__ = "ConfigModule"
 __author__ = "RealistikDash"
+__version__ = "v2.0.0"
 
-default_config = {
-    "http_port": 8080,
-    "sql_host": "localhost",
-    "sql_user": "root",
-    "sql_db": "GDPyS",
-    "sql_password": ""
-}
+class ConfigReader:
+    """A parent class meant for the easy management, updating
+    and the creation of a configuration `JSON` file."""
 
-user_config = {}
+    def __init__(self):
+        """Sets placeholder variables."""
 
-config_options = list(default_config.keys())
+        # Set to true if a new value was added to the config.
+        self.updated: bool = False
+        self.updated_keys: list = []
 
-
-def load_config(location: str = "config.json"):
-    """Loads a JSON configuration file located at `location`,
-    manages the updating of it to contain all keys located within
-    the `default_config` dict and sets `user_config` to it.
+        # An object around the configuration file.
+        self.json: JsonFile = JsonFile("config.json")
     
-    Args:
-        location (str): The location of the configuration file.
-    """
-    config = JsonFile(location)
-    user_config_temp = config.get_file()
+    def __init_subclass__(cls, stop_on_update: bool = False):
+        """Sets and reads the config child class."""
 
-    if user_config_temp is None:
-        info("Creating the new configuration file...")
-        config.write_file(default_config)
-        info("Generated new config! Please modify it and start GDPyS again.")
-        raise SystemExit
+        cls.__init__(cls)
 
-    # Checks for default configuration updates.
-    config_keys = list(user_config_temp.keys())
-    updated_conf = False
+        # Now we read all of the annotated valiables.
+        for var_name, key_type in cls.__annotations__.items():
 
-    for def_conf_option in config_options:
-        if def_conf_option not in config_keys:
-            updated_conf = True
-            user_config_temp[def_conf_option] = default_config[def_conf_option]
+            # We are checking for a possible default value (in case its a new field)
+            default = getattr(cls, var_name, None)
 
-    if updated_conf:
-        config.write_file(user_config_temp)
-        info(
-            "Your config has been updated! Please change the new values to your liking."
-        )
-        raise SystemExit
+            # Read the key.
+            key_val = cls.read_json(cls, var_name, default)
 
-    #global user_config
-    #user_config = user_config_temp
+            # Force it to be the sepcified type.
+            key_val = key_type(key_val)
 
-    # I wish i could simply use the solution above
-    for key, val in user_config_temp.items():
-        user_config[key] = val
+            # Set the attribute.
+            setattr(cls, var_name, key_val)
+    
+    def read_json(self, key: str, default = None):
+        """Reads a value directly from the json file and returns
+        if. If the value is not already in the JSON file, it adds
+        it and sets it as `default`.
+        
+        Args:
+            key (str): The JSON key to fetch the value of.
+            default (any): The value for the key to be set to if the
+                value is not set.
+        
+        Returns:
+            Value of the key.
+        """
+
+        # Check if the key is present. If not, set it.
+        if key not in dict_keys(self.json.file):
+            # Set it so we can check if the key was modified.
+            self.updated = True
+            self.updated_keys.append(key)
+            # Set the value in dict.
+            self.json.file[key] = default
+
+            # Write it to the file.
+            self.json.write_file(self.json.file)
+
+            # Return default
+            return default
+        
+        # It exists, just return it.
+        return self.json.file[key]
+
+# TODO: Notifications for config updates.
+class Config(ConfigReader):
+    """The main GDPyS class for the storage of config values.
+    These values are read directly from the `config.json` file."""
+
+    http_port: int = 8080
+    sql_host: str = "localhost"
+    sql_user: str = "root"
+    sql_db: str = "GDPyS"
+    sql_password: str = ""
+    dadadada: str = "aaaa"
+
+
+conf = Config()

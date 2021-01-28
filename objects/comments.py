@@ -32,7 +32,7 @@ class AccountComment:
         """
 
         # Fetch directly from db.
-        comment_db = await glob.sql.fetchone("SELECT account_id, likes, content, timestamp FROM a_comments WHERE id = %s LIMIT 1", (
+        comment_db = await glob.sql.fetchone("SELECT account_id, likes, content, timestamp, id FROM a_comments WHERE id = %s LIMIT 1", (
             comment_id,
         ))
 
@@ -46,6 +46,7 @@ class AccountComment:
         cls.likes = comment_db[1]
         cls.content = comment_db[2]
         cls.timestamp = comment_db[3]
+        cls.id = comment_db[4]
 
         # Return it
         return cls
@@ -165,3 +166,28 @@ class AccountComment:
                 if com.id == self.id:
                     u.account_comments[enu] = self
                     break
+    
+    async def delete(self):
+        """Deletes the account comment from the database and cached
+        user."""
+
+        if self.id == -1:
+            # It doesnt exist to our knowledge. Idk if this is the right exception.
+            raise FileNotFoundError("A comment must be inserted to the db prior to its deletion.")
+        
+        # Delete it straight from the database.
+        await glob.sql.execute(
+            "DELETE FROM a_comments WHERE id = %s LIMIT 1",
+            (self.id,)
+        )
+
+        # Delete it from the user's cached objects list IF it is cached.
+        if u := glob.user_cache.get_cache_object(self.account_id):
+            # We cant do account_comments.remove as we are expecting this
+            # object to be different from the one in the list.
+            for com in u.account_comments:
+                if com.id == self.id:
+                    u.account_comments.remove(com)
+                    break
+
+        self.id = -1 # Set it to -1 to signify not being in db

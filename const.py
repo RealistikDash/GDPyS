@@ -42,3 +42,8 @@ class GenericResponse:
     COMMON_SUCCESS = "1"
     COMMON_FAIL = "-1"
     NOT_FOUND = "-2"
+
+class Regexes:
+    """Commonly used regexes."""
+
+    EMAIL = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"

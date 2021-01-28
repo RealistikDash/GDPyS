@@ -24,6 +24,8 @@ class ConfigReader:
     def __init_subclass__(cls, stop_on_update: bool = False):
         """Sets and reads the config child class."""
 
+        cls.__init__(cls)
+
         # Now we read all of the annotated valiables.
         for var_name, key_type in cls.__annotations__.items():
 

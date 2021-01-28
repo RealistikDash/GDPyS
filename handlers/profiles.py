@@ -168,3 +168,22 @@ async def upload_acc_comment(req: Request, user: User) -> str:
 
     # Idk just give them a success.
     return 1
+
+async def delete_acc_comment(req: Request, user: User) -> str:
+    """Handles the `deleteGJAccComment20.php` endpoint."""
+
+    # Get the comment object from the id provided.
+    com = await AccountComment.from_db(
+        req.post_args["commentID"]
+    )
+
+    # Check if the user is the same as the poser.
+    if com.account_id != user.id:
+        # They are sending the reqs not through the client.
+        raise GDException("-1")
+
+    # Delete the comment.
+    await com.delete()
+    
+    # Send a success message.
+    return 1

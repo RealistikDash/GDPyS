@@ -40,6 +40,11 @@ class ConfigReader:
 
             # Set the attribute.
             setattr(cls, var_name, key_val)
+
+        if cls.updated:
+            info("The config has just been updated! Please edit according to your preferences!")
+            debug("Keys added: " + ", ".join(cls.updated_keys))
+            raise SystemExit
     
     def read_json(self, key: str, default = None):
         """Reads a value directly from the json file and returns
@@ -50,7 +55,7 @@ class ConfigReader:
             key (str): The JSON key to fetch the value of.
             default (any): The value for the key to be set to if the
                 value is not set.
-        
+                
         Returns:
             Value of the key.
         """
@@ -90,8 +95,3 @@ class Config(ConfigReader):
 
 conf = Config()
 
-# TODO: Fix this
-if conf.updated:
-    info("The config has just been updated! Please edit according to your preferences!")
-    debug("Keys added: " + ", ".join(conf.updated_keys))
-    raise SystemExit

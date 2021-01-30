@@ -4,6 +4,7 @@ from web.builders import gd_dict_str, gd_builder
 from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
 from helpers.time_helper import time_ago
+from helpers.security import verify_stats_seed
 from const import ReqStats
 from exceptions import GDException
 from typing import List
@@ -41,8 +42,8 @@ async def user_info(req: Request, user: User):
         16: target.id,
         17: target.stats.u_coins,
         # States.
-        18: 0 if target.req_states & ReqStats.MESSAGES else 1,
-        19: 0 if target.req_states & ReqStats.REQUESTS else 1,
+        18: 0 if target.messages_enabled else 1,
+        19: 0 if target.friend_requests_enabled else 1,
         20: target.youtube_url,
         21: target.stats.icon,
         22: target.stats.ship,
@@ -60,7 +61,7 @@ async def user_info(req: Request, user: User):
         46: target.stats.diamonds,
         48: target.stats.explosion,
         49: 0, # TODO: Mod levels (when privileges are done.)
-        50: 0 if target.req_states & ReqStats.COMMENTS else 1
+        50: 0 if target.comment_history_enabled else 1
     }
 
     return gd_dict_str(resp_dict)
@@ -70,6 +71,10 @@ async def update_stats(req: Request, user: User):
 
     # TODO: Analyse the data coming in for Cheatless AC.
     # TODO: Investigate the use of seed and seed2 for anticheat.
+
+    # Verifiying some neiche post args.
+    if not verify_stats_seed(req.post_args["seed"]):
+        raise GDException("-1")
 
     # Converting these to int also ensures proper input is passed.
     stars        = int(req.post_args.get("stars", 0))
@@ -92,23 +97,23 @@ async def update_stats(req: Request, user: User):
 
     # Now we set them for the user.
     await user.stats.set_stats(
-        stars= stars,
-        diamonds= diamonds,
-        coins= coins,
-        u_coins = u_coins,
-        demons= demons,
-        colour1= colour1,
-        colour2= colour2,
-        icon= icon,
-        ship= ship,
-        ufo= ufo,
-        wave= wave,
-        robot= robot,
-        ball= ball,
-        spider= spider,
-        explosion= explosion,
+        stars=        stars,
+        diamonds=     diamonds,
+        coins=        coins,
+        u_coins=      u_coins,
+        demons=       demons,
+        colour1=      colour1,
+        colour2=      colour2,
+        icon=         icon,
+        ship=         ship,
+        ufo=          ufo,
+        wave=         wave,
+        robot=        robot,
+        ball=         ball,
+        spider=       spider,
+        explosion=    explosion,
         display_icon= display_icon,
-        glow= glow
+        glow=         glow
     )
 
     # We have to return the users account ID.

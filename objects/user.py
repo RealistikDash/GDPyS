@@ -233,6 +233,28 @@ class User:
 
         return safe_username(self.name)
     
+    @property
+    def messages_enabled(self) -> bool:
+        """A property that returns a bool corresponding to whether
+        they have public messages enabled."""
+
+        return bool(self.req_states & ReqStats.MESSAGES)
+    
+    @property
+    def comment_history_enabled(self) -> bool:
+        """A property that returns a bool corresponding to whether
+        the user has their comment history set to public."""
+
+        return bool(self.req_states & ReqStats.COMMENTS)
+    
+    @property
+    def friend_requests_enabled(self) -> bool:
+        """A property that returns a bool corresponding to whether
+        the user has enabled receiving friend requests from the
+        general public."""
+
+        return bool(self.req_states & ReqStats.REQUESTS)
+    
     @classmethod
     async def from_sql(cls, account_id: int, full: bool = True):
         """Fetches the `User` object directly from the database, using

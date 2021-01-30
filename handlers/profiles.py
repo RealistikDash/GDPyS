@@ -143,7 +143,7 @@ async def account_comments(req: Request):
             4: i.likes,
             6: i.id,
             9: time_ago(i.timestamp),
-            12: "255,255,255" # TODO: When privilege groups are added.
+            12: str(target_user.privilege.colour)
         }, "~") for i in a_com
     ])
 

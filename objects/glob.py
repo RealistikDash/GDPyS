@@ -14,6 +14,10 @@ class Glob:
             cache_limit= 200
         )
 
+        # All of the privileges. Using a dict as we want
+        # them to never expire.
+        self.privileges: dict = {}
+
         # Global MySQL connection.
         self.sql = None
 

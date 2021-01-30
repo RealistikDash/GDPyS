@@ -6,6 +6,7 @@ from const import ReqStats, Privileges, Regexes
 from logger import debug
 from .glob import glob
 from .comments import AccountComment
+from .privilege import Privilege
 from exceptions import GDException
 from typing import List
 import re
@@ -205,7 +206,7 @@ class User:
         self.name: str = ""
         self.stats: Stats = Stats()
         self.registered_timestamp: int = 0
-        self.privileges: Privileges = Privileges(1<<0)
+        self.privilege: Privilege = Privilege()
 
         # Details
         self.bcrypt_pass: str = "" # Used for auth
@@ -450,8 +451,10 @@ class User:
         self.twitch_url, req_status)  = db_user
 
         # Set special objects from data
-        self.privileges = Privileges(priv)
         self.req_states = ReqStats(req_status)
+
+        # Grab privilege from global priv cache.
+        self.privilege = await Privilege.from_priv_enum(priv)
 
         # Set statistics.
         await self.stats.from_sql()
@@ -535,4 +538,7 @@ class User:
             Bool whether int flag is present.
         """
 
-        return bool(self.privileges & priv)
+        if self.privilege is None:
+            return False # They don't have a privilege group due to some error?
+        
+        return self.privilege.has_privilege(priv)

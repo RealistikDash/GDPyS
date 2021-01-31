@@ -17,7 +17,7 @@ def verify_stats_seed(seed: str) -> bool:
 
     # Currently, all I know is that this is a completely
     # random string that's 10 chars long.
-    if len(seed) != 10:
+    if len(seed) != 10 or seed.isnumeric():
         return False
     
     # All checks passed.

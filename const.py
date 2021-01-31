@@ -33,8 +33,11 @@ class ReqStats(IntFlag):
 class Privileges(IntFlag):
     """The GDPyS privileges."""
 
-    LOGIN   = 1 << 0
-    COMMENT = 1 << 1
+    LOGIN       = 1 << 0
+    COMMENT     = 1 << 1
+    RATE        = 1 << 2
+    MOD_BADGE   = 1 << 3
+    ELDER_BADGE = 1 << 4
 
 class GenericResponse:
     """Common Geometry Dash response codes."""

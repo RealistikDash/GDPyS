@@ -5,9 +5,7 @@ from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
 from helpers.time_helper import time_ago
 from helpers.security import verify_stats_seed
-from const import ReqStats
 from exceptions import GDException
-from typing import List
 from objects.comments import AccountComment
 
 async def user_info(req: Request, user: User):
@@ -60,7 +58,7 @@ async def user_info(req: Request, user: User):
         45: target.twitch_url,
         46: target.stats.diamonds,
         48: target.stats.explosion,
-        49: 0, # TODO: Mod levels (when privileges are done.)
+        49: target.badge_level,
         50: 0 if target.comment_history_enabled else 1
     }
 

@@ -255,6 +255,20 @@ class User:
 
         return bool(self.req_states & ReqStats.REQUESTS)
     
+    @property
+    def badge_level(self) -> int:
+        """Returns the badge level enum of the user."""
+
+        # Check if they have the elder badge.
+        if self.has_privilege(Privileges.ELDER_BADGE):
+            return 2
+        # Regular mod badge.
+        elif self.has_privilege(Privileges.MOD_BADGE):
+            return 1
+        
+        # They do not have a mod badge.
+        return 0
+    
     @classmethod
     async def from_sql(cls, account_id: int, full: bool = True):
         """Fetches the `User` object directly from the database, using

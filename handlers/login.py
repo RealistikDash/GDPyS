@@ -1,6 +1,7 @@
 from objects.user import User
 from web.http import Request
 from web.builders import gd_builder
+from helpers.security import verify_textbox
 from const import GenericResponse
 from exceptions import GDException
 from logger import info
@@ -11,9 +12,16 @@ async def register_account(req: Request) -> str:
 
     # Get variables and clean up from postdata.
     # TODO: some checks on this data.
-    email = req.post_args["email"]
-    username = req.post_args["userName"]
-    password = req.post_args["password"] # Plaintext
+    email = req.post["email"]
+    username = req.post["userName"]
+    password = req.post["password"] # Plaintext
+
+    # Verify post args.
+    for arg in (email, username):
+        if not verify_textbox(arg, ("@", ".")):
+            # Arg does not match.
+            debug("User sent invalid args!")
+            raise GDException("-1")
 
     # This classmethod takes care of the majority of things such as rising GDException
     # that is later handled by the http server itself.
@@ -38,8 +46,8 @@ async def login_account(req: Request) -> str:
     """
 
     # Set all required post args to variables.
-    name = req.post_args["userName"]
-    password = req.post_args["password"]
+    name = req.post["userName"]
+    password = req.post["password"]
 
     u = await User.from_name(name)
 

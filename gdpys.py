@@ -12,7 +12,8 @@ from handlers.profiles import (
     update_stats,
     account_comments,
     upload_acc_comment,
-    delete_acc_comment
+    delete_acc_comment,
+    update_social
 )
 
 # Load config
@@ -27,7 +28,8 @@ HANDLERS = (
     ("/updateGJUserScore22.php", update_stats, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("secret", "accGlow", "iconType", "accountID", "gjp", "userCoins", "seed2", "seed")),
     ("/getGJAccountComments20.php", account_comments, HandlerTypes.PLAIN_TEXT, ("accountID", "total", "page", "secret", "gdw")),
     ("/uploadGJAccComment20.php", upload_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "comment", "secret", "chk", "cType")),
-    ("/deleteGJAccComment20.php", delete_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "commentID"))
+    ("/deleteGJAccComment20.php", delete_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "commentID")),
+    ("/updateGJAccSettings20.php", update_social, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret"))
 )
 
 async def main(loop: asyncio.AbstractEventLoop):

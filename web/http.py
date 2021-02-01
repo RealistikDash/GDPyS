@@ -22,7 +22,7 @@ class Request:
         """Fills all defaults for the object. Please
         use classmethods instead of this."""
 
-        self.post_args: dict = {}
+        self.post: dict = {}
         self.get_args: dict = {}
         self.headers: dict = {}
         self.ip: str = "127.0.0.1"
@@ -40,8 +40,8 @@ class Request:
         Returns:
             GDPyS web request object.
         """
-        # First we set the post_args
-        cls.post_args = await aioreq.post()
+        # First we set the post
+        cls.post = await aioreq.post()
         # Next we fetch get_args
         cls.get_args = aioreq.rel_url.query
         # Set headers
@@ -199,13 +199,13 @@ class GDPySWeb:
         # Set it globally.
         glob.sql = self.pool
     
-    async def _gd_auth(self, post_args: dict) -> bool:
+    async def _gd_auth(self, post: dict) -> bool:
         """Handles authentication for Geometry Dash handlers."""
 
         # TODO: Anti-botting checks for vers and binaryver and secrets
         return await self.auth.gjp_check(
-            int(post_args["accountID"]),
-            post_args["gjp"]
+            int(post["accountID"]),
+            post["gjp"]
         )
     
     def _rate_limit(self, req: Request) -> bool:
@@ -246,13 +246,13 @@ class GDPySWeb:
                 args.append(self.pool)
             
             # Check if they have the required args.
-            if not handler.verify_postargs(dict_keys(request.post_args)):
+            if not handler.verify_postargs(dict_keys(request.post)):
                 # Idk just use the error handler.
                 raise KeyError
             
             # Check if it is authed.
             if handler.has_status(HandlerTypes.AUTHED):
-                if not (p := await self._gd_auth(request.post_args)):
+                if not (p := await self._gd_auth(request.post)):
                     raise GDException("-1")
 
                 # Add user as arg.
@@ -273,9 +273,9 @@ class GDPySWeb:
             debug(f"Handler triggered error code {resp_str}") # Temp debug as else it will be triggered a lot.
         
         # This is so we don't reveal post request required fields to people scouting.
-        except KeyError:
+        except KeyError as e:
             resp_str = "Incorrect post data." # Just assume it tbh
-            debug("Request sent incorrect post data.")
+            debug(f"Request sent incorrect post data. {e}")
         
         # There has been an actual exception within the handler.
         except Exception:

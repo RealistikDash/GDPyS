@@ -4,22 +4,23 @@ from web.builders import gd_dict_str, gd_builder
 from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
 from helpers.time_helper import time_ago
-from helpers.security import verify_stats_seed
+from helpers.security import verify_stats_seed, verify_textbox
 from exceptions import GDException
 from objects.comments import AccountComment
+from const import ReqStats
 
 async def user_info(req: Request, user: User):
     """Handles the `getGJUserInfo20.php` endpoint."""
 
     # Check if we are fetching ourselves.
-    checking_self = req.post_args["accountID"] == req.post_args["targetAccountID"]
+    checking_self = req.post["accountID"] == req.post["targetAccountID"]
 
     # If we are checking ourselves, we can just set the target user to that.
     if checking_self:
         target: User = user
     # We have to fetch the user directly.
     else:
-        target: User = await User.from_id(req.post_args["targetAccountID"])
+        target: User = await User.from_id(req.post["targetAccountID"])
 
         # TODO: Blocked check
 
@@ -40,7 +41,7 @@ async def user_info(req: Request, user: User):
         16: target.id,
         17: target.stats.u_coins,
         # States.
-        18: 0 if target.messages_enabled else 1,
+        18: 0 if target.messages_enabled else 2 if target.messages_fo else 1,
         19: 0 if target.friend_requests_enabled else 1,
         20: target.youtube_url,
         21: target.stats.icon,
@@ -59,7 +60,7 @@ async def user_info(req: Request, user: User):
         46: target.stats.diamonds,
         48: target.stats.explosion,
         49: target.badge_level,
-        50: 0 if target.comment_history_enabled else 1
+        50: 0 if target.comment_history_enabled else 2 if target.comment_history_fo else 1
     }
 
     return gd_dict_str(resp_dict)
@@ -71,27 +72,27 @@ async def update_stats(req: Request, user: User):
     # TODO: Investigate the use of seed and seed2 for anticheat.
 
     # Verifiying some neiche post args.
-    if not verify_stats_seed(req.post_args["seed"]):
+    if not verify_stats_seed(req.post["seed"]):
         raise GDException("-1")
 
     # Converting these to int also ensures proper input is passed.
-    stars        = int(req.post_args.get("stars", 0))
-    demons       = int(req.post_args.get("demons", 0))
-    display_icon = int(req.post_args.get("icon", 0))
-    diamonds     = int(req.post_args.get("diamonds", 0))
-    colour1      = int(req.post_args.get("color1", 0))
-    colour2      = int(req.post_args.get("color2", 1))
-    icon         = int(req.post_args.get("accIcon", 0))
-    ship         = int(req.post_args.get("accShip", 0))
-    ball         = int(req.post_args.get("accBall", 0))
-    ufo          = int(req.post_args.get("accBird", 0))
-    wave         = int(req.post_args.get("accDart", 0))
-    robot        = int(req.post_args.get("accRobot", 0))
-    glow         = int(req.post_args.get("accGlow", 0))
-    spider       = int(req.post_args.get("accSpider", 0))
-    explosion    = int(req.post_args.get("accExplosion", 0))
-    coins        = int(req.post_args.get("coins", 0))
-    u_coins      = int(req.post_args.get("userCoints", 0))
+    stars        = int(req.post.get("stars", 0))
+    demons       = int(req.post.get("demons", 0))
+    display_icon = int(req.post.get("icon", 0))
+    diamonds     = int(req.post.get("diamonds", 0))
+    colour1      = int(req.post.get("color1", 0))
+    colour2      = int(req.post.get("color2", 1))
+    icon         = int(req.post.get("accIcon", 0))
+    ship         = int(req.post.get("accShip", 0))
+    ball         = int(req.post.get("accBall", 0))
+    ufo          = int(req.post.get("accBird", 0))
+    wave         = int(req.post.get("accDart", 0))
+    robot        = int(req.post.get("accRobot", 0))
+    glow         = int(req.post.get("accGlow", 0))
+    spider       = int(req.post.get("accSpider", 0))
+    explosion    = int(req.post.get("accExplosion", 0))
+    coins        = int(req.post.get("coins", 0))
+    u_coins      = int(req.post.get("userCoints", 0))
 
     # Now we set them for the user.
     await user.stats.set_stats(
@@ -121,8 +122,8 @@ async def account_comments(req: Request):
     """Handles the `getGJAccountComments20.php` endpoint."""
 
     # We fetch data from post data.
-    page = int(req.post_args["page"])
-    target_id = int(req.post_args["accountID"])
+    page = int(req.post["page"])
+    target_id = int(req.post["accountID"])
 
     target_user = await User.from_id(target_id)
     
@@ -158,7 +159,7 @@ async def upload_acc_comment(req: Request, user: User) -> str:
     """Handles the `uploadGJAccComment20.php` endpoint."""
 
     # We grab the content from post args and immidiately decode b64
-    content = base64_decode(req.post_args["comment"])
+    content = base64_decode(req.post["comment"])
 
     # Now we create the account comment object from scratch.
     com = AccountComment.from_text(
@@ -177,7 +178,7 @@ async def delete_acc_comment(req: Request, user: User) -> str:
 
     # Get the comment object from the id provided.
     com = await AccountComment.from_db(
-        req.post_args["commentID"]
+        req.post["commentID"]
     )
 
     # Check if the user is the same as the poser.
@@ -189,4 +190,45 @@ async def delete_acc_comment(req: Request, user: User) -> str:
     await com.delete()
     
     # Send a success message.
+    return 1
+
+async def update_social(req: Request, user: User) -> str:
+    """Handles the `updateGJAccSettings20.php` endpoint."""
+
+    # Set post data to vars.
+    youtube = req.post.get("yt")
+    twitter = req.post.get("twitter")
+    twitch  = req.post.get("twitch")
+
+    # Verify values
+    for social in (youtube, twitch, twitter):
+        if not verify_textbox(social, ["."]):
+            debug("User failed value verification check.")
+            raise GDException("-1")
+    
+    new_req_state = 0
+
+    new_req_state += {
+        "0": ReqStats.MESSAGES,
+        "1": ReqStats.MESSAGES_FRIENDS_ONLY
+    }.get(req.post["mS"], 0)
+
+    new_req_state += ReqStats.REQUESTS if req.post["frS"] == "0" else 0
+
+    new_req_state += {
+        "0": ReqStats.COMMENTS,
+        "1": ReqStats.COMMENTS_FRIENDS_ONLY
+    }.get(req.post.get("cS"), 0)
+
+    new_req_state = ReqStats(new_req_state)
+
+    # Lastly we update them.
+    await user.update_socials(
+        youtube= youtube,
+        twitter= twitter,
+        twitch= twitch,
+        req_state= new_req_state
+    )
+
+    # Return a success!
     return 1

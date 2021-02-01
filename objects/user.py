@@ -256,6 +256,21 @@ class User:
         return bool(self.req_states & ReqStats.REQUESTS)
     
     @property
+    def messages_fo(self) -> bool:
+        """A property that returns a bool corresponding to whether
+        they have messages set to friend only."""
+
+        return bool(self.req_states & ReqStats.MESSAGES_FRIENDS_ONLY)
+    
+    @property
+    def comment_history_fo(self) -> bool:
+        """A property that returns a bool corresponding to whether
+        the user has their comment history set to be viewed by
+        friends only."""
+
+        return bool(self.req_states & ReqStats.COMMENTS_FRIENDS_ONLY)
+    
+    @property
     def badge_level(self) -> int:
         """Returns the badge level enum of the user."""
 
@@ -578,3 +593,32 @@ class User:
             return False # They don't have a privilege group due to some error?
         
         return self.privilege.has_privilege(priv)
+
+    async def update_socials(self, **kwargs):
+        """Updates the social aspects of the user's profile
+        from kwargs.
+        
+        Kwargs:
+            youtube (str): The user's new channel UUID.
+            twitter (str): The user's new twitter handle.
+            twitch (str): The user's new twitch channel
+                username.
+            req_state (ReqStats): The new social requests
+                value of the user (used for allowing friend
+                requests or messages).
+        """
+
+        # Set the kwargs to proper variables.
+        self.youtube_url   = kwargs.get("youtube", self.youtube_url)
+        self.twitter_url   = kwargs.get("twitter", self.twitter_url)
+        self.twitch_url    = kwargs.get("twitch", self.twitch_url)
+        self.req_states    = kwargs.get("req_state", self.req_states)
+
+        # Set it in the database.
+        await glob.sql.execute(
+            "UPDATE users SET yt_url = %s, twitter_url = %s, "
+            "twitch_url = %s, req_status = %s WHERE id = %s "
+            "LIMIT 1",
+            (self.youtube_url, self.twitter_url, self.twitch_url,
+            int(self.req_states), self.id)
+        )

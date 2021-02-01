@@ -11,7 +11,7 @@ class RGB:
     def __str__(self):
         """Retuns a string representation of the RGB value."""
 
-        return ",".join([self.red, self.green, self.blue])
+        return f"{self.red},{self.green},{self.blue}"
     
     def __repr__(self):
         """Debugging representation of the RGB value."""

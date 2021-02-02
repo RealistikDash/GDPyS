@@ -18,7 +18,7 @@ async def register_account(req: Request) -> str:
 
     # Verify post args.
     for arg in (email, username):
-        if not verify_textbox(arg, ("@", ".")):
+        if not verify_textbox(arg, ["@", "."]):
             # Arg does not match.
             debug("User sent invalid args!")
             raise GDException("-1")

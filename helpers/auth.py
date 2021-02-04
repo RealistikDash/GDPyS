@@ -66,7 +66,7 @@ class Auth:
         if not p.has_privilege(Privileges.LOGIN): return
 
         # Now we check if perhaps we already cached their val.
-        if cached_gjp := self._correct_gjps.get_cache_object(account_id):
+        if cached_gjp := self._correct_gjps.get(account_id):
             # Check if the cached gjp matches them.
             if gjp == cached_gjp:
                 debug(f"{p.name} authed successfully using cache hit.")
@@ -82,7 +82,7 @@ class Auth:
         # Now we compare the p_pass with bcrypt.
         if p.check_pass(p_pass):
             # They successfully authed. Store this bcrypt in cache for speed.
-            self._correct_gjps.cache_object(account_id, gjp)
+            self._correct_gjps.cache(account_id, gjp)
 
             # Log our success.
             debug(f"{p.name} authed successfully using direct BCrypt check.")

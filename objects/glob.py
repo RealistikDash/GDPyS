@@ -13,6 +13,11 @@ class Glob:
             cache_length= 20,
             cache_limit= 200
         )
+        # Song Cache
+        self.song_cache: Cache = Cache(
+            cache_length= 20,
+            cache_limit= 200
+        )
 
         # All of the privileges. Using a dict as we want
         # them to never expire.

@@ -72,3 +72,23 @@ def gd_dict_str(d: Dict[int, str], separator: str = ":") -> str:
     
     # Combine them all and send off.
     return separator.join(str(i) for i in a)
+
+def parse_to_dict(data: str, separator: str = "~|~") -> dict:
+    """Parses a GeometryDash style keyed split response into an
+    easy to work with Python dictionary object.
+    
+    Args:
+        data (str): The data to be parsed into a dict.
+    """
+
+    # Create the dict we will be making
+    resp = {}
+
+    # Split the data by separator.
+    d_s = data.split(separator)
+
+    # Iterate every two.
+    for key, val in zip(*[iter(d_s)] * 2):
+        resp[int(key)] = val
+    
+    return resp

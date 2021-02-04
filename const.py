@@ -52,3 +52,11 @@ class Regexes:
     """Commonly used regexes."""
 
     EMAIL = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
+
+class Secrets:
+    """All of the Geometry Dash secret values."""
+
+    DEFAULT = "Wmfd2893gb7"
+
+    # List of all.
+    ALL = (DEFAULT,)

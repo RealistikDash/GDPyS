@@ -15,7 +15,7 @@ class Cache:
         self._lenght = cache_length * 60 # Multipled by 60 to get the length in seconds rather than minutes.
         self._cache_limit = cache_limit
     
-    def cache_object(self, cache_id : int, cache_obj : object) -> None:
+    def cache(self, cache_id : int, cache_obj : object) -> None:
         """Adds an object to the cache."""
         self._cache[cache_id] = {
             "id" : cache_id,
@@ -24,7 +24,7 @@ class Cache:
         }
         self.run_checks()
     
-    def remove_cache_object(self, cache_id : int) -> None:
+    def remove_cache(self, cache_id : int) -> None:
         """Removes an object from cache."""
         try:
             del self._cache[cache_id]
@@ -32,7 +32,7 @@ class Cache:
             # It doesnt matter if it fails. All that matters is that no such object exist and if it doesnt exist in the first place, that's already objective complete.
             pass
     
-    def get_cache_object(self, cache_id : int) -> object:
+    def get(self, cache_id : int) -> object:
         """Retrieves a cached object from cache."""
 
         # Try to get it from cache.
@@ -55,7 +55,7 @@ class Cache:
         current_timestamp = get_timestamp()
         expired = []
         for cache_id in self._get_cached_ids():
-            # We dont want to use get_cache_object as that  will soon have the ability to make its own objects, slowing this down.
+            # We dont want to use get as that  will soon have the ability to make its own objects, slowing this down.
             if self._cache[cache_id]["expire"] < current_timestamp:
                 # This cache is expired.
                 expired.append(cache_id)
@@ -64,7 +64,7 @@ class Cache:
     def _remove_expired_cache(self) -> None:
         """Removes all of the expired cache."""
         for cache_id in self._get_expired_cache():
-            self.remove_cache_object(cache_id)
+            self.remove_cache(cache_id)
     
     def _remove_limit_cache(self) -> None:
         """Removes all objects past limit if cache reached its limit."""
@@ -79,7 +79,7 @@ class Cache:
         # Get x oldest ids to remove.
         throw_away_ids = self._get_cached_ids()[:throw_away_count]
         for cache_id in throw_away_ids:
-            self.remove_cache_object(cache_id)
+            self.remove_cache(cache_id)
     
     def run_checks(self) -> None:
         """Runs checks on the cache."""

@@ -132,7 +132,7 @@ class AccountComment:
         self.id = row
 
         # If the user is already cached, append the comment to them.
-        if u := glob.user_cache.get_cache_object(self.account_id):
+        if u := glob.user_cache.get(self.account_id):
             u.account_comments.insert(0, self)
     
     async def save(self):
@@ -160,7 +160,7 @@ class AccountComment:
         # If the user is already cached, update their 
         # comments. This is necessary as there isnt a 
         # global acc comment cache *yet*.
-        if u := glob.user_cache.get_cache_object(self.account_id):
+        if u := glob.user_cache.get(self.account_id):
             # Look for a comment with the matching id.
             for enu, com in enumerate(u.account_comments):
                 if com.id == self.id:
@@ -182,7 +182,7 @@ class AccountComment:
         )
 
         # Delete it from the user's cached objects list IF it is cached.
-        if u := glob.user_cache.get_cache_object(self.account_id):
+        if u := glob.user_cache.get(self.account_id):
             # We cant do account_comments.remove as we are expecting this
             # object to be different from the one in the list.
             for com in u.account_comments:

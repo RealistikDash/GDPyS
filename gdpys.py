@@ -15,6 +15,7 @@ from handlers.profiles import (
     delete_acc_comment,
     update_social
 )
+from handlers.misc import get_song
 
 # Load config
 
@@ -29,7 +30,8 @@ HANDLERS = (
     ("/getGJAccountComments20.php", account_comments, HandlerTypes.PLAIN_TEXT, ("accountID", "total", "page", "secret", "gdw")),
     ("/uploadGJAccComment20.php", upload_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "comment", "secret", "chk", "cType")),
     ("/deleteGJAccComment20.php", delete_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "commentID")),
-    ("/updateGJAccSettings20.php", update_social, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret"))
+    ("/updateGJAccSettings20.php", update_social, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret")),
+    ("/getGJSongInfo.php", get_song, HandlerTypes.PLAIN_TEXT, ("secret", "songID"))
 )
 
 async def main(loop: asyncio.AbstractEventLoop):

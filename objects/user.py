@@ -370,7 +370,7 @@ class User:
         """
 
         # First we attempt a cache hit which is the fastest by far.
-        if usr := glob.user_cache.get_cache_object(account_id):
+        if usr := glob.user_cache.get(account_id):
             debug(f"User {usr.name} ({account_id}) retrieved from cache.")
             return usr
         
@@ -379,7 +379,7 @@ class User:
             debug(f"User {usr.name} ({account_id}) retrieved from MySQL.")
 
             # Add them to the cache for speed later on.
-            glob.user_cache.cache_object(account_id, usr)
+            glob.user_cache.cache(account_id, usr)
             return usr
         
         # They do not exist to our knowledge.

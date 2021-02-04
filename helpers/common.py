@@ -89,3 +89,22 @@ def paginate_list(list_to_paginate: list, page: int, elems_page: int = 10):
     """
     offset = page * elems_page
     return list_to_paginate[offset : offset + elems_page]
+
+def is_numeric(digit: str) -> bool:
+    """Kind of like `str.isdigit()` but works with
+    checking for negative numbers too.
+    
+    Args:
+        digit (str): A string to be checked for if
+            it is a number.
+    
+    Returns:
+        True if it is numeric, else false.
+    """
+
+    # Ugly but works.
+    try:
+        int(digit)
+        return True
+    except ValueError:
+        return False

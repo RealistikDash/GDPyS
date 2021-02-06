@@ -87,11 +87,12 @@ class Config(ConfigReader):
     """The main GDPyS class for the storage of config values.
     These values are read directly from the `config.json` file."""
 
-    http_port: int = 8080
-    sql_host: str = "localhost"
-    sql_user: str = "root"
-    sql_db: str = "GDPyS"
-    sql_password: str = ""
+    http_sock: str     = "/tmp/gdpys.sock"
+    http_max_conn: int = 5
+    sql_host: str      = "localhost"
+    sql_user: str      = "root"
+    sql_db: str        = "GDPyS"
+    sql_password: str  = ""
 
 conf = Config()
 

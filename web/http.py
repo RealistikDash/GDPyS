@@ -1,68 +1,230 @@
 from const import HandlerTypes
-from aiohttp import web
 from dataclasses import dataclass
 from typing import Callable, Union
 from .sql import MySQLPool
 from helpers.auth import Auth
 from helpers.common import dict_keys
-from const import HandlerTypes
+from const import HandlerTypes, HTTP_CODES
 from logger import error, info, debug
 from helpers.time_helper import Timer
 from exceptions import GDException
 from objects.glob import glob
 import asyncio
 import traceback
+import os
+import socket
 
 class Request:
-    """A GDPyS request object. It contains details
-    regarding the post request and the user that
-    send it."""
+    """Request class for storing & parsing all data.
+    Made by Lenforiee and adapted for use within GDPyS."""
 
-    def __init__(self):
-        """Fills all defaults for the object. Please
-        use classmethods instead of this."""
+    def __init__(self, client: socket.socket, loop: asyncio.AbstractEventLoop):
+        """Init placeholders."""
 
-        self.post: dict = {}
-        self.get_args: dict = {}
-        self.headers: dict = {}
-        self.ip: str = "127.0.0.1"
+        self._client: socket.socket = client
+        self._loop: asyncio.AbstractEventLoop = loop
+
+        self.type: str = "GET"
+        self.http_ver: str = "HTTP/1.1"
         self.path: str = "/"
+        self.body: Union[bytearray, bytes] = b''
+        self.headers: dict = {}
+        self.get_args: dict = {}
+        self.post: dict = {}
+        self.files: dict = {}
+        self.ip: str = "0.0.0.0"
 
-    @classmethod
-    async def from_aiohttp(cls, aioreq: web.Request):
-        """Converts an aiohttp request into a GDPyS
-        Web one.
-        
-        Args:
-            aioreq (web.Request): The initial aiohttp
-                request object you would like to convert.
+        # send back data
+        self._send_headers: list = []
+        self._send_code: int = 200
 
-        Returns:
-            GDPyS web request object.
-        """
-        # First we set the post
-        cls.post = await aioreq.post()
-        # Next we fetch get_args
-        cls.get_args = aioreq.rel_url.query
-        # Set headers
-        cls.headers = aioreq.headers
-        # Set path
-        cls.path = aioreq.path
+    async def _parse_headers(self, content: str) -> None:
+        """Parses all headers from single client"""
 
-        # Now we grab the ip. This requires some logic so we don't
-        # get nginx's ip all the time.
-        if ip := aioreq.headers.get("x-real-ip"):
-            cls.ip = ip
-            return cls
+        # Best instance to parse headers so far I made.
+
+        # We will split first line of headers
+        lines = content.splitlines()[0].split(" ")
+
+        # Unpack all data
+        self.type, self.path, self.http_ver = lines
+
+        if "?" in self.path:
+            # We have to parse query args
+            args = self.path.split("?", 1)
+            # Update path
+            self.path = args[0]
+
+            # Now we will loop all args
+            for arg in args[1].split("&"):
+                # now split arg
+                arg = arg.split("=", 1)
+
+                if len(arg) != 2:
+                    debug("GDPyS Web: Invalid GET argument size!")
+                    #return
+                    continue
+                
+                self.get_args.update({arg[0]: arg[1]})
         
-        # This one isn't really """safe""" but eh
-        if ip := aioreq.headers.get("x-forwarded-for"):
-            cls.ip = ip
-            return cls
+        for header in content.splitlines()[1:]:
+            # Now we will parse headers in request
+            header = header.split(':', 1)
+
+            if len(header) != 2:
+                debug("GDPyS Web: Invalid header size!")
+                #return
+                continue
+            
+            self.headers.update({header[0]: header[1].lstrip()})
         
-        # Ig we have no other choice than to use this.
-        cls.ip = aioreq.remote
-        return cls
+        # This is the reason we need nginx.
+        self.ip = self.headers.get("X-Real-IP")
+
+    async def _parse_multipart(self):
+        """Parses multipart from post request"""
+        # Honestly I have no idea how to parse multipart
+        # if this code will ever work it's only by my luck.
+
+        # Ok so after long deep searching I think, I'm kinda able
+        # to know how to parse them
+
+        # Lets build boundary, it's gonna be useful for parsing multipart
+        # What is boundary? its like key to parse multiple data from multipart
+        # boundary have 26 of '-' however we need 28 of them.
+        boundary = "--" + self.headers['Content-Type'].split('boundary=')[1]
+
+        # We will get all multiparts from there.
+        for parts in self.body[:-4].split(boundary.encode()):
+            if not parts:
+                # Sometimes it can be empty and fuck
+                # our instance
+                continue
+
+            # we need to separate headers from body in parts.
+            headers, body = parts.split(b'\r\n\r\n')
+
+            # Parse exisng headers.
+            temp_headers = {}
+            for header in headers.decode().split("\r\n")[1:]:
+                header = header.split(":", 1)
+
+                # Header didn't send data??
+                if len(header) != 2:
+                    debug("GDPyS Web: Invalid multipart header!")
+                    continue
+
+                # Update our temp headers dict.
+                temp_headers.update({header[0]: header[1].lstrip()})
+
+            if not temp_headers.get("Content-Disposition"):
+                # Main header somehow don't exist???
+                return
+            
+            temp_args = {}
+            for args in temp_headers["Content-Disposition"].split(";")[1:]:
+                # basically now its like args in path query
+                args = args.split("=", 1)
+
+                if len(args) != 2:
+                    debug("GDPyS Web: Invalid multipart arguments!")
+                    continue
+
+                temp_args.update({args[0].lstrip(): args[1][1:-1]})
+
+            # Get our type, if it has filename its file if not its post arg
+            if 'filename' in temp_args:
+                self.files.update({temp_args['name']: body[:-2]})
+            else:
+                self.post.update({temp_args['name']: body[:-2].decode()})
+
+    async def _parse_www_form(self):
+        """Parses form data from request"""
+
+        # this is simple to parse
+        for parts in self.body.split(b"&"):
+            parts = parts.decode().split("=", 1)
+
+            if len(parts) != 2:
+                debug("GDPyS Web: Misformated www-form data, ignoring.")
+                continue
+            
+            self.post.update({parts[0]: parts[1]})
+
+    async def _parse(self) -> None:
+        """Parses all data from single client"""
+
+        # I'm sure if we read 1024 bytes we will get everything.
+        buf = await self._loop.sock_recv(self._client, 1024)
+
+        # Now we will split headers & parse them.
+        buf_list = buf.split(b'\r\n\r\n')
+        await self._parse_headers(buf_list[0].decode())
+
+        # work out already read and remaining
+        read_already = buf[len(buf_list[0]) + 4:]
+        content_length = self.headers.get('Content-Length')
+
+        if not content_length:
+            # well its only headers
+            self.body = read_already
+        else:
+            if len(read_already) != int(content_length):
+                # Still data remaining, well here
+                # ill just use recv_into to recive 
+                # remaining chunks to bytearray, this
+                # is the fastest and best I could find.
+
+                to_read = int(content_length) - len(read_already)
+                temp_buf = bytearray(to_read)
+
+                while to_read:
+                    read_bytes = await self._loop.sock_recv_into(self._client, temp_buf)
+                    to_read -= read_bytes
+
+                self.body = read_already + bytes(temp_buf)
+            else:
+                # We have already read all data.
+                self.body = read_already
+
+            if (content := self.headers.get('Content-Type')):
+                # Eh multipart, I spend literally most of my time
+                # to make this parser so its better should work.
+                if 'multipart/form-data' in content:
+                    await self._parse_multipart()
+                elif 'x-www-form' in content:
+                    await self._parse_www_form()
+
+    def add_header(self, header: str, index: int = -1) -> None:
+        """Adds response header into list"""
+
+        if index > -1:
+            self._send_headers.insert(index, header)
+        else:
+            self._send_headers.append(header)
+
+    async def send(self, code: int, body: bytes):
+        """Sends data to a client"""
+
+        # we will query all headers
+        self.add_header(f"HTTP/1.1 {code} {HTTP_CODES.get(code)}", 0)
+
+        if body:
+            self.add_header(f'Content-Length: {len(body)}', 1)
+
+        # join & encode headers
+        joined_headers = '\r\n'.join(self._send_headers)
+        response = f'{joined_headers}\r\n\r\n'.encode()
+
+        # add body if exists
+        if body:
+            response += body
+
+        try: # Send all data to the client.
+            await self._loop.sock_sendall(self._client, response)
+        except Exception as e:
+            debug(f"GDPyS Web: Connection ended abruptly with exception: {e}")
+
 
 @dataclass
 class Handler:
@@ -106,12 +268,10 @@ class Handler:
         return True
 
 class GDPySWeb:
-    """A low level aiohttp server specialised for usage
-    within GDPyS. Using this implementation allows us to
-    reduce overhead from aiohttp's routing system (as we
-    do not require something that complex) and allows us
-    to add a lot of our own handler-level checks and
-    tools."""
+    """A HTTP server based on Python's low level socket package.
+    All of the socket and HTTP parsing has been made by Lenforiee.
+    This allows us to take full control of the process as well as
+    ensure speed due to the removal of unnecessary features."""
 
     def __init__(self, loop: asyncio.AbstractEventLoop):
         """Prepares the server for configuration and usage."""
@@ -213,23 +373,17 @@ class GDPySWeb:
 
         raise NotImplementedError("Rate limits have not been implemented yet.")
     
-    async def _handle_conn(self, req: web.Request) -> web.Response:
-        """Handles all requests to the server. Specialised
-        for `aiohttp` low level server.
+    async def _handle_conn(self, request: Request) -> str:
+        """Handles all requests to the server. And routing
+        through handlers.
         
         Args:
-            req (web.Request): `aiohttp` request object.
+            req (Request): A current request object.
         
         Returns:
-            aiohttp web.Response object.
+            String of HTTP contents.
         """
 
-        # Create a timer to measure the performance.
-        t = Timer()
-        t.start()
-
-        # Convert request to GDPyS request.
-        request: Request = await Request.from_aiohttp(req)
         resp_str = ""
 
         # Grab handler from handler list. Check if none, use the 404 one.
@@ -239,7 +393,7 @@ class GDPySWeb:
         
         # Now we calc the args
         try:
-            args = [Request]
+            args = [request]
 
             # Check if we require the mysql conn.
             if handler.has_status(HandlerTypes.DATABASE):
@@ -295,24 +449,9 @@ class GDPySWeb:
 
         # Debug log the resp.
         debug(resp_str)
-        # Converting the response we got into aiohttp objects.
-
-        # Plaintext responses are simple.
-        if handler.has_status(HandlerTypes.PLAIN_TEXT):
-            final_resp = web.Response(text= resp_str)
-        
-        # JSON responses use aiohttp's cool own function.
-        elif handler.has_status(HandlerTypes.JSON):
-            final_resp = web.json_response(resp_str)
-        
-        # End timer.
-        t.end()
-        
-        # Log it.
-        info(f"[{request.ip}] {req.method} {request.path} | `{handler.handler.__name__}` {t.time_str()}")
 
         # Return it
-        return final_resp
+        return resp_str
     
     def add_handler(
         self,
@@ -348,33 +487,93 @@ class GDPySWeb:
             req_postargs= req_postargs
         )
     
-    # Server start
-    async def start(self, port: int = 8080):
-        """Starts the GDPyS HTTP server on http://127.0.0.1 with port `port`
-        and creates a neverending loop to keep it running.
-        
+    async def _handle_sock(self, client: socket.socket):
+        """Handles parsing all headers and all data
         Args:
-            port (int): The port at which the HTTP server should listen for
-                connections.
+            client (socket.socket): Currently connected client socket.
+
+        Made by Lenforiee
         """
 
-        # Start the aiohttp low level server.
-        server = web.Server(self._handle_conn)
-        runner = web.ServerRunner(server)
-        await runner.setup()
-        site = web.TCPSite(
-            runner,
-            "127.0.0.1",
-            port
-        )
+        # Create a timer to measure the performance.
+        t = Timer()
+        t.start()
 
-        # Start the server.
-        await site.start()
+        # Make request object & parse headers.
+        request = Request(client, self.loop)
+        await request._parse()
+
+        # After all the parsing we check the host header, which should
+        # be sent all the time.
+        if not request.headers.get("Host"):
+            # This is messed up...
+            client.shutdown(socket.SHUT_RDWR)
+            client.close()
+            return
+
+        # Now we will call our own external handler function
+        response = await self._handle_conn(request)
+
+        # We send the response to the client. Just return a 200 as GD doesnt 
+        # need anything else.
+        await request.send(200, response.encode())
+
+        # End timer.
+        t.end()
+        
+        # Log it.
+        info(f"[{request.ip}] {request.type} {request.path} | {t.time_str()}")
+
+        # Lastly try to close connection
+        try:
+            client.shutdown(socket.SHUT_RDWR)
+            client.close()
+        except socket.error:
+            pass
+    
+    # Server start
+    async def start(self, sock_name: str = "/tmp/gdpys.sock", max_conn: int = 5):
+        """Starts the GDPyS HTTP server on socket `sock`, looping forever
+        to receive connections.
+
+        Note:
+            This server is based on pure Python sockets for S P E E D and
+                customisation purposes.
+            This HTTP server currently only supports UNIX systems (Linux
+                and MacOS) due to UNIX sockets (which are faster) but port
+                support (and thus Windows support) will be added if there
+                is demand.
+        
+        Args:
+            sock_name (int): The UNIX socket file on which the GDPyS HTTP 
+                server shall be ran.
+            max_conn (int): The max concurrent connections to be allowed by
+                the server.
+        """
 
         # Log that its started.
-        debug(f"Server starting with {len(self.handlers)} handlers.")
-        info(f"GDPyS HTTP: Started listening on http://127.0.0.1:{port}/")
+        debug(f"GDPyS HTTP is starting with {len(self.handlers)} registered handlers.")
 
-        # Keep alive forever.
-        while True:
-            await asyncio.sleep(10000)
+        # Check if old socket exists from old instances.
+        if os.path.exists(sock_name):
+            # Unlink the unix socket
+            os.unlink(sock_name)
+            debug("Removed old socket file!")
+
+        # Create socket
+        with socket.socket(socket.AF_UNIX) as sock:
+            # Bind the socket.
+            sock.bind(sock_name)
+            # Make is non-blocking for async.
+            sock.setblocking(False)
+            sock.listen(max_conn)
+
+            # Make the socket fully accessable to avoid future errors.
+            os.chmod(sock_name, 0o777)
+
+            info(f"GDPyS HTTP: Started server on socket {sock_name}")
+
+            # Run server forever.
+            while True:
+                client, _ = await self.loop.sock_accept(sock)
+                self.loop.create_task(self._handle_sock(client))

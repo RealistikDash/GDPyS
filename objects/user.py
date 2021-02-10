@@ -379,7 +379,7 @@ class User:
             debug(f"User {usr.name} ({account_id}) retrieved from MySQL.")
 
             # Add them to the cache for speed later on.
-            glob.user_cache.cache(account_id, usr)
+            usr.cache()
             return usr
         
         # They do not exist to our knowledge.
@@ -460,8 +460,16 @@ class User:
         # Log.
         debug(f"{cls.name} ({cls.id}) has registered!")
 
+        # Cache them so login is a bit faster.
+        cls.cache()
+
         # Return obj.
         return cls
+    
+    def cache(self):
+        """Commits the user object to the cache."""
+
+        glob.user_cache.cache(self.id, self)
 
     async def stats_db(self):
         """Sets the statistics for the user directly from the database.

@@ -93,6 +93,7 @@ class Config(ConfigReader):
     sql_user: str      = "root"
     sql_db: str        = "GDPyS"
     sql_password: str  = ""
+    dir_levels: str    = ".data/levels"
 
 conf = Config()
 

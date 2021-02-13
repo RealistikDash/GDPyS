@@ -8,6 +8,7 @@ CLEAR_FORE = Fore.RESET
 CLEAR_BACK = Back.RESET
 
 # Received permission directly from him to use it. Just figured it looks cool.
+# Made some optimisations to it.
 __name__ = "LoggerModule"
 __author__ = "Lenforiee"
 
@@ -22,35 +23,34 @@ if os.name == "nt":
         7
     )
 
-def logMessage(**kwargs):
-    """Form message to be logged"""
-    # Get kwargs
-    content = kwargs.get('content')
-    logType = kwargs.get('type')
-    back_colour = kwargs.get('back_colour')
-
-    # get our colours
-    bg_colour = {
-        "YELLOW": Back.YELLOW,
-        "GREEN": Back.GREEN,
-        "RED": Back.RED,
-        "BLUE": Back.BLUE
-    }.get(back_colour, Back.GREEN)
+def log_message(content: str, l_type: str, bg_col: Fore):
+    """Creates the final string and writes it to console.
+    
+    Args:
+        content (str): The main text to be logged to
+            console.
+        l_type (str): The type of the log that will be
+            displayed to the user.
+        bl_col (Fore): The background colour for the
+            `l_type`.
+    """
         
-    # Output
-    logConsole = f'{Fore.WHITE}{bg_colour}[{logType}]{CLEAR_BACK} - [{formatted_date()}] {content}{CLEAR_FORE}'
-    print(logConsole)
+    # Print to console. Use this as faster ig.
+    sys.stdout.write(
+        f"{Fore.WHITE}{bg_col}[{l_type}]{CLEAR_BACK} - "
+        f"[{formatted_date()}] {content}{CLEAR_FORE}\n"
+    )
 
 def debug(message: str):
     if DEBUG:
-        return logMessage(content=message, type="DEBUG", back_colour="YELLOW")
+        return log_message(message, "DEBUG", Back.YELLOW)
 
 def info(message: str):
-    return logMessage(content=message, type="INFO", back_colour="GREEN")
+    return log_message(message, "INFO", Back.GREEN)
  
 def error(message: str):
-    return logMessage(content=message, type="ERROR", back_colour="RED")
+    return log_message(message, "ERROR", Back.RED)
 
 def warning(message: str):
-    return logMessage(content=message, type="WARNING", back_colour="BLUE")
+    return log_message(message, "WARNING", Back.BLUE)
 

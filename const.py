@@ -61,6 +61,16 @@ class Secrets:
     # List of all.
     ALL = (DEFAULT,)
 
+class Difficulty:
+	"""All of the difficulty face enums for levels."""
+
+	NA     = 0
+	EASY   = 10
+	NORMAL = 20
+	HARD   = 30
+	HARDER = 40
+	INSANE = 50
+
 # Source of these can be found on https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 HTTP_CODES = {
 	100: 'Continue',

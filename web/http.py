@@ -146,7 +146,7 @@ class Request:
             parts = parts.decode().split("=", 1)
 
             if len(parts) != 2:
-                debug("GDPyS Web: Misformated www-form data, ignoring.")
+                debug("GDPyS Web: Malformed www-form data, ignoring.")
                 continue
             
             self.post.update({parts[0]: parts[1]})

@@ -1,10 +1,9 @@
 from objects.user import User
 from web.http import Request
-from web.builders import gd_builder
 from helpers.security import verify_textbox
 from const import GenericResponse
 from exceptions import GDException
-from logger import info
+from logger import info, debug
 from const import Privileges
 
 async def register_account(req: Request) -> str:

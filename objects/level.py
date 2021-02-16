@@ -24,7 +24,7 @@ class Level:
         self.song: Song = Song()
         # Contains batch nodes to help with rendering
         self.extra_str: str = "0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0"
-        self.level_info: str = ""
+        self.replay: str = ""
         self.game_version: int = 22
         self.binary_version: int = 35
         self.timestamp: int = 0
@@ -76,6 +76,13 @@ class Level:
         # We can just use the star rating as
         # unrated levels cant be auto.
         return self.stars == 1
+    
+    @property
+    def featured(self) -> bool:
+        """Returns a bool of whether the level is
+        featured."""
+
+        return bool(self.feature_id)
 
     async def load(self) -> str:
         """Loads the level data directly from
@@ -90,13 +97,13 @@ class Level:
         if self._cache: return self._cache
 
         # Nope, we have to load it from storage.
-        l = self.path
+        p = self.path
 
         # Check if it even is locally available
-        if not l: return
+        if not p: return
 
         # Loading directly from storage.
-        async with aiofiles.open(l, "r") as f:
+        async with aiofiles.open(p, "r") as f:
             contents = await f.read()
         
         # Check if the contents are below 5kb to see

@@ -3,6 +3,5 @@ aiomysql == 0.0.21
 colorama == 0.4.4
 uvloop == 0.14.0
 orjson == 3.4.6
-timeago == 1.0.15
 bcrypt == 3.2.0
 aiofiles == 0.6.0

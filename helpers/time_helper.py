@@ -1,7 +1,6 @@
 # For now this is simply taken from GDPyS v2 as this has no huge flaws with it.
 import time
 from datetime import datetime
-import timeago
 
 class Timer:
     """A simple timer class used to time the execution of code."""
@@ -52,10 +51,35 @@ def time_ago(timestamp: int) -> str:
         timestamp (int): A UNIX timestamp you want the `time_ago`
             string from.
     """
-    raw_timeago = timeago.format(datetime.fromtimestamp(timestamp - 1), datetime.now())
-    return raw_timeago[:-4]
 
+    time_diff = get_timestamp() - round(timestamp)
 
+    # No difference.
+    if time_diff == 0:
+        return "just"
+    
+    # Make a non-negative variant for formatting.
+    pos_diff = time_diff if time_diff > 0 else time_diff * -1
+
+    # Seconds
+    if pos_diff < 60: return f"{pos_diff} second" + ("s" if pos_diff > 1 else "")
+    
+    # Minutes
+    pos_diff //= 60
+    if pos_diff < 60: return f"{pos_diff} minute" + ("s" if pos_diff > 1 else "")
+
+    # Hours
+    pos_diff //= 60
+    if pos_diff < 24: return f"{pos_diff} hour" + ("s" if pos_diff > 1 else "")
+
+    # Days
+    pos_diff //= 24
+    if pos_diff < 365: return f"{pos_diff} day" + ("s" if pos_diff > 1 else "")
+
+    # Years
+    pos_diff //= 365
+    return f"{pos_diff} year" + ("s" if pos_diff > 1 else ""
+)
 def week_ago() -> int:
     """Returns timestamp exactly week ago."""
     return get_timestamp() - 604800

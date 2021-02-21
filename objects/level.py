@@ -7,6 +7,9 @@ import aiofiles
 import os
 import sys
 
+# Local Consts.
+MAX_CACHE_SIZE = 5000
+
 class Level:
     """An object representing the values and qualities of
     a Geometry Dash level in code. It contains all of the
@@ -108,8 +111,26 @@ class Level:
         
         # Check if the contents are below 5kb to see
         # if we can cache.
-        if sys.getsizeof(contents) <= 5000:
+        if sys.getsizeof(contents) <= MAX_CACHE_SIZE:
             self._cache = contents
         
         # Return it
         return contents
+    
+    async def write(self, contents: str) -> None:
+        """Writes the level string to local
+        storage.
+        
+        Args:
+            contents (str): The level string
+                to be saved.
+        """
+
+        # If the level is small enough, cache it for
+        # faster access later.
+        if sys.getsizeof(contents) <= MAX_CACHE_SIZE:
+            self._cache = contents
+        
+        # Write the level to storage.
+        async with aiofiles.open(f"{conf.dir_levels}/{self.id}", "w+") as f:
+            await f.write(contents)

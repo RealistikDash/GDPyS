@@ -362,7 +362,14 @@ class GDPySWeb:
     async def _gd_auth(self, post: dict) -> bool:
         """Handles authentication for Geometry Dash handlers."""
 
-        # TODO: Anti-botting checks for vers and binaryver and secrets
+        # TODO: Anti-botting checks
+
+        # Verify their GD version is not pre-history.
+        if int(post["gameVersion"]) < 21\
+        or int(post["binaryVersion"]) < 34:
+            debug(f"GJP failed for user for pre-historic GD version.")
+            return False
+
         return await self.auth.gjp_check(
             int(post["accountID"]),
             post["gjp"]

@@ -19,6 +19,11 @@ class Glob:
             cache_limit= 200
         )
 
+        self.level_cache: Cache = Cache(
+            cache_length= 200,
+            cache_limit= 20
+        )
+
         # All of the privileges. Using a dict as we want
         # them to never expire.
         self.privileges: dict = {}

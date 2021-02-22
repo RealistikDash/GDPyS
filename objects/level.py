@@ -134,3 +134,75 @@ class Level:
         # Write the level to storage.
         async with aiofiles.open(f"{conf.dir_levels}/{self.id}", "w+") as f:
             await f.write(contents)
+    
+    @classmethod
+    async def from_sql(cls, level_id: int, full: bool = True):
+        """Fetches the level data from the
+        MySQL database and creates an instance
+        of `Level`.
+        
+        Args:
+            level_id (int): The ID of the level
+                in the database.
+            full (bool): Whether non-crucial data
+                will be also fetched (such as
+                comments).
+        """
+
+        # Create the instance of Level.
+        self = cls()
+
+        # Fetch data from MySQL
+        level_db = await glob.sql.fetchone(
+            "SELECT id, name, user_id, description,"
+            "song_id, extra_str, replay, game_version,"
+            "binary_version, timestamp, downloads, likes,"
+            "stars, difficulty, demon_diff, coins, coins_verified,"
+            "requested_stars, featured_id, epic, ldm,"
+            "objects, password FROM levels WHERE "
+            "id = %s LIMIT 1",
+            (level_id,)
+        )
+
+        # Stop an exception if level is not found.
+        if level_db is None: return
+
+        # Set simple data and store.
+        (
+            self.id,
+            self.name,
+            user_id,
+            self.description,
+            song_id,
+            self.extra_str,
+            self.replay,
+            self.game_version,
+            self.binary_version,
+            self.timestamp,
+            self.downloads,
+            self.likes,
+            self.stars,
+            self.difficulty,
+            self.demon_diff,
+            self.coins,
+            self.coins_verified,
+            self.requested_stars,
+            self.feature_id,
+            self.epic,
+            self.ldm,
+            self.objects,
+            self.password
+        ) = level_db
+
+        # GDPyS custom objects.
+        self.creator = await User.from_id(user_id)
+        self.song = await Song.from_id(song_id)
+
+        if full:
+            await self._fetch_comments()
+    
+    async def _fetch_comments(self):
+        """Fetches level comments from the MySQL
+        database and sets them in the object."""
+
+        ...

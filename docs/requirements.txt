@@ -1,6 +1,6 @@
 sphinx
 sphinxcontrib_trio
-aiohttp == 3.6.2
+aiohttp == 3.7.4
 aiomysql == 0.0.20
 bcrypt == 3.2.0
 timeago == 1.0.14

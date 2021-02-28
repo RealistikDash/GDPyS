@@ -38,10 +38,9 @@ async def login_account(req: Request) -> str:
     """Handles the action of user login.
     
     Note:
-        Currently, bcrypt for this authentication is
-            not cached due to it being in plain text,
-            rather than GJP. This means that its slow
-            as BCRYPT!!!
+        Currently, bcrypt for this authentication is not cached due to it
+        being in plain text, rather than GJP. This means that its slow as
+        BCRYPT!!!
     """
 
     # Set all required post args to variables.

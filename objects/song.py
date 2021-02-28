@@ -7,8 +7,7 @@ from web.builders import parse_to_dict, gd_dict_str
 from logger import error, debug
 
 class Song:
-    """The object representation of the GDPyS
-    and Geometry Dash songs."""
+    """The object representation of the GDPyS and Geometry Dash songs."""
 
     def __init__(self):
         """Sets the placeholder variables. Please
@@ -24,19 +23,17 @@ class Song:
     
     @property
     def full_name(self) -> str:
-        """Returns the name of the song in the format
-        Author Name - Song Name"""
+        """Returns the name of the song in the format Author Name - Song Name"""
 
         return f"{self.author_name} - {self.title}"
     
     @classmethod
     async def from_sql(cls, song_id: int):
-        """Fetches the song data directly from the MySQL
-        database and sets the object data based off it.
+        """Fetches the song data directly from the MySQL database and sets the
+        object data based off it.
         
         Args:
-            song_id (int): The Newgrounds ID of the song
-                to be fetched.
+            song_id (int): The Newgrounds ID of the song to be fetched.
         
         Returns:
             Instance of `Song` if found.
@@ -70,15 +67,12 @@ class Song:
 
     @classmethod
     async def from_boomlings(cls, song_id: int):
-        """Fetches the song data for the song with
-        the Newgrounds ID of `song_id` from the
-        Boomlings private API.
+        """Fetches the song data for the song with the Newgrounds ID of
+        `song_id` from the Boomlings private API.
         
         Note:
-            This is by far the slowest way of 
-            fetching from the servers as it has 
-            to make a http request to another 
-            server.
+            This is by far the slowest way of fetching from the servers as it
+                has to make a http request to another server.
         
         Args:
             song_id (int): The Newgrounds ID of the
@@ -121,17 +115,14 @@ class Song:
     
     @classmethod
     async def from_id(cls, song_id: int):
-        """Fetches the song object, searching for
-        `song_id`.
+        """Fetches the song object, searching for `song_id`.
         
         Note:
-            This classmethod searches through multiple
-                sources, in the order of cache, sql,
-                boomlings (ordered by speed).
+            This classmethod searches through multiple sources, in the order
+                of cache, sql, boomlings (ordered by speed).
 
         Args:
-            song_id (int): The Newgrounds ID of the
-                song to fetch.
+            song_id (int): The Newgrounds ID of the song to fetch.
         
         Returns:
             Instance of `Song` if found.
@@ -160,8 +151,7 @@ class Song:
         return
     
     async def insert(self):
-        """Inserts the song data from the object
-        into the MySQL database."""
+        """Inserts the song data from the object into the MySQL database."""
 
         # Check if we want to assign it a new ID.
         if self.id == -1:
@@ -193,8 +183,7 @@ class Song:
         return self.full_name
     
     def __repr__(self) -> str:
-        """"A Geometry Dash HTTP response styled song
-        object."""
+        """"A Geometry Dash HTTP response styled song object."""
 
         return gd_dict_str(
             {

@@ -7,23 +7,21 @@ import aiomysql
 import asyncio
 
 class MySQLPool:
-    """The GDPyS specific wrapper around the `aiomysql` module.
-    It allows for the simple usage of the database within many
-    circumstances while respecting the one connection at a time
-    rule.
+    """The GDPyS specific wrapper around the `aiomysql` module. It allows for
+    the simple usage of the database within many circumstances while
+    respecting the one connection at a time rule.
     
-    Creating a wrapper as such allows us to quickly change the
-    module used for MySQL without rewriting a large portion of
-    the codebase.
+    Creating a wrapper as such allows us to quickly change the module used for
+    MySQL without rewriting a large portion of the codebase.
 
     Classmethods:
-        connect: Creates a connection to the MySQL server and
-            establishes a pool.
+        connect: Creates a connection to the MySQL server and establishes a
+            pool.
     """
 
     def __init__(self):
-        """Creates the default values for the connector. Use the
-        `conntect` classmethod instead."""
+        """Creates the default values for the connector. Use the `conntect`
+        classmethod instead."""
         self._pool: aiomysql.Pool
         self.last_row_id: int = 0
         self._loop: asyncio.AbstractEventLoop
@@ -38,20 +36,20 @@ class MySQLPool:
         port: int = 3306,
         loop: asyncio.AbstractEventLoop = None
     ):
-        """Creates the MySQL connecton pool. Handles authentication and
-        the configuration of the object.
+        """Creates the MySQL connecton pool. Handles authentication and the
+        configuration of the object.
         
         Note:
-            Calling this function allows for the usage of all functions
-                within this class, such as `fetchone`.
+            Calling this function allows for the usage of all functions within
+                this class, such as `fetchone`.
         
         Args:
-            host (str): The hostname of the MySQL server you would like
-                to connect. Usually `localhost`.
-            user (str): The username of the MySQL user you would like to
+            host (str): The hostname of the MySQL server you would like to
+                connect. Usually `localhost`.
+            user (str): The username of the MySQL user you would like to log
+                into.
+            password (str): The password of the MySQL user you would like to
                 log into.
-            password (str): The password of the MySQL user you would like
-                to log into.
             database (str): The database you would like to interact with.
             port (int): The port at which the MySQL server is located at.
                 Default set to 3306.
@@ -80,12 +78,12 @@ class MySQLPool:
         
         Args:
             query (str): The MySQL query to be executed.
-            args (tuple, list): The list or tuple of arguments to
-                be safely formatted into the query.
+            args (tuple, list): The list or tuple of arguments to be safely
+                formatted into the query.
         
         Returns:
-            Tuple in the arrangement specified within the query if
-                a result is found.
+            Tuple in the arrangement specified within the query if a result is
+                found.
             None if no results are found.
         """
 
@@ -100,13 +98,12 @@ class MySQLPool:
                 return await cur.fetchone()
     
     async def fetchall(self, query: str, args: tuple = ()) -> Tuple[tuple]:
-        """Executes `query` in MySQL and returns all of the found
-        results.
+        """Executes `query` in MySQL and returns all of the found results.
         
         Args:
             query (str): The MySQL query to be executed.
-            args (tuple, list): The list or tuple of arguments to
-                be safely formatted into the query.
+            args (tuple, list): The list or tuple of arguments to be safely
+                formatted into the query.
         
         Returns:
             Tuple of tuples with the results found.
@@ -124,17 +121,17 @@ class MySQLPool:
                 return await cur.fetchall()
         
     async def execute(self, query: str, args: tuple = ()) -> int:
-        """Simply executes `query` and commits all changes made by
-        it to database.
+        """Simply executes `query` and commits all changes made by it to
+        database.
         
         Note:
-            Please don't use this function for select queries. For
-                them rather use `fetchall` and `fetchone`
+            Please don't use this function for select queries. For them rather
+                use `fetchall` and `fetchone`
         
         Args:
             query (str): The MySQL query to be executed.
-            args (tuple, list): The list or tuple of arguments to
-                be safely formatted into the query.
+            args (tuple, list): The list or tuple of arguments to be safely
+                formatted into the query.
         
         Returns:
             The ID of the last row affected.

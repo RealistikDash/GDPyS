@@ -7,9 +7,8 @@ from logger import debug
 from const import Privileges
 
 class Auth:
-    """A helper that assists with the task of authenticating
-    users. It helps with GJP authentication and other minor
-    authentication related tasks."""
+    """A helper that assists with the task of authenticating users. It helps
+    with GJP authentication and other minor authentication related tasks."""
 
     def __init__(self):
         """Establishes the auth helper."""
@@ -29,30 +28,24 @@ class Auth:
         )
     
     async def gjp_check(self, account_id: int, gjp: str) -> Union[User, None]:
-        """Checks if the combination of `account_id` and `gjp`
-        matches the credentials of the target user.
+        """Checks if the combination of `account_id` and `gjp` matches the
+        credentials of the target user.
         
         Note:
-            Correct GJPs from this are stored within a private
-                cache.
+            Correct GJPs from this are stored within a private cache.
             Cached results stored are used within this check.
         
         Args:
-            account_id (int): The ID of the user that you want
-                to authenticate.
-            gjp (str): The GJP encoded variant of the user's
-                password.
+            account_id (int): The ID of the user that you want to authenticate.
+            gjp (str): The GJP encoded variant of the user's password.
         
         Returns:
-            If the user is successfully validated, an instance
-                of the matching user's `User` object is
-                returned.
+            If the user is successfully validated, an instance of the matching 
+                user's `User` object is returned.
             
-            If the user is not successfully validated, None is
-                returned.
+            If the user is not successfully validated, None is returned.
             
-            If the target is not found within either medium,
-                None is returned.
+            If the target is not found within either medium, None is returned.
         """
 
         # Fetch the user directly from any available medium.

@@ -1,17 +1,14 @@
 class CommandsAsync:
-    """A commands framework for any usage. Its goal
-    is to provide a simple way of adding a pathway
-    for specific user input -> handler. This is an
+    """A commands framework for any usage. Its goal is to provide a simple
+    way of adding a pathway for specific user input -> handler. This is an
     async handler only variant."""
 
     def __init__(self, prefix: str = "/") -> None:
-        """Configures the commands framework with
-        prefix.
+        """Configures the commands framework with prefix.
         
         Args:
-            prefix (str): The prefix all commands
-                must start with to be handled by
-                the framework.
+            prefix (str): The prefix all commands must start with to be
+                handled by the framework.
         """
 
         self.prefix: str = prefix
@@ -28,16 +25,12 @@ class CommandsAsync:
         return tuple(self.handlers)
     
     def register(self, name: str, handler, priv: int) -> None:
-        """Registers a handler into a list of commands
-        to be handled.
+        """Registers a handler into a list of commands to be handled.
         
         Args:
-            name (str): The name of the command
-                that triggers the handler.
-            handler (coroutine): The coroutine
-                of the command handler.
-            priv (int): A bitwise privilege enum
-                required for the command.
+            name (str): The name of the command that triggers the handler.
+            handler (coroutine): The coroutine of the command handler.
+            priv (int): A bitwise privilege enum required for the command.
         """
 
         self.handlers[name] = {
@@ -46,8 +39,7 @@ class CommandsAsync:
         }
     
     def _handlable(self, input: str) -> bool:
-        """Checks if the user input meets the prerequisites
-        to be handled.
+        """Checks if the user input meets the prerequisites to be handled.
         Args:
             input (str): The input of the user.
         
@@ -60,14 +52,12 @@ class CommandsAsync:
         return False
     
     def _meets_privs(self, name: str, user: object) -> bool:
-        """Checks if the user passed meets the
-        privileges for the command.
+        """Checks if the user passed meets the privileges for the command.
         
         Args:
             name (str): The name of the command.
-            user (any): The object to validate the
-                privileges of (must have `has_privilege`)
-                function!
+            user (any): The object to validate the privileges of (must have
+                `has_privilege`) function!
         """
 
         return user.has_privilege(
@@ -75,7 +65,6 @@ class CommandsAsync:
         )
     
     def _command_exists(self, name: str) -> bool:
-        """Checks if the command name passed is registered
-        with a handler."""
+        """Checks if the command name passed is registered with a handler."""
 
         return name in self.commands

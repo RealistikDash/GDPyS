@@ -17,8 +17,8 @@ class JsonFile:
         """Loads a Json file `file_name` from disk.
         
         Args:
-            file_name (str): The path including the filename
-                of the JSON file you would like to load.
+            file_name (str): The path including the filename of the JSON file
+                you would like to load.
         """
 
         self.file = None
@@ -39,8 +39,8 @@ class JsonFile:
         """Writes `new_content` to the target file.
         
         Args:
-            new_content (dict, list): The new content that should
-                be placed within the file.
+            new_content (dict, list): The new content that should be placed
+                within the file.
         """
 
         with open(self.file_name, "w") as f:
@@ -48,8 +48,7 @@ class JsonFile:
         self.file = new_content
 
 def dict_keys(d: dict) -> tuple:
-    """Returns a `tuple` of all the keys present within
-    the dictionary `d`.
+    """Returns a `tuple` of all the keys present within the dictionary `d`.
     
     Args:
         d (dict): A dictionary to fetch all the keys of.
@@ -65,24 +64,23 @@ def safe_username(uname: str) -> str:
         uname (str): The username to convert to a safe variant.
     
     Returns:
-        The username string that is lowercase and ` ` replaced
-            with `_`.
+        The username string that is lowercase and ` ` replaced with `_`.
     """
 
     return uname.lower().replace(" ", "_")
 
 
 def paginate_list(list_to_paginate: list, page: int, elems_page: int = 10):
-    """Grabs a 'page' out of the given `list_to_paginate`
-    and returns a section `elems_page` large.
+    """Grabs a 'page' out of the given `list_to_paginate` and returns a section
+    `elems_page` large.
     
     Args:
-        list_to_paginate (list): The list of items you
-            would like to get the page of.
-        page (int): The number of the page (starting
-            with 0) you would like to fetch.
-        elems_page (int): The number of elements that
-            should be present within a page.
+        list_to_paginate (list): The list of items you would like to get the
+            page of.
+        page (int): The number of the page (starting with 0) you would like to
+            fetch.
+        elems_page (int): The number of elements that should be present within
+            a page.
     
     Returns:
         A list of elements.
@@ -91,12 +89,11 @@ def paginate_list(list_to_paginate: list, page: int, elems_page: int = 10):
     return list_to_paginate[offset : offset + elems_page]
 
 def is_numeric(digit: str) -> bool:
-    """Kind of like `str.isdigit()` but works with
-    checking for negative numbers too.
+    """Kind of like `str.isdigit()` but works with checking for negative numbers
+    too.
     
     Args:
-        digit (str): A string to be checked for if
-            it is a number.
+        digit (str): A string to be checked for if it is a number.
     
     Returns:
         True if it is numeric, else false.

@@ -3,14 +3,12 @@ from .misc import RGB
 from const import Privileges
 
 class Privilege:
-    """A GDPyS privilege group, representing the privileges of
-    users (what they are allowed to do essentially). These
-    are used to group people as well as determine what they
-    can and can't do."""
+    """A GDPyS privilege group, representing the privileges of users (what
+    they are allowed to do essentially). These are used to group people as
+    well as determine what they can and can't do."""
 
     def __init__(self):
-        """Sets out placeholders for the class. Use classmethods
-        instead."""
+        """Sets out placeholders for the class. Use classmethods instead."""
 
         self.id: int = -1
         self.name: str = ""
@@ -19,12 +17,11 @@ class Privilege:
         self.colour: RGB = RGB()
 
     def has_privilege(self, priv: Privileges) -> bool:
-        """Check if members of the privilege group have the given
-        permisison.
+        """Check if members of the privilege group have the given permisison.
         
         Args:
-            priv (Privileges): An IntFlag representing the privilege
-                to check for.
+            priv (Privileges): An IntFlag representing the privilege to check
+                for.
 
         Returns:
             True if has privilege, else False.
@@ -34,8 +31,8 @@ class Privilege:
     
     @classmethod
     async def from_sql(cls, sql_id: int):
-        """Fetches the privilege directly from the MySQL database,
-        seaching by the ID of the privilege.
+        """Fetches the privilege directly from the MySQL database, seaching by
+        the ID of the privilege.
 
         Note:
             This also caches the object globally.

@@ -8,6 +8,7 @@ from helpers.security import verify_stats_seed, verify_textbox
 from exceptions import GDException
 from objects.comments import AccountComment
 from const import ReqStats
+from logger import debug
 
 async def user_info(req: Request, user: User):
     """Handles the `getGJUserInfo20.php` endpoint."""
@@ -232,3 +233,5 @@ async def update_social(req: Request, user: User) -> str:
 
     # Return a success!
     return 1
+
+async def profile_search(req: Request)

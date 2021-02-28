@@ -11,13 +11,13 @@ import sys
 MAX_CACHE_SIZE = 5000
 
 class Level:
-    """An object representing the values and qualities of
-    a Geometry Dash level in code. It contains all of the
-    functions and properties to work with levels."""
+    """An object representing the values and qualities of a Geometry Dash
+    level in code. It contains all of the functions and properties to work
+    with levels."""
 
     def __init__(self) -> None:
-        """Sets all the placeholder attributes. Use
-        classmethods instead please."""
+        """Sets all the placeholder attributes. Use classmethods instead
+        please."""
 
         self.id: int = 0
         self.name: str = ""
@@ -52,8 +52,7 @@ class Level:
     
     @property
     def path(self) -> str:
-        """Returns the path to the level's local 
-        location in storage."""
+        """Returns the path to the level's local location in storage."""
 
         path = f"{conf.dir_levels}/{self.id}"
 
@@ -64,8 +63,7 @@ class Level:
     
     @property
     def demon(self) -> bool:
-        """Returns a bool of whether the level
-        has a demon rating."""
+        """Returns a bool of whether the level has a demon rating."""
 
         # We can just use the star rating as
         # unrated levels cant be demons.
@@ -73,8 +71,7 @@ class Level:
     
     @property
     def auto(self) -> bool:
-        """Returns a bool of whether the level
-        has the auto rating."""
+        """Returns a bool of whether the level has the auto rating."""
 
         # We can just use the star rating as
         # unrated levels cant be auto.
@@ -82,18 +79,15 @@ class Level:
     
     @property
     def featured(self) -> bool:
-        """Returns a bool of whether the level is
-        featured."""
+        """Returns a bool of whether the level is featured."""
 
         return bool(self.feature_id)
 
     async def load(self) -> str:
-        """Loads the level data directly from
-        storage and returns it.
+        """Loads the level data directly from storage and returns it.
         
         Note:
-            If the level is really small, it
-            can be cached for s p e e d.
+            If the level is really small, it can be cached for s p e e d.
         """
 
         # Check cache first in case its a really small level.
@@ -118,12 +112,10 @@ class Level:
         return contents
     
     async def write(self, contents: str) -> None:
-        """Writes the level string to local
-        storage.
+        """Writes the level string to local storage.
         
         Args:
-            contents (str): The level string
-                to be saved.
+            contents (str): The level string to be saved.
         """
 
         # If the level is small enough, cache it for
@@ -137,16 +129,13 @@ class Level:
     
     @classmethod
     async def from_sql(cls, level_id: int, full: bool = True):
-        """Fetches the level data from the
-        MySQL database and creates an instance
-        of `Level`.
+        """Fetches the level data from the MySQL database and creates an
+        instance of `Level`.
         
         Args:
-            level_id (int): The ID of the level
-                in the database.
-            full (bool): Whether non-crucial data
-                will be also fetched (such as
-                comments).
+            level_id (int): The ID of the level in the database.
+            full (bool): Whether non-crucial data will be also fetched (such
+                as comments).
         """
 
         # Create the instance of Level.
@@ -202,7 +191,7 @@ class Level:
             await self._fetch_comments()
     
     async def _fetch_comments(self):
-        """Fetches level comments from the MySQL
-        database and sets them in the object."""
+        """Fetches level comments from the MySQL database and sets them in the
+        object."""
 
         ...

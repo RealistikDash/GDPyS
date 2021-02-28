@@ -20,12 +20,12 @@ class RGB:
     
     @classmethod
     def from_string(cls, string: str):
-        """Creates an instance of `RGB` from a comma separated
-        string of RGB values.
+        """Creates an instance of `RGB` from a comma separated string of RGB
+        values.
         
         Args:
-            string (str): A string of RGB ints in the order of
-                red, green, blue.
+            string (str): A string of RGB ints in the order of red, green,
+                blue.
         """
 
         # First we clean up the string in case.

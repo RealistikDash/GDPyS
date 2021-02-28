@@ -7,9 +7,11 @@ class Cache:
 
     def __init__(self, cache_length : int = 5, cache_limit : int = 500):
         """Establishes a cache and configures the limits.
-        Params:
-        cache_length: (in minutes) how long each cache lasts before being removed
-        cache_limit: A limit to how many objects can be max cached before other objects start being removed.
+        Args:
+            cache_length (int): How long (in minutes) each cache lasts before
+                being removed
+            cache_limit (int): A limit to how many objects can be max cached
+                before other objects start being removed.
         """
         self._cache = {} # The main cache object.
         self._lenght = cache_length * 60 # Multipled by 60 to get the length in seconds rather than minutes.

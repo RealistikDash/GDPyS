@@ -13,8 +13,8 @@ import re
 
 @dataclass
 class Stats:
-    """An object representation of a user's stats, Providing
-    storage and assistance for working with stats."""
+    """An object representation of a user's stats, Providing storage and
+    assistance for working with stats."""
 
     user_id: int = 0
     stars: int = 0
@@ -40,8 +40,8 @@ class Stats:
     display_icon: int = 0
 
     async def calc_rank(self):
-        """Calculates the leaderboards placement for the user
-        using the MySQL database.
+        """Calculates the leaderboards placement for the user using the MySQL
+        database.
         """
 
         # We don't count ranks for users with 0 stars.
@@ -55,12 +55,11 @@ class Stats:
             self.rank = stars_db[0] + 1
     
     async def from_sql(self, full: bool = True):
-        """Sets the statistics for user directly from the MySQL
-        database.
+        """Sets the statistics for user directly from the MySQL database.
         
         Args:
-            full (bool): Whether extra details such as rank should
-                be calculated.
+            full (bool): Whether extra details such as rank should be
+                calculated.
         """
 
         # Execute the query to fetch data.
@@ -111,17 +110,14 @@ class Stats:
         """Sets the statistics for a user from kwargs provided.
         
         Note:
-            This affects both the local object and the data
-                stored within the MySQL database.
+            This affects both the local object and the data stored within the
+                MySQL database.
 
         Kwargs:
             stars (int): The new starcount for the user.
-            diamonds (int): The new diamond count for the
-                user.
-            coins (int): The new golden coin count for the
-                user.
-            u_coins (int): The new verified user coin count
-                for the user.
+            diamonds (int): The new diamond count for the user.
+            coins (int): The new golden coin count for the user.
+            u_coins (int): The new verified user coin count for the user.
             demons (int): The new demon count for the user.
             cp (int): The new creator point count for the user.
             colour1 (int): The new primary colour of the user.
@@ -133,12 +129,11 @@ class Stats:
             robot (int): The robot icon enum for the user.
             ball (int): The ball icon enum for the user.
             spider (int): The spider icon enum for the user.
-            explosion (int): The explosion item enum that the
-                user has equipped.
-            display_icon (int): The icon that will be displayed
-                on the leaderboards and profile.
-            glow (bool): Whether the user's icons should have
-                glow around them.
+            explosion (int): The explosion item enum that the user has
+                equipped.
+            display_icon (int): The icon that will be displayed on the
+                leaderboards and profile.
+            glow (bool): Whether the user's icons should have glow around them.
         """
 
         # Set all values from kwargs, with old values as defaults.
@@ -194,13 +189,13 @@ class Stats:
         ))
 
 class User:
-    """The primary class for the representation of GDPyS users.
-    This class allows for the OOP way of working with users.
+    """The primary class for the representation of GDPyS users. This class
+    allows for the OOP way of working with users.
     """
 
     def __init__(self):
-        """Configures all placeholders for the object. Please
-        use classmethods instead."""
+        """Configures all placeholders for the object. Please use classmethods
+        instead."""
 
         self.id: int = 0
         self.name: str = ""
@@ -227,46 +222,44 @@ class User:
     
     @property
     def safe_name(self) -> str:
-        """Creates a version of `name` thats all lower case with
-        spaces replaced by underscores. Made to allow quick lookups
-        and safe working."""
+        """Creates a version of `name` thats all lower case with spaces
+        replaced by underscores. Made to allow quick lookups and safe
+        working."""
 
         return safe_username(self.name)
     
     @property
     def messages_enabled(self) -> bool:
-        """A property that returns a bool corresponding to whether
-        they have public messages enabled."""
+        """A property that returns a bool corresponding to whether they have
+        public messages enabled."""
 
         return bool(self.req_states & ReqStats.MESSAGES)
     
     @property
     def comment_history_enabled(self) -> bool:
-        """A property that returns a bool corresponding to whether
-        the user has their comment history set to public."""
+        """A property that returns a bool corresponding to whether the user
+        has their comment history set to public."""
 
         return bool(self.req_states & ReqStats.COMMENTS)
     
     @property
     def friend_requests_enabled(self) -> bool:
-        """A property that returns a bool corresponding to whether
-        the user has enabled receiving friend requests from the
-        general public."""
+        """A property that returns a bool corresponding to whether the user
+        has enabled receiving friend requests from the general public."""
 
         return bool(self.req_states & ReqStats.REQUESTS)
     
     @property
     def messages_fo(self) -> bool:
-        """A property that returns a bool corresponding to whether
-        they have messages set to friend only."""
+        """A property that returns a bool corresponding to whether they have
+        messages set to friend only."""
 
         return bool(self.req_states & ReqStats.MESSAGES_FRIENDS_ONLY)
     
     @property
     def comment_history_fo(self) -> bool:
-        """A property that returns a bool corresponding to whether
-        the user has their comment history set to be viewed by
-        friends only."""
+        """A property that returns a bool corresponding to whether the user
+        has their comment history set to be viewed by friends only."""
 
         return bool(self.req_states & ReqStats.COMMENTS_FRIENDS_ONLY)
     
@@ -286,13 +279,13 @@ class User:
     
     @classmethod
     async def from_sql(cls, account_id: int, full: bool = True):
-        """Fetches the `User` object directly from the database, using
-        the `account_id` for lookup.
+        """Fetches the `User` object directly from the database, using the
+        `account_id` for lookup.
         
         Args:
             account_id (int): The account id of the user to be fetched.
-            full (bool): Decides whether the full profile will be fetched
-                from the database of only the minimums.
+            full (bool): Decides whether the full profile will be fetched from
+                the database of only the minimums.
         
         Returns:
             None if user is not found within the datbase.
@@ -323,16 +316,13 @@ class User:
         """Attempts to fetch the user object from their name.
         
         Note:
-            Currently, this function works by looking up the
-                name within the database and then calling the
-                `from_id` classmethod. While slightly slower,
-                it shouldn't be too much. However, please use
-                `from_id` wherever you can so less stress on
-                the db.
+            Currently, this function works by looking up the name within the
+                database and then calling the `from_id` classmethod. While
+                slightly slower, it shouldn't be too much. However, please use
+                `from_id` wherever you can so less stress on the db.
         
         Args:
-            name (str): The username of the account we will
-                fetch.
+            name (str): The username of the account we will fetch.
         
         Returns:
             If user found, instance of the `User` object is returned.
@@ -358,8 +348,8 @@ class User:
         multiple sources, which are ordered from fastest to slowest.
         
         Note:
-            Currently, the only two sources included are the user cache
-                and MySQL.
+            Currently, the only two sources included are the user cache and
+                MySQL.
         
         Args:
             account_id (int): The account of the user you are fetching.
@@ -388,19 +378,18 @@ class User:
     
     @classmethod
     async def register(cls, email: str, username: str, password: str):
-        """Registers the user with the given credentials, adds them to
-        the database and returns an instance of their User object.
+        """Registers the user with the given credentials, adds them to the
+        database and returns an instance of their User object.
         
         Note:
-            Any gdpys-related error that occurs within this function
-                will be raised as a `GDException` with the GD response
-                error enum corresponding to the issue.
+            Any GDPyS-related error that occurs within this function will be
+                raised as a `GDException` with the GD response error enum
+                corresponding to the issue.
         
         Args:
-            email (str): The email under which to identify the newly
+            email (str): The email under which to identify the newly 
                 registered user.
-            username (str): The name that the user will be registered
-                under.
+            username (str): The name that the user will be registered under.
             password (str): The password under which the user will be 
                 authenticated. Will be hashed with BCrypt.
         
@@ -519,8 +508,8 @@ class User:
         await self.stats.from_sql()
     
     async def accomment_db(self):
-        """Sets and populates the account comment list
-        with `AccountComment` objects of the user."""
+        """Sets and populates the account comment list with `AccountComment`
+        objects of the user."""
 
         # Get rid of possible old comments.
         self.account_comments.clear()
@@ -568,16 +557,16 @@ class User:
         return f"<User {self.name} ({self.id})>"
     
     def check_pass(self, password: str) -> bool:
-        """Compares the passed plaintext `password` to the
-        BCrypt hashed password.
+        """Compares the passed plaintext `password` to the BCrypt hashed
+        password.
         
         Note:
-            This does NOT use the GJP cache, meaning it is
-                as slow as BCrypt is. Please consider this.
+            This does NOT use the GJP cache, meaning it is as slow as BCrypt
+            is. Please consider this.
         
         Args:
-            password (str): The plaintext version of the
-                password to compare the BCrypt to.
+            password (str): The plaintext version of the password to compare
+                the BCrypt to.
         
         Returns:
             Bool of whether the passwords match.
@@ -589,9 +578,8 @@ class User:
         """Check if the user has the permission `priv`.
         
         Args:
-            priv (Privileges): The privilege int flag
-                to check for within the user's priv
-                int flag.
+            priv (Privileges): The privilege int flag to check for within the
+                user's priv int flag.
         
         Returns:
             Bool whether int flag is present.
@@ -603,17 +591,14 @@ class User:
         return self.privilege.has_privilege(priv)
 
     async def update_socials(self, **kwargs):
-        """Updates the social aspects of the user's profile
-        from kwargs.
+        """Updates the social aspects of the user's profile from kwargs.
         
         Kwargs:
             youtube (str): The user's new channel UUID.
             twitter (str): The user's new twitter handle.
-            twitch (str): The user's new twitch channel
-                username.
-            req_state (ReqStats): The new social requests
-                value of the user (used for allowing friend
-                requests or messages).
+            twitch (str): The user's new twitch channel username.
+            req_state (ReqStats): The new social requests value of the user
+                (used for allowing friend requests or messages).
         """
 
         # Set the kwargs to proper variables.

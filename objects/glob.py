@@ -2,8 +2,7 @@
 from helpers.cache import Cache
 
 class Glob:
-    """The global object shared between most
-    major GDPyS systems."""
+    """The global object shared between most major GDPyS systems."""
 
     def __init__(self):
         """Creates all the default glob variables."""

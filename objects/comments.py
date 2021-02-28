@@ -6,8 +6,7 @@ class AccountComment:
     account comments."""
 
     def __init__(self):
-        """Sets all default values for the object.
-        Use classmethods instead."""
+        """Sets all default values for the object. Use classmethods instead."""
         
         self.id: int = -1 # -1 means not in db.
         self.account_id: int = 0 # Thought about making this an acc object but that could lead to ram issues etc.
@@ -17,18 +16,15 @@ class AccountComment:
     
     @classmethod
     async def from_db(cls, comment_id: int):
-        """Fetches the account comment directly
-        from the database and creates the
-        `AccountComment` object.
+        """Fetches the account comment directly from the database and creates
+        the `AccountComment` object.
 
         Args:
-            comment_id (int): The ID of the comment
-                within the database.
+            comment_id (int): The ID of the comment within the database.
         
         Returns:
             None if comment not found.
-            AccountComment instance if comment
-                found.
+            AccountComment instance if comment found.
         """
 
         # Fetch directly from db.
@@ -53,16 +49,15 @@ class AccountComment:
     
     @classmethod
     def from_tuple(cls, from_t: tuple):
-        """Configures the object based on data from
-        a `tuple`.
+        """Configures the object based on data from a `tuple`.
         
         Note:
-            This is primarily used in database fetches
-                to avoid running multiple queries.
+            This is primarily used in database fetches to avoid running
+                multiple queries.
         
         Args:
-            from_t (tuple): Tuple with date in the order
-                of id, account_id, likes, content, timestamp.
+            from_t (tuple): Tuple with date in the order of id, account_id,
+                likes, content, timestamp.
         """
 
         cls = cls()
@@ -79,19 +74,16 @@ class AccountComment:
     
     @classmethod
     def from_text(cls, account_id: int, content: str):
-        """Creates a new account comment object from the
-        `content` argument.
+        """Creates a new account comment object from the `content` argument.
         
         Note:
-            This is commonly used for the creation of new
-                posts, and therefore is mostly tailored to
-                that function.
+            This is commonly used for the creation of new posts, and therefore
+                is mostly tailored to that function.
 
         Args:
-            account_id (int): The account ID of the user
-                the comment should be assigned to.
-            content (str): The plaintext contents of the
-                account comment. 
+            account_id (int): The account ID of the user the comment should be
+                assigned to.
+            content (str): The plaintext contents of the account comment. 
         """
 
         cls = cls()
@@ -106,14 +98,11 @@ class AccountComment:
         return cls
 
     async def insert(self):
-        """Inserts the content of the object directly
-        into the MySQL database.
+        """Inserts the content of the object directly into the MySQL database.
         
         Note:
-            The check if the comment is already in the
-                database is done by checking it the
-                id variable is equal to its default
-                value (-1)
+            The check if the comment is already in the database is done by
+                checking it the id variable is equal to its default value (-1)
         
         """
 
@@ -136,14 +125,12 @@ class AccountComment:
             u.account_comments.insert(0, self)
     
     async def save(self):
-        """Saves the current version of the object to
-        the database, replacing the current database
-        entry.
+        """Saves the current version of the object to the database, replacing
+        the current database entry.
         
         Note:
-            For this to work, the comment must already
-                be in the database. If it isn't, please
-                use the `insert` coroutine.
+            For this to work, the comment must already be in the database. If
+                it isn't, please use the `insert` coroutine.
         """
 
         if self.id == -1:
@@ -168,8 +155,7 @@ class AccountComment:
                     break
     
     async def delete(self):
-        """Deletes the account comment from the database and cached
-        user."""
+        """Deletes the account comment from the database and cached user."""
 
         if self.id == -1:
             # It doesnt exist to our knowledge. Idk if this is the right exception.

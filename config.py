@@ -8,8 +8,8 @@ __author__ = "RealistikDash"
 __version__ = "v2.0.0"
 
 class ConfigReader:
-    """A parent class meant for the easy management, updating
-    and the creation of a configuration `JSON` file."""
+    """A parent class meant for the easy management, updating and the creation
+    of a configuration `JSON` file."""
 
     def __init__(self):
         """Sets placeholder variables."""

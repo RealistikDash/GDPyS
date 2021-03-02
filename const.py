@@ -2,8 +2,7 @@
 from enum import IntEnum, IntFlag
 
 class HandlerTypes(IntFlag):
-    """This `IntFlag` class contains enumeration for GDPyS
-    handler types."""
+    """This `IntFlag` class contains enumeration for GDPyS handler types."""
 
     # Args passed.
     DATABASE     = 1 << 0

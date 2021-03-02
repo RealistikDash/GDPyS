@@ -50,14 +50,12 @@ def gd_builder(resp: List[Union[dict, str]], separator: str = "#") -> str:
     return separator.join(final_resp)
 
 def gd_dict_str(d: Dict[int, str], separator: str = ":") -> str:
-    """Converts the dict `d` into a Geometry Dash-styled HTTP
-    response.
+    """Converts the dict `d` into a Geometry Dash-styled HTTP response.
     
     Args:
-        d (dict): A dictionary of keys to convert. Should be in
-            the format `key int: str`.
-        separator (str): The character to separate all elements of
-            the dict.
+        d (dict): A dictionary of keys to convert. Should be in the format 
+            key int: str`.
+        separator (str): The character to separate all elements of the dict.
     
     Returns:
         Returns a string from the dict in the format `1:aaa:2:b`
@@ -74,8 +72,8 @@ def gd_dict_str(d: Dict[int, str], separator: str = ":") -> str:
     return separator.join(str(i) for i in a)
 
 def parse_to_dict(data: str, separator: str = "~|~") -> dict:
-    """Parses a GeometryDash style keyed split response into an
-    easy to work with Python dictionary object.
+    """Parses a GeometryDash style keyed split response into an easy to work
+    with Python dictionary object.
     
     Args:
         data (str): The data to be parsed into a dict.

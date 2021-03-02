@@ -25,6 +25,7 @@ async def user_info(req: Request, user: User):
 
         # TODO: Blocked check
 
+    # Here we build it ourselves as it has extra data
     resp_dict = {
         1: target.name,
         2: target.id,
@@ -234,4 +235,30 @@ async def update_social(req: Request, user: User) -> str:
     # Return a success!
     return 1
 
-async def profile_search(req: Request)
+async def profile_search(req: Request) -> str:
+    """Handles `getGJUsers20.php`."""
+
+    # NOTE: For speed reasons, we are only getting exact results.
+
+    # UserID search.
+    search = req.post["str"]
+    if search.isnumeric():
+        u = await User.from_id(int(search))
+    else:
+        u = await User.from_name(search)
+    
+    # If not found.
+    if u is None:
+        return "#0:0:10"
+    
+    return u.resp() + "#1:0:10"
+
+async def req_mod(req: Request, user: User) -> str:
+    """Handles `requestUserAccess.php` (mod check.)"""
+
+    # Here we simply utilise their mod badge level as it would be a bit
+    # useless to create a new permission for this.
+
+    lvl = user.badge_level
+
+    return lvl if lvl != 0 else -1 # Weird request requirement but ok.

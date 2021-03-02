@@ -9,6 +9,7 @@ from .comments import AccountComment
 from .privilege import Privilege
 from exceptions import GDException
 from typing import List
+from web.builders import gd_dict_str
 import re
 
 @dataclass
@@ -45,7 +46,7 @@ class Stats:
         """
 
         # We don't count ranks for users with 0 stars.
-        if not self.stars:
+        if self.stars:
             # Count how many users are ahead of us that are not banned.
             stars_db = await glob.sql.fetchone(
                 "SELECT COUNT(*) FROM users WHERE stars > %s AND privileges & %s",
@@ -614,4 +615,44 @@ class User:
             "LIMIT 1",
             (self.youtube_url, self.twitter_url, self.twitch_url,
             int(self.req_states), self.id)
+        )
+    
+    def resp(self) -> str:
+        """Builds the user data into a GD user object."""
+
+        return gd_dict_str(
+            {
+                1: self.name,
+                2: self.id,
+                3: self.stats.stars,
+                4: self.stats.demons,
+                6: self.stats.rank,
+                7: self.id,
+                8: self.stats.cp,
+                9: self.stats.display_icon,
+                10: self.stats.colour1,
+                11: self.stats.colour2,
+                13: self.stats.coins,
+                14: self.stats.icon,
+                15: 0, # "Special" value. Not sure what it does.
+                16: self.id,
+                17: self.stats.u_coins,
+                # States.
+                20: self.youtube_url,
+                21: self.stats.icon,
+                22: self.stats.ship,
+                23: self.stats.ball,
+                24: self.stats.ufo,
+                25: self.stats.wave,
+                26: self.stats.robot,
+                28: int(self.stats.glow),
+                29: 1,
+                30: self.stats.rank,
+                43: self.stats.spider,
+                44: self.twitter_url,
+                45: self.twitch_url,
+                46: self.stats.diamonds,
+                48: self.stats.explosion,
+                49: self.badge_level,
+            }
         )

@@ -7,13 +7,11 @@ import string
 ALLOWED_CHARS = list("abcdefghijklmnopqrstuvwxyz0123456789 ")
 
 def verify_stats_seed(seed: str) -> bool:
-    """Verifies if the seed sent in the `seed` post
-    argument of the request is valid by performing
-    several checks on it.
+    """Verifies if the seed sent in the `seed` post argument of the request is
+    valid by performing several checks on it.
     
     Args:
-        seed (str): The seed passed by Geometry Dash
-            as part of the request.
+        seed (str): The seed passed by Geometry Dash as part of the request.
     
     Returns:
         True if valid, else False.
@@ -28,16 +26,12 @@ def verify_stats_seed(seed: str) -> bool:
     return True
 
 def verify_textbox(text: str, extra_chars: tuple = ()) -> bool:
-    """Verifies if textbox entry contains allowed
-    characters to prevent the user entering
-    bad characters.
+    """Verifies if textbox entry contains allowed characters to prevent the
+    user entering bad characters.
     
     Args:
-        text (str): The input to verify the
-            characters of.
-        extra_chars (tuple): Additional
-            characters in case of spacial
-            fields.
+        text (str): The input to verify the characters of.
+        extra_chars (tuple): Additional characters in case of spacial fields.
     """
 
     # Check if the length isn't absurd

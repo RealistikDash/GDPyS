@@ -75,13 +75,13 @@ class Privilege:
     
     @classmethod
     async def from_priv_enum(cls, enum: int):
-        """Fetches the privilege directly by searching for its total
-        privilege enum.
+        """Fetches the privilege directly by searching for its total privilege
+        enum.
         
-        Note:
-            This searches through two sources (where we can possibly
-            find the object), the cache (instant) and the database
-            (slow as we make 2 queries).
+        Note: 
+            This searches through two sources (where we can possibly find
+                the object), the cache (instant) and the database (slow as we
+                make 2 queries).
         
         Args:
             enum (int): The privilege enum for the privilege to fetch.

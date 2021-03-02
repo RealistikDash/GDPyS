@@ -27,12 +27,9 @@ def log_message(content: str, l_type: str, bg_col: Fore):
     """Creates the final string and writes it to console.
     
     Args:
-        content (str): The main text to be logged to
-            console.
-        l_type (str): The type of the log that will be
-            displayed to the user.
-        bl_col (Fore): The background colour for the
-            `l_type`.
+        content (str): The main text to be logged to console.
+        l_type (str): The type of the log that will be displayed to the user.
+        bl_col (Fore): The background colour for the `l_type`.
     """
         
     # Print to console. Use this as faster ig.

@@ -48,8 +48,7 @@ def time_ago(timestamp: int) -> str:
     """Returns a string that is timeago from now (for GD responses).
     
     Args:
-        timestamp (int): A UNIX timestamp you want the `time_ago`
-            string from.
+        timestamp (int): A UNIX timestamp you want the `time_ago` string from.
     """
 
     time_diff = get_timestamp() - round(timestamp)

@@ -13,7 +13,9 @@ from handlers.profiles import (
     account_comments,
     upload_acc_comment,
     delete_acc_comment,
-    update_social
+    update_social,
+    profile_search,
+    req_mod
 )
 from handlers.misc import get_song
 
@@ -31,7 +33,9 @@ HANDLERS = (
     ("/uploadGJAccComment20.php", upload_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "comment", "secret", "chk", "cType")),
     ("/deleteGJAccComment20.php", delete_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "commentID")),
     ("/updateGJAccSettings20.php", update_social, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret")),
-    ("/getGJSongInfo.php", get_song, HandlerTypes.PLAIN_TEXT, ("secret", "songID"))
+    ("/getGJSongInfo.php", get_song, HandlerTypes.PLAIN_TEXT, ("secret", "songID")),
+    ("/getGJUsers20.php", profile_search, HandlerTypes.PLAIN_TEXT, ("str", "page", "total")),
+    ("/requestUserAccess.php", req_mod, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "gameVersion", "binaryVersion", "gdw"))
 )
 
 async def main(loop: asyncio.AbstractEventLoop):

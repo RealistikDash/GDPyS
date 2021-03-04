@@ -7,7 +7,7 @@ from helpers.common import dict_keys
 from const import HandlerTypes, HTTP_CODES
 from logger import error, info, debug
 from helpers.time_helper import Timer
-from exceptions import GDException
+from exceptions import GDPySHandlerException
 from objects.glob import glob
 import asyncio
 import traceback
@@ -414,7 +414,7 @@ class GDPySWeb:
             # Check if it is authed.
             if handler.has_status(HandlerTypes.AUTHED):
                 if not (p := await self._gd_auth(request.post)):
-                    raise GDException("-1")
+                    raise GDPySHandlerException("-1")
 
                 # Add user as arg.
                 args.append(p)
@@ -426,8 +426,8 @@ class GDPySWeb:
             
             resp_str = await handler.handler(*args)
         
-        except GDException as e:
-            # GDExceptions are different, with them being called when the
+        except GDPySHandlerException as e:
+            # GDPySHandlerExceptions are different, with them being called when the
             # handler is executed correctly BUT it is sending an error 
             # code to the client.
             resp_str = str(e)

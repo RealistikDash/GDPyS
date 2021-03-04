@@ -3,7 +3,7 @@
 from .glob import glob
 from web.client import post_request
 from helpers.common import is_numeric
-from web.builders import parse_to_dict, gd_dict_str
+from utils.gdform import parse_to_dict, gd_dict_str
 from logger import error, debug
 
 class Song:

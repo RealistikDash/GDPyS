@@ -1,11 +1,11 @@
 from objects.user import User
 from web.http import Request # Pylint appeasement.
-from web.builders import gd_dict_str, gd_builder
+from utils.gdform import gd_dict_str, gd_builder
 from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
 from helpers.time_helper import time_ago
-from helpers.security import verify_stats_seed, verify_textbox
-from exceptions import GDException
+from utils.security import verify_stats_seed, verify_textbox
+from exceptions import GDPySHandlerException
 from objects.comments import AccountComment
 from const import ReqStats
 from logger import debug
@@ -75,7 +75,7 @@ async def update_stats(req: Request, user: User):
 
     # Verifiying some neiche post args.
     if not verify_stats_seed(req.post["seed"]):
-        raise GDException("-1")
+        raise GDPySHandlerException("-1")
 
     # Converting these to int also ensures proper input is passed.
     stars        = int(req.post.get("stars", 0))
@@ -131,7 +131,7 @@ async def account_comments(req: Request):
     
     # Check if user found.
     if not target_user:
-        raise GDException("-1")
+        raise GDPySHandlerException("-1")
 
     # Ok so first we have to only grab the specific section
     # the gd client wants as its only asking for like 10
@@ -186,7 +186,7 @@ async def delete_acc_comment(req: Request, user: User) -> str:
     # Check if the user is the same as the poser.
     if com.account_id != user.id:
         # They are sending the reqs not through the client.
-        raise GDException("-1")
+        raise GDPySHandlerException("-1")
 
     # Delete the comment.
     await com.delete()
@@ -206,7 +206,7 @@ async def update_social(req: Request, user: User) -> str:
     for social in (youtube, twitch, twitter):
         if not verify_textbox(social, ["."]):
             debug("User failed value verification check.")
-            raise GDException("-1")
+            raise GDPySHandlerException("-1")
     
     new_req_state = 0
 

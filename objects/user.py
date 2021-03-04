@@ -7,9 +7,9 @@ from logger import debug
 from .glob import glob
 from .comments import AccountComment
 from .privilege import Privilege
-from exceptions import GDException
+from exceptions import GDPySHandlerException
 from typing import List
-from web.builders import gd_dict_str
+from utils.gdform import gd_dict_str
 import re
 
 @dataclass
@@ -384,7 +384,7 @@ class User:
         
         Note:
             Any GDPyS-related error that occurs within this function will be
-                raised as a `GDException` with the GD response error enum
+                raised as a `GDPySHandlerException` with the GD response error enum
                 corresponding to the issue.
         
         Args:
@@ -412,8 +412,8 @@ class User:
 
         # User with that username already exists in the db.
         if un_exists:
-            # Raise GDException that will be directly reported to the client.
-            raise GDException("-2")
+            # Raise GDPySHandlerException that will be directly reported to the client.
+            raise GDPySHandlerException("-2")
         
         # Check for email.
         em_exists = await glob.sql.fetchone("SELECT 1 FROM users WHERE email = %s LIMIT 1", (
@@ -421,20 +421,20 @@ class User:
         ))
         if em_exists:
             # Im not sure of the proper error but an acc with that email already exists.
-            raise GDException("-3")
+            raise GDPySHandlerException("-3")
         
         # Regex check for the email.
         if not re.search(Regexes.EMAIL, cls.email):
-            raise GDException("-6")
+            raise GDPySHandlerException("-6")
 
         # Check name length
         if not (3 < len(username) < 10):
             # Im not sure of the proper error code for this but their name is too long.
-            raise GDException("-9")
+            raise GDPySHandlerException("-9")
         
         # Check password length
         if len(password) < 6:
-            raise GDException("-8")
+            raise GDPySHandlerException("-8")
         
         # Do this here as its slow as hell.
         cls.bcrypt_pass = bcrypt_hash(password)

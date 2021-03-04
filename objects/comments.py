@@ -1,3 +1,4 @@
+from exceptions import GDPySAlreadyExists, GDPySDoesntExist
 from .glob import glob
 from helpers.time_helper import get_timestamp
 
@@ -108,7 +109,7 @@ class AccountComment:
 
         if self.id != -1:
             # It already exists we think. Idk if this is the right exception.
-            raise FileExistsError("This comment already exists in the database!")
+            raise GDPySAlreadyExists("This comment already exists in the database!")
         
         # Just insert it ig.
         row = await glob.sql.execute(
@@ -135,7 +136,7 @@ class AccountComment:
 
         if self.id == -1:
             # It doesnt exist to our knowledge. Idk if this is the right exception.
-            raise FileNotFoundError("A comment must be inserted to the db prior to its updating.")
+            raise GDPySDoesntExist("A comment must be inserted to the db prior to its updating.")
 
         # Just run the update query.
         await glob.sql.execute(
@@ -159,7 +160,7 @@ class AccountComment:
 
         if self.id == -1:
             # It doesnt exist to our knowledge. Idk if this is the right exception.
-            raise FileNotFoundError("A comment must be inserted to the db prior to its deletion.")
+            raise GDPySDoesntExist("A comment must be inserted to the db prior to its deletion.")
         
         # Delete it straight from the database.
         await glob.sql.execute(

@@ -70,6 +70,22 @@ class Difficulty:
 	HARDER = 40
 	INSANE = 50
 
+class GDCol:
+	"""Geometry Dash letters corresponding to `FLAlertLayer` colours."""
+
+	BLURPLE = "b"
+	GREEN   = "g"
+	LBLUE   = "l",
+	ORANGE  = "o"
+	PINK    = "p"
+	LRED    = "r"
+	YELLOW  = "y"
+	RED     = ""
+
+	ALL = (
+		BLURPLE, GREEN, LBLUE, ORANGE, PINK, LRED, YELLOW, RED
+	)
+
 # Source of these can be found on https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 HTTP_CODES = {
 	100: 'Continue',

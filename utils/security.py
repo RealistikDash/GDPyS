@@ -1,6 +1,7 @@
 # This helper is used for verifying some of the post
 # args sent by some endpoints. To keep the handlers
 # clean, these will be kept here. 
+from const import GDCol
 import string
 
 # Local constants
@@ -44,3 +45,35 @@ def verify_textbox(text: str, extra_chars: tuple = ()) -> bool:
             return False
     
     return True
+
+def close_col_tags(text: str) -> str:
+    """Fixes all unclosed colour tags, which are known to cause crashes in
+    Geometry Dash.
+    
+    Args:
+        text (str): The text to fix the tag closing for.
+    
+    Returns:
+        A safe version of the text.
+    """
+
+    while text.count("<c") > text.count("</c>"):
+        text += "</c>"
+
+def remove_col_tags(text: str) -> str:
+    """Removes all colour tags from the message. These tags are known to cause
+    crashes in-game.
+    
+    Args:
+        text (str): The text to fix the tag closing for.
+    
+    Returns:
+        A safe version of the text.
+    """
+
+    for tag in GDCol.ALL:
+        text.replace(f"<c{tag}>", "")
+    
+    text.replace("</c>", "")
+
+    return text

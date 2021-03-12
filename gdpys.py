@@ -18,6 +18,7 @@ from handlers.profiles import (
     req_mod
 )
 from handlers.misc import get_song
+from handlers.leaderboards import get_leaderboard
 
 # Load config
 
@@ -35,7 +36,8 @@ HANDLERS = (
     ("/updateGJAccSettings20.php", update_social, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret")),
     ("/getGJSongInfo.php", get_song, HandlerTypes.PLAIN_TEXT, ("secret", "songID")),
     ("/getGJUsers20.php", profile_search, HandlerTypes.PLAIN_TEXT, ("str", "page", "total")),
-    ("/requestUserAccess.php", req_mod, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "gameVersion", "binaryVersion", "gdw"))
+    ("/requestUserAccess.php", req_mod, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "gameVersion", "binaryVersion", "gdw")),
+    ("/getGJScores20.php", get_leaderboard, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "secret", "gdw", "type"))
 )
 
 async def main(loop: asyncio.AbstractEventLoop):

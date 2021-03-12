@@ -35,10 +35,11 @@ class Privileges(IntFlag):
     """The GDPyS privileges."""
 
     LOGIN       = 1 << 0
-    COMMENT     = 1 << 1
-    RATE        = 1 << 2
-    MOD_BADGE   = 1 << 3
-    ELDER_BADGE = 1 << 4
+    PUBLIC      = 1 << 1
+    COMMENT     = 1 << 2
+    RATE        = 1 << 3
+    MOD_BADGE   = 1 << 4
+    ELDER_BADGE = 1 << 5
 
 class GenericResponse:
     """Common Geometry Dash response codes."""
@@ -85,6 +86,14 @@ class GDCol:
 	ALL = (
 		BLURPLE, GREEN, LBLUE, ORANGE, PINK, LRED, YELLOW, RED
 	)
+
+class LeaderboardTypes:
+	"""In-game leaderboard type enums."""
+
+	TOP      = 0
+	RELATIVE = 1
+	CP       = 2
+	FRIENDS  = 3
 
 # Source of these can be found on https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 HTTP_CODES = {

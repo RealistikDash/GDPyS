@@ -30,5 +30,9 @@ class Glob:
         # Global MySQL connection.
         self.sql = None
 
+        # I am SO SORRY for placing this here but circular imports suck.
+        self.star_lb = None
+        self.cp_lb = None
+
 # Define glob here so we can just use it.
 glob = Glob()

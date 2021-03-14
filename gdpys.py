@@ -2,6 +2,7 @@ from web.http import GDPySWeb
 from objects.glob import glob
 from config import conf
 from const import HandlerTypes
+from cron.cron import cron_runner
 import uvloop
 import asyncio
 
@@ -61,6 +62,9 @@ async def main(loop: asyncio.AbstractEventLoop):
             handler= handler[1],
             req_postargs= handler[3]
         )
+    
+    # Schedule cron running thing.
+    loop.create_task(cron_runner())
 
     await server.start(conf.http_sock, conf.http_max_conn)
 

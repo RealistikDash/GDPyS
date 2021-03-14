@@ -58,27 +58,20 @@ def time_ago(timestamp: int) -> str:
         return "just"
     
     # Make a non-negative variant for formatting.
-    pos_diff = time_diff if time_diff > 0 else time_diff * -1
+    pos_diff = (time_diff if time_diff > 0 else time_diff * -1) * 60
 
-    # Seconds
-    if pos_diff < 60: return f"{pos_diff} second" + ("s" if pos_diff > 1 else "")
-    
-    # Minutes
-    pos_diff //= 60
-    if pos_diff < 60: return f"{pos_diff} minute" + ("s" if pos_diff > 1 else "")
+    intervals = (
+        ("second", 60), ("minute", 60), ("hour", 60), ("day", 24),
+        ("months", 30), ("years", 12), ("decade", 100)
+    )
 
-    # Hours
-    pos_diff //= 60
-    if pos_diff < 24: return f"{pos_diff} hour" + ("s" if pos_diff > 1 else "")
+    ret = ""
+    for idx, time_i in enumerate(intervals):
+        singular, time = time_i
+        pos_diff //= time
+        if pos_diff < intervals[idx + 1][1]:
+            return f"{pos_diff} {singular}" + ("s" if pos_diff > 1 else "")
 
-    # Days
-    pos_diff //= 24
-    if pos_diff < 365: return f"{pos_diff} day" + ("s" if pos_diff > 1 else "")
-
-    # Years
-    pos_diff //= 365
-    return f"{pos_diff} year" + ("s" if pos_diff > 1 else ""
-)
 def week_ago() -> int:
     """Returns timestamp exactly week ago."""
     return get_timestamp() - 604800

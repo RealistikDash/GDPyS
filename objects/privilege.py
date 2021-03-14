@@ -16,6 +16,17 @@ class Privilege:
         self.privileges: Privileges = Privileges(0)
         self.colour: RGB = RGB()
 
+    def api(self) -> dict:
+        """Converts the privilege into a dict for api reasons."""
+
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.descritpion,
+            "privileges": int(self.privileges),
+            "colour": self.colour.api()
+        }
+
     def has_privilege(self, priv: Privileges) -> bool:
         """Check if members of the privilege group have the given permisison.
         

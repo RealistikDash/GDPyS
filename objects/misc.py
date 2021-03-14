@@ -18,6 +18,11 @@ class RGB:
 
         return f"<RGB({self.red}, {self.green}, {self.blue})>"
     
+    def api(self) -> list:
+        """Converts the object into a list for api reasons."""
+
+        return [self.red, self.green, self.blue]
+    
     @classmethod
     def from_string(cls, string: str):
         """Creates an instance of `RGB` from a comma separated string of RGB

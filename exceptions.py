@@ -10,3 +10,13 @@ class GDPySAlreadyExists(Exception):
 
 class GDPySDoesntExist(Exception):
     """Error raised when something doesnt exist."""
+    pass
+
+class GDPySAPINotFound(Exception):
+    """Exception raised when the api doesn't find something."""
+    pass
+
+class GDPySAPIBadData(Exception):
+    """Exception raised when the api is sent invalid data."""
+    pass
+

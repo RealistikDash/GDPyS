@@ -7,12 +7,13 @@ from helpers.common import dict_keys
 from const import HandlerTypes, HTTP_CODES
 from logger import error, info, debug
 from helpers.time_helper import Timer
-from exceptions import GDPySHandlerException
+from exceptions import GDPySAPIBadData, GDPySAPINotFound, GDPySHandlerException
 from objects.glob import glob
 import asyncio
 import traceback
 import os
 import socket
+import json
 
 class Request:
     """Request class for storing & parsing all data.
@@ -433,6 +434,19 @@ class GDPySWeb:
             resp_str = str(e)
             debug(f"Handler triggered error code {resp_str}") # Temp debug as else it will be triggered a lot.
         
+        except GDPySAPINotFound:
+            resp_str = {
+                "status": 404,
+                "message": "The object you are looking for has not been found..."
+            }
+        
+        except GDPySAPIBadData:
+            resp_str = {
+                "status": 400,
+                "message": "Your request is either missing some data or the "
+                           "data sent is plain wrong."
+            }
+        
         # This is so we don't reveal post request required fields to people scouting.
         except KeyError as e:
             resp_str = "Incorrect post data." # Just assume it tbh
@@ -452,7 +466,13 @@ class GDPySWeb:
             resp_str = await handler.handler(request, tb)
         
         # Just ensure it is str.
-        resp_str = str(resp_str) if not handler.has_status(HandlerTypes.JSON) else resp_str
+        if handler.has_status(HandlerTypes.JSON):
+            if "status" not in dict_keys(resp_str): resp_str["status"] = 200
+            resp_str = json.dumps(resp_str)
+            # Important content type header
+            request.add_header("Content-Type: application/json")
+        else:
+            resp_str = str(resp_str)
 
         # Debug log the resp.
         debug(resp_str)

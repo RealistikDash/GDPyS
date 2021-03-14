@@ -40,6 +40,31 @@ class Stats:
     glow: bool = False
     display_icon: int = 0
 
+    def api(self) -> dict:
+        """Converts the stats into a dict object (mostly for api purposes)."""
+
+        return {
+            "stars": self.stars,
+            "diamonds": self.diamonds,
+            "coins": self.coins,
+            "u_coins": self.u_coins,
+            "demons": self.demons,
+            "cp": self.cp,
+            "rank": self.rank,
+            "colour1": self.colour1,
+            "colour2": self.colour2,
+            "icon": self.icon,
+            "ship": self.ship,
+            "ufo": self.ufo,
+            "wave": self.wave,
+            "ball": self.ball,
+            "robot": self.robot,
+            "spider": self.spider,
+            "explosion": self.explosion,
+            "glow": bool(self.glow),
+            "display_icon": self.display_icon
+        }
+
     async def calc_rank(self):
         """Calculates the leaderboards placement for the user using the MySQL
         database.
@@ -220,6 +245,26 @@ class User:
         self.friend_reqs: list = []
         self.friends: list = []
         self.account_comments: List[AccountComment] = []
+    
+    def api(self) -> dict:
+        """Turns the User object into a dict primarily for API related
+        objectives."""
+
+        return {
+            "id": self.id,
+            "name": self.name,
+            "stats": self.stats.api(),
+            "registered": self.registered_timestamp,
+            "privilege": self.privilege.api(),
+            "socials": {
+                "youtube": self.youtube_url,
+                "twitter": self.twitch_url,
+                "twitch": self.twitch_url
+            },
+            "account_comments": [
+                c.api() for c in self.account_comments
+            ]
+        }
     
     @property
     def safe_name(self) -> str:

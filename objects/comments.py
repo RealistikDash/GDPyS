@@ -15,6 +15,16 @@ class AccountComment:
         self.content: str = "" # Plaintext content.
         self.timestamp: int = 0 # UNIX style timestamp.
     
+    def api(self) -> dict:
+        """Converts the object into a dict (mostly for API purposes)."""
+        
+        return {
+            "id": self.id,
+            "likes": self.likes,
+            "content": self.content,
+            "timestamp": self.timestamp
+        }
+    
     @classmethod
     async def from_db(cls, comment_id: int):
         """Fetches the account comment directly from the database and creates

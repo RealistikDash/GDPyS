@@ -1,3 +1,4 @@
+from handlers.api import get_user_api
 from web.http import GDPySWeb
 from objects.glob import glob
 from config import conf
@@ -41,6 +42,10 @@ HANDLERS = (
     ("/getGJScores20.php", get_leaderboard, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "secret", "gdw", "type"))
 )
 
+API_HANDLERS = (
+    ("user", get_user_api),
+)
+
 async def main(loop: asyncio.AbstractEventLoop):
     """The main asyncronous function."""
 
@@ -61,6 +66,14 @@ async def main(loop: asyncio.AbstractEventLoop):
             status= handler[2],
             handler= handler[1],
             req_postargs= handler[3]
+        )
+    
+    # API handlers
+    for route, handler in API_HANDLERS:
+        server.add_handler(
+            f"/api/{route}",
+            HandlerTypes.JSON,
+            handler
         )
     
     # Schedule cron running thing.

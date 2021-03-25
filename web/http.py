@@ -360,20 +360,25 @@ class GDPySWeb:
         # Set it globally.
         glob.sql = self.pool
     
-    async def _gd_auth(self, post: dict) -> bool:
+    async def _gd_auth(self, req: Request) -> bool:
         """Handles authentication for Geometry Dash handlers."""
 
         # TODO: Anti-botting checks
 
         # Verify their GD version is not pre-history.
-        if int(post["gameVersion"]) < 21\
-        or int(post["binaryVersion"]) < 34:
+        if int(req.post["gameVersion"]) < 21\
+        or int(req.post["binaryVersion"]) < 34:
             debug(f"GJP failed for user for pre-historic GD version.")
+            return False
+        
+        # Verifying the proper content type
+        if req.headers["Content-Type"] != "application/x-www-form-urlencoded":
+            debug("GJP failed due to unknown Content-Type (likely bot)!")
             return False
 
         return await self.auth.gjp_check(
-            int(post["accountID"]),
-            post["gjp"]
+            int(req.post["accountID"]),
+            req.post["gjp"]
         )
     
     def _rate_limit(self, req: Request) -> bool:
@@ -414,7 +419,7 @@ class GDPySWeb:
             
             # Check if it is authed.
             if handler.has_status(HandlerTypes.AUTHED):
-                if not (p := await self._gd_auth(request.post)):
+                if not (p := await self._gd_auth(request)):
                     raise GDPySHandlerException("-1")
 
                 # Add user as arg.

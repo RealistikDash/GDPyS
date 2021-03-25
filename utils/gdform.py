@@ -125,7 +125,7 @@ def tempban_instant(*text) -> str:
     text_str = " ".join(text)
     return tempban(text_str, 0)
     
-def tempban(self, reason: str, duration_left: int) -> str:
+def tempban(reason: str, duration_left: int) -> str:
     """Builds a server response in the structure of a comment ban.
     
     Note:

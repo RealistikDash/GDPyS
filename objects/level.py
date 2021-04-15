@@ -1,8 +1,10 @@
+from time import time
 from .glob import glob
 from .user import User
 from .song import Song
 from config import conf
 from const import Difficulty
+from helpers.time_helper import get_timestamp
 import aiofiles
 import os
 import sys
@@ -127,6 +129,11 @@ class Level:
         async with aiofiles.open(f"{conf.dir_levels}/{self.id}", "w+") as f:
             await f.write(contents)
     
+    def cache(self) -> None:
+        """Adds the current level into the global level cache."""
+
+        glob.level_cache.cache(self.id, self)
+    
     @classmethod
     async def from_sql(cls, level_id: int, full: bool = True):
         """Fetches the level data from the MySQL database and creates an
@@ -189,6 +196,51 @@ class Level:
 
         if full:
             await self._fetch_comments()
+    
+    @classmethod
+    async def from_id(cls, level_id: int):
+        """Creates an instance of `Level` from data in MySQL database.
+        
+        Args:
+            level_id (int): The ID of the level in the database.
+        
+        Returns:
+            `None` if not found, else instance of `Level`.
+        """
+
+        # Cache can save us A LOT of time. Check it in case we already have it
+        if cache_l := glob.level_cache.get(level_id): return cache_l
+
+        # We are required to utilise the sql (slow).
+        return Level.from_sql(level_id, True)
+    
+    async def insert(self) -> None:
+        """Inserts the level data directly into the MySQL table.
+        
+        Note:
+            This also sets the level ID locally based on `cur.lastrowid`.
+        """
+
+        if self.id:
+            raise FileExistsError(
+                "Level is already uploaded (has ID assigned)."
+            )
+
+        timestamp: int = get_timestamp()
+        # We are inserting into the database, and using the cur.lastrowid for
+        # setting the id locally.
+        self.id = await glob.sql.execute(
+            "INSERT INTO levels (name, user_id, description, song_id, replay,"
+            "game_version, binary_version, timestamp, coins, requested_stars,"
+            "ldm, objects, password) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
+            "%s,%s,%s)",
+            (
+                self.name, self.creator.id, self.description, self.song.id,
+                self.replay, self.game_version, self.binary_version, timestamp,
+                self.coins, self.requested_stars, int(self.ldm), self.objects,
+                self.password
+            )
+        )
     
     async def _fetch_comments(self):
         """Fetches level comments from the MySQL database and sets them in the

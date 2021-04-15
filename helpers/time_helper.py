@@ -41,7 +41,7 @@ class Timer:
 
 def get_timestamp() -> int:
     """Returns current timestamp as a full integer."""
-    return round(time.time())
+    return int(time.time())
 
 
 def time_ago(timestamp: int) -> str:

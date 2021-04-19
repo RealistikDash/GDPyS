@@ -153,3 +153,14 @@ class MySQLPool:
                 # Return it
                 return cur.lastrowid
 
+    def kill(self) -> None:
+        """Ends the MySQL connection pool to the MySQL server.
+        
+        Note:
+            As the name suggests, this fully terminates the connection. This
+                means that no MySQL queries may be ran following the execution
+                of this coro.
+        """
+
+        self._pool.terminate()
+        self._pool.close()

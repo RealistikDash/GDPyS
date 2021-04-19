@@ -4,7 +4,7 @@ from typing import Callable, Union
 from .sql import MySQLPool
 from helpers.auth import Auth
 from helpers.common import dict_keys
-from const import HandlerTypes, HTTP_CODES
+from const import HandlerTypes, HTTP_CODES, GDPyS
 from logger import error, info, debug
 from helpers.time_helper import Timer
 from exceptions import GDPySAPIBadData, GDPySAPINotFound, GDPySHandlerException
@@ -16,8 +16,8 @@ import socket
 import json
 
 class Request:
-    """Request class for storing & parsing all data.
-    Made by Lenforiee and adapted for use within GDPyS."""
+    """Request class for storing & parsing all data. Made by Lenforiee and
+    adapted for use within GDPyS."""
 
     def __init__(self, client: socket.socket, loop: asyncio.AbstractEventLoop):
         """Init placeholders."""
@@ -282,6 +282,8 @@ class GDPySWeb:
         self.err_handlers: dict = {}
         self.loop = loop
         self.auth: Auth = Auth()
+        self.alive: bool = True
+        self.main_sock: socket.socket = None
 
         # Setting the default err_handlers
         self.err_handlers[404] = Handler(
@@ -594,6 +596,8 @@ class GDPySWeb:
 
         # Create socket
         with socket.socket(socket.AF_UNIX) as sock:
+            # We need to access this in close coro
+            self.main_sock = sock
             # Bind the socket.
             sock.bind(sock_name)
             # Make is non-blocking for async.
@@ -603,9 +607,36 @@ class GDPySWeb:
             # Make the socket fully accessable to avoid future errors.
             os.chmod(sock_name, 0o777)
 
-            info(f"GDPyS HTTP: Started server on socket {sock_name}")
+            debug(f"GDPyS HTTP: Started server on socket {sock_name}")
+            info(f"{GDPyS.NAME} b{GDPyS.BUILD} has been successfully started!")
 
             # Run server forever.
-            while True:
-                client, _ = await self.loop.sock_accept(sock)
-                self.loop.create_task(self._handle_sock(client))
+            try:
+                while self.alive:
+                    client, _ = await self.loop.sock_accept(sock)
+                    self.loop.create_task(self._handle_sock(client))
+            except KeyboardInterrupt: # UVLOOP DOESNT DO THIS.
+                # Safely discard of the server.
+                self.kill()
+    
+    def kill(self) -> None:
+        """Ends the web server and MySQL connection.
+        
+        Note:
+            The server would have to be fully restarted following the
+                execution of this coro.
+        """
+
+        info("GDPyS is shutting down...")
+        # Kill SQL.
+        self.pool.kill()
+        debug("Discarded MySQL pool.")
+
+        # On next reloop, sock receiving connections should be dead.
+        self.alive = False
+
+        # Unbind socket.
+        self.main_sock.close()
+        debug("Socket closed.")
+        info(f"{GDPyS.NAME} b{GDPyS.BUILD} has been shut down!")
+        raise SystemExit

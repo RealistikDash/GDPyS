@@ -182,7 +182,7 @@ class Song:
         # Just return full name.
         return self.full_name
     
-    def __repr__(self) -> str:
+    def resp(self) -> str:
         """"A Geometry Dash HTTP response styled song object."""
 
         return gd_dict_str(

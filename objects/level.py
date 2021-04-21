@@ -27,6 +27,7 @@ class Level:
         self.comments: list = [] # TODO: Correct type hints when comment object is done.
         self.description: str = ""
         self.song: Song = Song()
+        self.level_version: int = 0
         # Contains batch nodes to help with rendering
         self.extra_str: str = "0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0"
         self.replay: str = ""
@@ -48,6 +49,7 @@ class Level:
         self.ldm: bool = False
         self.objects: int = 0
         self.password: int = 0
+        self.working_time: int = 0 # Time spent building the level.
 
         # Special cache for small levels.
         self._cache: str = ""
@@ -155,7 +157,7 @@ class Level:
             "binary_version, timestamp, downloads, likes,"
             "stars, difficulty, demon_diff, coins, coins_verified,"
             "requested_stars, featured_id, epic, ldm,"
-            "objects, password FROM levels WHERE "
+            "objects, password FROM levels, working_time, level_ver WHERE "
             "id = %s LIMIT 1",
             (level_id,)
         )
@@ -187,7 +189,9 @@ class Level:
             self.epic,
             self.ldm,
             self.objects,
-            self.password
+            self.password,
+            self.working_time,
+            self.level_version
         ) = level_db
 
         # GDPyS custom objects.
@@ -214,6 +218,16 @@ class Level:
         # We are required to utilise the sql (slow).
         return Level.from_sql(level_id, True)
     
+    @classmethod
+    async def from_submit(
+        self,
+        account_id: int,
+        name: str,
+        desc: str,
+        version: int
+    ):
+        """Creates a level object using data from level submit."""
+    
     async def insert(self) -> None:
         """Inserts the level data directly into the MySQL table.
         
@@ -232,15 +246,20 @@ class Level:
         self.id = await glob.sql.execute(
             "INSERT INTO levels (name, user_id, description, song_id, replay,"
             "game_version, binary_version, timestamp, coins, requested_stars,"
-            "ldm, objects, password) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
-            "%s,%s,%s)",
+            "ldm, objects, password, working_time, level_ver) VALUES (%s,%s,"
+            "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (
                 self.name, self.creator.id, self.description, self.song.id,
                 self.replay, self.game_version, self.binary_version, timestamp,
                 self.coins, self.requested_stars, int(self.ldm), self.objects,
-                self.password
+                self.password, self.working_time, self.level_version
             )
         )
+    
+    async def update(self, **kwargs) -> None:
+        """Updates the level's data locally and in MySQL."""
+
+        ...
     
     async def _fetch_comments(self):
         """Fetches level comments from the MySQL database and sets them in the

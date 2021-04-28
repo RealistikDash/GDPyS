@@ -102,6 +102,14 @@ class LeaderboardTypes:
     CP       = 2
     FRIENDS  = 3
 
+class LevelLengths:
+    """Enums for all of the possible level lengths."""
+    TINY   = 0
+    SHORT  = 1
+    MEDIUM = 2
+    LONG   = 3
+    XL     = 4
+
 # Source of these can be found on https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 HTTP_CODES = {
     100: 'Continue',

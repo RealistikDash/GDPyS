@@ -5,6 +5,12 @@ from copy import copy
 from typing import List
 from logger import debug
 
+# Local Constants
+LEADERBOARD_TYPES = {
+    LeaderboardTypes.CP: "cp",
+    LeaderboardTypes.TOP: "stars"
+}
+
 class Leaderboard:
     """The GDPyS in-game leaderboard containter for storing user objects in
     their ranking position."""
@@ -28,10 +34,7 @@ class Leaderboard:
     def _column(self) -> str:
         """Returns the name of the SQL column name to order by."""
 
-        return {
-            LeaderboardTypes.CP: "cp",
-            LeaderboardTypes.TOP: "stars"
-        }.get(self._lb_type)
+        return LEADERBOARD_TYPES.get(self._lb_type)
     
     async def _get_ids(self) -> List[int]:
         """Fetches an ordered list of the IDs of the users in the leaderboard."""

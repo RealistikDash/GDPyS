@@ -3,7 +3,7 @@ from .glob import glob
 from .user import User
 from .song import Song
 from config import conf
-from const import Difficulty
+from const import Difficulty, LevelLengths
 from helpers.time_helper import get_timestamp
 import aiofiles
 import os
@@ -27,7 +27,11 @@ class Level:
         self.comments: list = [] # TODO: Correct type hints when comment object is done.
         self.description: str = ""
         self.song: Song = Song()
+        self.track_id: int = 0 # The in-game song IDs. Don't like how its done.
         self.level_version: int = 0
+        self.length: LevelLengths = 0
+        self.dual: bool = False
+        self.unlisted: bool = False
         # Contains batch nodes to help with rendering
         self.extra_str: str = "0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0"
         self.replay: str = ""
@@ -157,8 +161,8 @@ class Level:
             "binary_version, timestamp, downloads, likes,"
             "stars, difficulty, demon_diff, coins, coins_verified,"
             "requested_stars, featured_id, epic, ldm,"
-            "objects, password FROM levels, working_time, level_ver WHERE "
-            "id = %s LIMIT 1",
+            "objects, password FROM levels, working_time, level_ver, "
+            "track_id, length, duals, unlisted WHERE id = %s LIMIT 1",
             (level_id,)
         )
 
@@ -191,7 +195,11 @@ class Level:
             self.objects,
             self.password,
             self.working_time,
-            self.level_version
+            self.level_version,
+            self.track_id,
+            self.length,
+            self.dual,
+            self.unlisted
         ) = level_db
 
         # GDPyS custom objects.
@@ -246,18 +254,51 @@ class Level:
         self.id = await glob.sql.execute(
             "INSERT INTO levels (name, user_id, description, song_id, replay,"
             "game_version, binary_version, timestamp, coins, requested_stars,"
-            "ldm, objects, password, working_time, level_ver) VALUES (%s,%s,"
-            "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            "ldm, objects, password, working_time, level_ver, track_id, length,"
+            "duals, unlisted) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
+            "%s,%s)",
             (
                 self.name, self.creator.id, self.description, self.song.id,
                 self.replay, self.game_version, self.binary_version, timestamp,
                 self.coins, self.requested_stars, int(self.ldm), self.objects,
-                self.password, self.working_time, self.level_version
+                self.password, self.working_time, self.level_version,
+                self.track_id, self.length, int(self.dual), int(self.unlisted)
             )
         )
     
     async def update(self, **kwargs) -> None:
-        """Updates the level's data locally and in MySQL."""
+        """Updates the level's data set within the kwargs locally and in
+        MySQL.
+
+        Note:
+            The input here has to be generally trusted as no checks are
+                performed on the data passed here. You may get DB errors or 
+                someone exploiting you if you don't verify this.
+
+        Kwargs:
+            name (str): The name of the level.
+            desc (str): The plain-text description for the level.
+            version (int): The in-game version of the level.
+            length (LevelLength): An int enum corresponding to the length of
+                the level.
+            ldm (bool): Bool corresponding to the availability of low detail
+                mode for the level.
+            u_coins (int): The quantity of u_coins present within the level.
+            coins_verified (bool): Whether the u_coins are verified (reward 
+                the user).
+            verified_u_coins (bool): Whether
+            dual (bool): Corresponding to whether the level allows input from
+                two individual players.
+            password (str): The 6 digit password of the level (str due to 0s).
+            objects (str): The total object count of the level.
+            song_id (int): The ID of the song to set.
+            work_time (int): Time spent working on the level (wt2).
+            unlisted (bool): Whether the level should appear in pulic search.
+        """
+
+        # Custom object setting is a bit special.
+        if song_id := kwargs.get("song_id", 0):
+            self.song = Song.from_id(song_id)
 
         ...
     

@@ -10,6 +10,17 @@ from objects.comments import AccountComment
 from const import ReqStats
 from logger import debug
 
+# LOCAL CONSTS
+REQ_STATES = {
+    "0": ReqStats.MESSAGES,
+    "1": ReqStats.MESSAGES_FRIENDS_ONLY
+}
+
+COMMENT_STATES = {
+    "0": ReqStats.COMMENTS,
+    "1": ReqStats.COMMENTS_FRIENDS_ONLY
+}
+
 async def user_info(req: Request, user: User):
     """Handles the `getGJUserInfo20.php` endpoint."""
 
@@ -210,17 +221,11 @@ async def update_social(req: Request, user: User) -> str:
     
     new_req_state = 0
 
-    new_req_state += {
-        "0": ReqStats.MESSAGES,
-        "1": ReqStats.MESSAGES_FRIENDS_ONLY
-    }.get(req.post["mS"], 0)
+    new_req_state += REQ_STATES.get(req.post["mS"], 0)
 
     new_req_state += ReqStats.REQUESTS if req.post["frS"] == "0" else 0
 
-    new_req_state += {
-        "0": ReqStats.COMMENTS,
-        "1": ReqStats.COMMENTS_FRIENDS_ONLY
-    }.get(req.post.get("cS"), 0)
+    new_req_state += COMMENT_STATES.get(req.post.get("cS"), 0)
 
     new_req_state = ReqStats(new_req_state)
 

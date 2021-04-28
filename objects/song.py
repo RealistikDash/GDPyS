@@ -129,6 +129,8 @@ class Song:
             None if not found.
         """
 
+        if not song_id: return Song() # Empty because else causes errors lol.
+
         # First we check if its already cached.
         if s := glob.song_cache.get(song_id):
             # Already cached, this one is easy.

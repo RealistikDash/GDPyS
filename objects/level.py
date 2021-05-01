@@ -283,10 +283,10 @@ class Level:
                 the level.
             ldm (bool): Bool corresponding to the availability of low detail
                 mode for the level.
-            u_coins (int): The quantity of u_coins present within the level.
+            coins (int): The quantity of u_coins present within the level.
             coins_verified (bool): Whether the u_coins are verified (reward 
                 the user).
-            verified_u_coins (bool): Whether
+            verified_coins (bool): Whether
             dual (bool): Corresponding to whether the level allows input from
                 two individual players.
             password (str): The 6 digit password of the level (str due to 0s).
@@ -294,13 +294,53 @@ class Level:
             song_id (int): The ID of the song to set.
             work_time (int): Time spent working on the level (wt2).
             unlisted (bool): Whether the level should appear in pulic search.
+            game_version (int): The version of the game the level has been
+                uploaded with.
+            binary_version (int): Similar to Game Version but is incremented
+                fully each update.
+            track_id (int): The ID of the in-game song for this map.
+            replay (str): The replay string for the verification of the level.
+            feature_id (int): The ID of the feature (by which level on the
+                featured page are ordered).
+            epic (bool): Whether the level should be classified as epic.
+            downloads (int): The amount of times the level has been
+                downloaded.
+            likes (int): The amount of people that liked the level (can be
+                negative).
         """
 
-        # Custom object setting is a bit special.
-        if song_id := kwargs.get("song_id", 0):
-            self.song = Song.from_id(song_id)
+        # Check if we are not setting an unuploaded level. We need the level 
+        # id to set the mysql query.
+        if not self.id: raise FileNotFoundError(
+            "Level has not been uploaded yet."
+        )
 
-        ...
+        # Custom object setting is a bit special.
+        if song_id := kwargs.get("song_id"):
+            self.song = Song.from_id(song_id)
+            # Ensure that only one of them exists at once, with custom songs
+            # taking priority.
+            self.track_id = 0
+        else:
+            self.track_id = kwargs.get("track_id", 0)
+
+        # TODO: Cleanup. Possibly loop through all of the args and just
+        # `setattr` them. That might not be too secure tho. /shrug
+        self.name = kwargs.get("name", self.name)
+        self.description = kwargs.get("desc", self.description)
+        self.level_version = kwargs.get("version", self.level_version)
+        self.length = kwargs.get("length", self.length)
+        self.ldm = kwargs.get("ldm", self.ldm)
+        self.coins = kwargs.get("coins", self.coins)
+        self.coins_verified = kwargs.get("verified_coins", self.coins_verified)
+        self.dual = kwargs.get("dual", self.dual)
+        self.password = kwargs.get("password", self.password)
+        self.objects = kwargs.get("objects", self.objects)
+        self.working_time = kwargs.get("work_time", self.working_time)
+        self.unlisted = kwargs.get("unlisted", self.unlisted)
+
+        # Update time.
+
     
     async def _fetch_comments(self):
         """Fetches level comments from the MySQL database and sets them in the

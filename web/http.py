@@ -9,6 +9,7 @@ from logger import error, info, debug
 from helpers.time_helper import Timer
 from exceptions import GDPySAPIBadData, GDPySAPINotFound, GDPySHandlerException
 from objects.glob import glob
+from urllib.parse import unquote
 import asyncio
 import traceback
 import os
@@ -150,7 +151,7 @@ class Request:
                 debug("GDPyS Web: Malformed www-form data, ignoring.")
                 continue
             
-            self.post.update({parts[0]: parts[1]})
+            self.post.update({parts[0]: unquote(parts[1])})
 
     async def _parse(self) -> None:
         """Parses all data from single client"""
@@ -400,11 +401,13 @@ class GDPySWeb:
         """
 
         resp_str = ""
+        code = 200
 
         # Grab handler from handler list. Check if none, use the 404 one.
         if (handler := self.handlers.get(request.path)) is None:
             # Use the 404 one.
             handler = self.err_handlers[404]
+            code = 404
         
         # Now we calc the args
         try:
@@ -433,6 +436,7 @@ class GDPySWeb:
                 pass
             
             resp_str = await handler.handler(*args)
+            if type(resp_str) is tuple: code, resp_str = resp_str
         
         except GDPySHandlerException as e:
             # GDPySHandlerExceptions are different, with them being called when the
@@ -442,14 +446,16 @@ class GDPySWeb:
             debug(f"Handler triggered error code {resp_str}") # Temp debug as else it will be triggered a lot.
         
         except GDPySAPINotFound:
+            code = 404
             resp_str = {
-                "status": 404,
+                "status": code,
                 "message": "The object you are looking for has not been found..."
             }
         
         except GDPySAPIBadData:
+            code = 400
             resp_str = {
-                "status": 400,
+                "status": code,
                 "message": "Your request is either missing some data or the "
                            "data sent is plain wrong."
             }
@@ -470,6 +476,7 @@ class GDPySWeb:
             # Call error handler
             # TODO: Maybe allow this to use db and statuses etc.
             handler = self.err_handlers[500]
+            code = 500
             resp_str = await handler.handler(request, tb)
         
         # Just ensure it is str.
@@ -485,7 +492,7 @@ class GDPySWeb:
         debug(resp_str)
 
         # Return it
-        return resp_str
+        return code, resp_str.encode()
     
     def add_handler(
         self,
@@ -550,7 +557,7 @@ class GDPySWeb:
 
         # We send the response to the client. Just return a 200 as GD doesnt 
         # need anything else.
-        await request.send(200, response.encode())
+        await request.send(*response)
 
         # End timer.
         t.end()

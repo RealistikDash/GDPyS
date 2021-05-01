@@ -14,6 +14,8 @@ async def upload_level(req: Request, user: User) -> str:
         if level:
             # Some stuff we have to decode and ensure correct types.
             desc = base64_decode(req.post["levelDesc"])
-            unlisted = req.post["unlisted"] == "1"
-            ldm = req.post["ldm"] == 1
-            level.update()
+            level.update(
+                description= desc,
+                unlisted= req.post["unlisted"] == "1",
+                ldm= req.post["ldm"] == 1
+            )

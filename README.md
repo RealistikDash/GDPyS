@@ -1,5 +1,5 @@
 # GDPyS v3 - The modern Geometry Dash Custom Server!
-GDPyS is an implementation of a Geometry Dash server in modern Python!
+Taking Geometry Dash servers to the moon 🚀. GDPyS is an implementation of a Geometry Dash server in modern Python!
 
 ## What are the aims of GDPyS
 When I set out to create GDPyS, I had two primary goals.

@@ -10,7 +10,7 @@ GDPyS aims to revolutionise the Geometry Dash server space. Here are some of its
 - Speed and security
 - Simplicity of modification and expansion
 - Efficient database usage
-- Fully asyncronous codebase
+- Fully asynchronous codebase
 
 ## Requirements
 To run GDPyS, the requirements differ significantly when compared to other solutions.

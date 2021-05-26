@@ -3,7 +3,7 @@ from .glob import glob
 from .user import User
 from .song import Song
 from config import conf
-from const import Difficulty, LevelLengths
+from const import Difficulty, LevelLengths, LevelStatus
 from helpers.time_helper import get_timestamp
 import aiofiles
 import os
@@ -49,7 +49,7 @@ class Level:
         self.coins_verified: bool = False
         self.requested_stars: int = 0
         self.feature_id: int = 0 # Funnily enough features are NOT bools, but rather ordered by feaid
-        self.epic: bool = False
+        self.rate_status: LevelStatus = 0
         self.ldm: bool = False
         self.objects: int = 0
         self.password: int = 0
@@ -89,7 +89,14 @@ class Level:
     def featured(self) -> bool:
         """Returns a bool of whether the level is featured."""
 
-        return bool(self.feature_id)
+        return self.feature_id > 0
+    
+    # Rating status attributes prior to refactor.
+    @property
+    def epic(self) -> bool:
+        """Checks if the level is rated epic."""
+
+        return self.has_status(LevelStatus.EPIC)
 
     async def load(self) -> str:
         """Loads the level data directly from storage and returns it.
@@ -160,7 +167,7 @@ class Level:
             "song_id, extra_str, replay, game_version,"
             "binary_version, timestamp, downloads, likes,"
             "stars, difficulty, demon_diff, coins, coins_verified,"
-            "requested_stars, featured_id, epic, ldm,"
+            "requested_stars, featured_id, rate_status, ldm,"
             "objects, password FROM levels, working_time, level_ver, "
             "track_id, length, duals, unlisted WHERE id = %s LIMIT 1",
             (level_id,)
@@ -190,7 +197,7 @@ class Level:
             self.coins_verified,
             self.requested_stars,
             self.feature_id,
-            self.epic,
+            self.rate_status,
             self.ldm,
             self.objects,
             self.password,
@@ -338,6 +345,9 @@ class Level:
         self.objects = kwargs.get("objects", self.objects)
         self.working_time = kwargs.get("work_time", self.working_time)
         self.unlisted = kwargs.get("unlisted", self.unlisted)
+        self.game_version = kwargs.get("game_version", self.game_version)
+        self.binary_version = kwargs.get("binary_version", self.binary_version)
+        self.track_id = kwargs.get("track_id", self.track_id)
 
         # Update time.
 
@@ -347,3 +357,26 @@ class Level:
         object."""
 
         ...
+    
+    def has_status(self, status: LevelStatus) -> bool:
+        """Checks if the level has the `status` rating status.
+        
+        Args:
+            status (LevelStauts): The level status to check for in the level's
+                rating.
+
+        Example: # Since this might be a bad desc.
+        ```py
+        # The level object we are working with.
+        l = Level()
+
+        # We are checking if the level is epic.
+        epic = l.has_stauts(LevelStatus.EPIC)
+        ...
+        ```
+
+        Returns:
+            `bool` corresponding to whether the level has the status.
+        """
+
+        return self.rate_status & status > 0

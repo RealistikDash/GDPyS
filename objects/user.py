@@ -61,7 +61,7 @@ class Stats:
             "robot": self.robot,
             "spider": self.spider,
             "explosion": self.explosion,
-            "glow": bool(self.glow),
+            "glow": self.glow,
             "display_icon": self.display_icon
         }
 
@@ -279,35 +279,35 @@ class User:
         """A property that returns a bool corresponding to whether they have
         public messages enabled."""
 
-        return bool(self.req_states & ReqStats.MESSAGES)
+        return self.req_states & ReqStats.MESSAGES > 0
     
     @property
     def comment_history_enabled(self) -> bool:
         """A property that returns a bool corresponding to whether the user
         has their comment history set to public."""
 
-        return bool(self.req_states & ReqStats.COMMENTS)
+        return self.req_states & ReqStats.COMMENTS > 0
     
     @property
     def friend_requests_enabled(self) -> bool:
         """A property that returns a bool corresponding to whether the user
         has enabled receiving friend requests from the general public."""
 
-        return bool(self.req_states & ReqStats.REQUESTS)
+        return self.req_states & ReqStats.REQUESTS > 0
     
     @property
     def messages_fo(self) -> bool:
         """A property that returns a bool corresponding to whether they have
         messages set to friend only."""
 
-        return bool(self.req_states & ReqStats.MESSAGES_FRIENDS_ONLY)
+        return self.req_states & ReqStats.MESSAGES_FRIENDS_ONLY > 0
     
     @property
     def comment_history_fo(self) -> bool:
         """A property that returns a bool corresponding to whether the user
         has their comment history set to be viewed by friends only."""
 
-        return bool(self.req_states & ReqStats.COMMENTS_FRIENDS_ONLY)
+        return self.req_states & ReqStats.COMMENTS_FRIENDS_ONLY > 0
     
     @property
     def badge_level(self) -> int:

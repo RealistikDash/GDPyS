@@ -110,6 +110,13 @@ class LevelLengths:
     LONG   = 3
     XL     = 4
 
+class LevelStatus:
+    """Int flags for level statuses (such as epic, magic, awarded)."""
+
+    EPIC    = 2 << 0
+    MAGIC   = 2 << 1
+    AWARDED = 2 << 2
+
 # Source of these can be found on https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 HTTP_CODES = {
     100: 'Continue',

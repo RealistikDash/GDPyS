@@ -38,7 +38,7 @@ class Privilege:
             True if has privilege, else False.
         """
 
-        return bool(self.privileges & priv)
+        return self.privileges & priv > 0
     
     @classmethod
     async def from_sql(cls, sql_id: int):

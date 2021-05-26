@@ -247,7 +247,7 @@ class Handler:
         """
 
         # These are just bitwise operators so we can to this.
-        return bool(self.status & status)
+        return self.status & status > 0
     
     def verify_postargs(self, args: Union[list, tuple]) -> bool:
         """Check if the provided post `args` contain the

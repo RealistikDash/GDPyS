@@ -1,6 +1,6 @@
 from time import localtime, strftime
 from colorama import Fore, Back
-from helpers.time_helper import formatted_date
+from helpers.time import formatted_date
 import sys
 import os
 

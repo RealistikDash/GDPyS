@@ -6,7 +6,7 @@ from helpers.auth import Auth
 from helpers.common import dict_keys
 from const import HandlerTypes, HTTP_CODES, GDPyS
 from logger import error, info, debug
-from helpers.time_helper import Timer
+from helpers.time import Timer
 from exceptions import GDPySAPIBadData, GDPySAPINotFound, GDPySHandlerException
 from objects.glob import glob
 from urllib.parse import unquote
@@ -34,7 +34,7 @@ class Request:
         self.get_args: dict = {}
         self.post: dict = {}
         self.files: dict = {}
-        self.ip: str = "0.0.0.0"
+        self.ip: str = "127.0.0.1"
 
         # send back data
         self._send_headers: list = []
@@ -200,10 +200,8 @@ class Request:
     def add_header(self, header: str, index: int = -1) -> None:
         """Adds response header into list"""
 
-        if index > -1:
-            self._send_headers.insert(index, header)
-        else:
-            self._send_headers.append(header)
+        if index > -1: self._send_headers.insert(index, header)
+        else: self._send_headers.append(header)
 
     async def send(self, code: int, body: bytes):
         """Sends data to a client"""
@@ -402,6 +400,7 @@ class GDPySWeb:
 
         resp_str = ""
         code = 200
+        glob.connections_handled += 1
 
         # Grab handler from handler list. Check if none, use the 404 one.
         if (handler := self.handlers.get(request.path)) is None:

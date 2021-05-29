@@ -1,6 +1,6 @@
 from exceptions import GDPySAlreadyExists, GDPySDoesntExist
 from .glob import glob
-from helpers.time_helper import get_timestamp
+from helpers.time import get_timestamp
 
 class AccountComment:
     """An object representation of Geometry Dash

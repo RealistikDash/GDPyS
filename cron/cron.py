@@ -1,14 +1,16 @@
 # The GDPyS Cron Job manager.
-from helpers.time_helper import Timer
+from helpers.time import Timer
 from logger import debug, info, error
 import traceback
 import asyncio
 
 # Cron job imports
 from .leaderboards import refresh_leaderboards
+from .cache import cache_registered
 
 JOBS = ( # All the cron coroutine functions
     refresh_leaderboards,
+    cache_registered
 )
 
 async def cron_runner(delay: int = 1800) -> None:

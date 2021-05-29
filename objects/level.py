@@ -4,7 +4,7 @@ from .user import User
 from .song import Song
 from config import conf
 from const import Difficulty, LevelLengths, LevelStatus
-from helpers.time_helper import get_timestamp
+from helpers.time import get_timestamp
 import aiofiles
 import os
 import sys

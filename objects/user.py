@@ -1,5 +1,5 @@
 from helpers.crypt import bcrypt_hash, bcrypt_check
-from helpers.time_helper import get_timestamp
+from helpers.time import get_timestamp
 from helpers.common import safe_username
 from dataclasses import dataclass
 from const import ReqStats, Privileges, Regexes

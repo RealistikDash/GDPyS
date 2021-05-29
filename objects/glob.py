@@ -1,5 +1,6 @@
 # Shared global class. https://cdn.discordapp.com/attachments/768893339683913728/798677938932547624/1200px-Flag_of_Poland.png
 from helpers.cache import Cache
+from helpers.time import get_timestamp
 
 class Glob:
     """The global object shared between most major GDPyS systems."""
@@ -33,6 +34,11 @@ class Glob:
         # I am SO SORRY for placing this here but circular imports suck.
         self.star_lb = None
         self.cp_lb = None
+
+        # Some statistics
+        self.connections_handled: int = 0
+        self.startup_time: int = get_timestamp()
+        self.registered_users: int = 0 # Cached in cron
 
 # Define glob here so we can just use it.
 glob = Glob()

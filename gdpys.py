@@ -3,7 +3,6 @@ from web.http import GDPySWeb
 from objects.glob import glob
 from config import conf
 from const import HandlerTypes
-from cron.cron import cron_runner
 import uvloop
 import asyncio
 
@@ -19,10 +18,11 @@ from handlers.profiles import (
     profile_search,
     req_mod
 )
-from handlers.misc import get_song
+from handlers.misc import get_song, index
 from handlers.leaderboards import get_leaderboard
 
-# Load config
+# Init cron
+from cron.cron import cron_runner
 
 # Local Consts
 DB_PREFIX = "/database"
@@ -39,7 +39,7 @@ HANDLERS = (
     ("/getGJSongInfo.php", get_song, HandlerTypes.PLAIN_TEXT, ("secret", "songID")),
     ("/getGJUsers20.php", profile_search, HandlerTypes.PLAIN_TEXT, ("str", "page", "total")),
     ("/requestUserAccess.php", req_mod, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "gameVersion", "binaryVersion", "gdw")),
-    ("/getGJScores20.php", get_leaderboard, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "secret", "gdw", "type"))
+    ("/getGJScores20.php", get_leaderboard, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "secret", "gdw", "type")),
 )
 
 API_HANDLERS = (
@@ -75,6 +75,12 @@ async def main(loop: asyncio.AbstractEventLoop):
             HandlerTypes.JSON,
             handler
         )
+    
+    server.add_handler(
+        "/",
+        HandlerTypes.PLAIN_TEXT,
+        index
+    )
     
     # Schedule cron running thing.
     loop.create_task(cron_runner())

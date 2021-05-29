@@ -1,6 +1,8 @@
 from objects.song import Song
+from objects.glob import glob
 from exceptions import GDPySHandlerException
-from const import Secrets
+from const import Secrets, GDPyS
+from helpers.time import time_ago, get_timestamp
 from logger import debug
 
 async def get_song(req) -> str:
@@ -18,3 +20,14 @@ async def get_song(req) -> str:
     
     debug(f"Requested song {req.post['songID']} could not be found...")
     raise GDPySHandlerException("-1")
+
+async def index(req) -> str:
+    """The GDPyS index page `/`."""
+
+    return (
+        f"Running {GDPyS.NAME} Build {GDPyS.BUILD}\n"
+        f"Connections handled: {glob.connections_handled}\n"
+        f"Users registered: {glob.registered_users}\n"
+        f"Cached users: {glob.user_cache.cached_items}\n"
+        f"Server started {time_ago(get_timestamp() - glob.startup_time, False)} ago"
+    )

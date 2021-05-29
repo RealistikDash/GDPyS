@@ -3,7 +3,7 @@ from web.http import Request # Pylint appeasement.
 from utils.gdform import gd_dict_str, gd_builder
 from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
-from helpers.time_helper import time_ago
+from helpers.time import time_ago
 from utils.security import verify_stats_seed, verify_textbox
 from exceptions import GDPySHandlerException
 from objects.comments import AccountComment

@@ -1,4 +1,4 @@
-from .time_helper import get_timestamp
+from .time import get_timestamp
 from .common import dict_keys
 
 class Cache:
@@ -14,14 +14,22 @@ class Cache:
                 before other objects start being removed.
         """
         self._cache = {} # The main cache object.
-        self._lenght = cache_length * 60 # Multipled by 60 to get the length in seconds rather than minutes.
+        self.length = cache_length * 60 # Multipled by 60 to get the length in seconds rather than minutes.
         self._cache_limit = cache_limit
+    
+    @property
+    def cached_items(self) -> int:
+        """Returns an int of the lumber of cached items stored."""
+
+        return len(self._cache)
+    
+    def __len__(self): return self.cached_items()
     
     def cache(self, cache_id : int, cache_obj : object) -> None:
         """Adds an object to the cache."""
         self._cache[cache_id] = {
             "id" : cache_id,
-            "expire" : get_timestamp() + self._lenght,
+            "expire" : get_timestamp() + self.length,
             "object" : cache_obj
         }
         self.run_checks()

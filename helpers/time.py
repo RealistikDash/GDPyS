@@ -44,14 +44,18 @@ def get_timestamp() -> int:
     return int(time.time())
 
 
-def time_ago(timestamp: int) -> str:
+def time_ago(timestamp: int, is_ts: bool = True) -> str:
     """Returns a string that is timeago from now (for GD responses).
     
     Args:
-        timestamp (int): A UNIX timestamp you want the `time_ago` string from.
+        timestamp (int): A UNIX timestamp you want the `time_ago` string from
+            if `is_ts` is not passed. Else time diff.
+        is_ts (bool): Whether the timestamp passed is an actual timestamp or a
+            time diff.
     """
-
-    time_diff = get_timestamp() - round(timestamp)
+    
+    if is_ts: time_diff = get_timestamp() - int(timestamp)
+    else: time_diff = timestamp
 
     # No difference.
     if time_diff == 0:

@@ -1,7 +1,5 @@
 from helpers.common import JsonFile, dict_keys
 from logger import info, debug
-import os
-import json
 
 __name__ = "ConfigModule"
 __author__ = "RealistikDash"
@@ -96,4 +94,3 @@ class Config(ConfigReader):
     dir_levels: str    = ".data/levels"
 
 conf = Config()
-

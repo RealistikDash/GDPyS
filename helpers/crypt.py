@@ -1,7 +1,6 @@
 # Common encryption/hashing related functions within GDPyS.
 from itertools import cycle
 from const import XorKeys
-import hashlib
 import bcrypt
 import base64
 import random

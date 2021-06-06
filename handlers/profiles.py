@@ -1,6 +1,6 @@
 from objects.user import User
 from web.http import Request # Pylint appeasement.
-from utils.gdform import gd_dict_str, gd_builder
+from utils.gdform import gd_dict_str
 from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
 from helpers.time import time_ago

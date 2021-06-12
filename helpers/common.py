@@ -1,14 +1,13 @@
 # Common functions related to simple python-related things.
 from typing import Union
 import os
+from json import dump as json_dump
 try:
     from orjson import loads as json_load
-    from json import dump as json_dump
 except ImportError:
     # there is always one person in milion peoples that
     # orjson wont work for them so thats a backup
     from json import loads as json_load
-    from json import dump as json_dump
 
 class JsonFile:
     """Assists within working with simple JSON files."""

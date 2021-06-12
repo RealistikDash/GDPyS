@@ -1,8 +1,7 @@
 # This helper is used for verifying some of the post
 # args sent by some endpoints. To keep the handlers
-# clean, these will be kept here. 
+# clean, these will be kept here.
 from const import GDCol
-import string
 
 # Local constants
 ALLOWED_CHARS = list("abcdefghijklmnopqrstuvwxyz0123456789 ")

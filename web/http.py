@@ -16,6 +16,19 @@ import os
 import socket
 import json
 
+WWW_FORM = 'application/x-www-form-urlencoded'
+IP_HEADER = "X-Real-IP"
+RESP_404 = "GDPyS 404: path doesn't exist!"
+RESP_400_API = {
+    "status": 400,
+    "message": "Your request is either missing some data or the "
+               "data sent is plain wrong."
+}
+RESP_404_API = {
+    "status": 404,
+    "message": "The object you are looking for has not been found..."
+}
+
 class Request:
     """Request class for storing & parsing all data. Made by Lenforiee and
     adapted for use within GDPyS."""
@@ -39,6 +52,12 @@ class Request:
         # send back data
         self._send_headers: list = []
         self._send_code: int = 200
+    
+    def _parse_get_args(self, arg_str: str) -> None:
+        """Parses the URL get args and sets them."""
+
+        for arg in arg_str.split("&", 1):
+            self.get_args[arg[0]] = arg[1]
 
     async def _parse_headers(self, content: str) -> None:
         """Parses all headers from single client"""
@@ -53,92 +72,20 @@ class Request:
 
         if "?" in self.path:
             # We have to parse query args
-            args = self.path.split("?", 1)
+            path, args = self.path.split("?", 1)
             # Update path
-            self.path = args[0]
+            self.path = path
 
-            # Now we will loop all args
-            for arg in args[1].split("&"):
-                # now split arg
-                arg = arg.split("=", 1)
-
-                if len(arg) != 2:
-                    debug("GDPyS Web: Invalid GET argument size!")
-                    #return
-                    continue
-                
-                self.get_args.update({arg[0]: arg[1]})
+            self._parse_get_args(args)
         
         for header in content.splitlines()[1:]:
             # Now we will parse headers in request
             header = header.split(':', 1)
-
-            if len(header) != 2:
-                debug("GDPyS Web: Invalid header size!")
-                #return
-                continue
             
             self.headers.update({header[0]: header[1].lstrip()})
         
         # This is the reason we need nginx.
-        self.ip = self.headers.get("X-Real-IP")
-
-    async def _parse_multipart(self):
-        """Parses multipart from post request"""
-        # Honestly I have no idea how to parse multipart
-        # if this code will ever work it's only by my luck.
-
-        # Ok so after long deep searching I think, I'm kinda able
-        # to know how to parse them
-
-        # Lets build boundary, it's gonna be useful for parsing multipart
-        # What is boundary? its like key to parse multiple data from multipart
-        # boundary have 26 of '-' however we need 28 of them.
-        boundary = "--" + self.headers['Content-Type'].split('boundary=')[1]
-
-        # We will get all multiparts from there.
-        for parts in self.body[:-4].split(boundary.encode()):
-            if not parts:
-                # Sometimes it can be empty and fuck
-                # our instance
-                continue
-
-            # we need to separate headers from body in parts.
-            headers, body = parts.split(b'\r\n\r\n')
-
-            # Parse exisng headers.
-            temp_headers = {}
-            for header in headers.decode().split("\r\n")[1:]:
-                header = header.split(":", 1)
-
-                # Header didn't send data??
-                if len(header) != 2:
-                    debug("GDPyS Web: Invalid multipart header!")
-                    continue
-
-                # Update our temp headers dict.
-                temp_headers.update({header[0]: header[1].lstrip()})
-
-            if not temp_headers.get("Content-Disposition"):
-                # Main header somehow don't exist???
-                return
-            
-            temp_args = {}
-            for args in temp_headers["Content-Disposition"].split(";")[1:]:
-                # basically now its like args in path query
-                args = args.split("=", 1)
-
-                if len(args) != 2:
-                    debug("GDPyS Web: Invalid multipart arguments!")
-                    continue
-
-                temp_args.update({args[0].lstrip(): args[1][1:-1]})
-
-            # Get our type, if it has filename its file if not its post arg
-            if 'filename' in temp_args:
-                self.files.update({temp_args['name']: body[:-2]})
-            else:
-                self.post.update({temp_args['name']: body[:-2].decode()})
+        self.ip = self.headers.get(IP_HEADER)
 
     async def _parse_www_form(self):
         """Parses form data from request"""
@@ -146,11 +93,6 @@ class Request:
         # this is simple to parse
         for parts in self.body.split(b"&"):
             parts = parts.decode().split("=", 1)
-
-            if len(parts) != 2:
-                debug("GDPyS Web: Malformed www-form data, ignoring.")
-                continue
-            
             self.post.update({parts[0]: unquote(parts[1])})
 
     async def _parse(self) -> None:
@@ -190,11 +132,7 @@ class Request:
                 self.body = read_already
 
             if (content := self.headers.get('Content-Type')):
-                # Eh multipart, I spend literally most of my time
-                # to make this parser so its better should work.
-                if 'multipart/form-data' in content:
-                    await self._parse_multipart()
-                elif 'x-www-form' in content:
+                if WWW_FORM == content:
                     await self._parse_www_form()
 
     def add_header(self, header: str, index: int = -1) -> None:
@@ -286,13 +224,13 @@ class GDPySWeb:
 
         # Setting the default err_handlers
         self.err_handlers[404] = Handler(
-            path= "doesnt natter",
+            path= "",
             handler=self._default_not_found_handler,
             status= HandlerTypes.PLAIN_TEXT
         )
 
         self.err_handlers[500] = Handler(
-            path= "doesnt natter",
+            path= "",
             handler=self._default_exception_handler,
             status= HandlerTypes.PLAIN_TEXT
         )
@@ -309,7 +247,7 @@ class GDPySWeb:
 
         # Since this is just the default, we are keeping it
         # simple.
-        return "GDPyS 404: path doesn't exist!"
+        return RESP_404
     
     async def _default_exception_handler(self, req: Request, exc: str) -> str:
         """Simple 500 error handler.
@@ -373,7 +311,7 @@ class GDPySWeb:
             return False
         
         # Verifying the proper content type
-        if req.headers["Content-Type"] != "application/x-www-form-urlencoded":
+        if req.headers["Content-Type"] != WWW_FORM:
             debug("GJP failed due to unknown Content-Type (likely bot)!")
             return False
 
@@ -446,18 +384,11 @@ class GDPySWeb:
         
         except GDPySAPINotFound:
             code = 404
-            resp_str = {
-                "status": code,
-                "message": "The object you are looking for has not been found..."
-            }
+            resp_str = RESP_404_API
         
         except GDPySAPIBadData:
             code = 400
-            resp_str = {
-                "status": code,
-                "message": "Your request is either missing some data or the "
-                           "data sent is plain wrong."
-            }
+            resp_str = RESP_400_API
         
         # This is so we don't reveal post request required fields to people scouting.
         except KeyError as e:
@@ -617,13 +548,9 @@ class GDPySWeb:
             info(f"{GDPyS.NAME} b{GDPyS.BUILD} has been successfully started!")
 
             # Run server forever.
-            try:
-                while self.alive:
-                    client, _ = await self.loop.sock_accept(sock)
-                    self.loop.create_task(self._handle_sock(client))
-            except KeyboardInterrupt: # UVLOOP DOESNT DO THIS.
-                # Safely discard of the server.
-                self.kill()
+            while self.alive:
+                client, _ = await self.loop.sock_accept(sock)
+                self.loop.create_task(self._handle_sock(client))
     
     def kill(self) -> None:
         """Ends the web server and MySQL connection.

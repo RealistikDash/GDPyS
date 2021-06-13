@@ -28,9 +28,9 @@ class Level:
         self.description: str = ""
         self.song: Song = Song()
         self.track_id: int = 0 # The in-game song IDs. Don't like how its done.
-        self.level_version: int = 0
+        self.version: int = 0
         self.length: LevelLengths = 0
-        self.dual: bool = False
+        self.two_player: bool = False
         self.unlisted: bool = False
         # Contains batch nodes to help with rendering
         self.extra_str: str = "0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0"
@@ -169,7 +169,7 @@ class Level:
             "stars, difficulty, demon_diff, coins, coins_verified,"
             "requested_stars, featured_id, rate_status, ldm,"
             "objects, password FROM levels, working_time, level_ver, "
-            "track_id, length, duals, unlisted WHERE id = %s LIMIT 1",
+            "track_id, length, two_player, unlisted WHERE id = %s LIMIT 1",
             (level_id,)
         )
 
@@ -202,10 +202,10 @@ class Level:
             self.objects,
             self.password,
             self.working_time,
-            self.level_version,
+            self.version,
             self.track_id,
             self.length,
-            self.dual,
+            self.two_player,
             self.unlisted
         ) = level_db
 
@@ -262,14 +262,14 @@ class Level:
             "INSERT INTO levels (name, user_id, description, song_id, replay,"
             "game_version, binary_version, timestamp, coins, requested_stars,"
             "ldm, objects, password, working_time, level_ver, track_id, length,"
-            "duals, unlisted) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
+            "two_player, unlisted) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
             "%s,%s)",
             (
                 self.name, self.creator.id, self.description, self.song.id,
                 self.replay, self.game_version, self.binary_version, timestamp,
                 self.coins, self.requested_stars, int(self.ldm), self.objects,
-                self.password, self.working_time, self.level_version,
-                self.track_id, self.length, int(self.dual), int(self.unlisted)
+                self.password, self.working_time, self.version,
+                self.track_id, self.length, int(self.two_player), int(self.unlisted)
             )
         )
     
@@ -281,6 +281,10 @@ class Level:
             The input here has to be generally trusted as no checks are
                 performed on the data passed here. You may get DB errors or 
                 someone exploiting you if you don't verify this.
+            This also ensures the state of the level in memory and database
+                are exactly the same, as this sets ALL of the modifiable
+                attributes of the objects to the database, regardless of
+                whether they were modified.
 
         Kwargs:
             name (str): The name of the level.
@@ -294,8 +298,8 @@ class Level:
             coins_verified (bool): Whether the u_coins are verified (reward 
                 the user).
             verified_coins (bool): Whether
-            dual (bool): Corresponding to whether the level allows input from
-                two individual players.
+            two_player (bool): Corresponding to whether the level allows input
+                from two individual players.
             password (str): The 6 digit password of the level (str due to 0s).
             objects (str): The total object count of the level.
             song_id (int): The ID of the song to set.
@@ -309,11 +313,12 @@ class Level:
             replay (str): The replay string for the verification of the level.
             feature_id (int): The ID of the feature (by which level on the
                 featured page are ordered).
-            epic (bool): Whether the level should be classified as epic.
             downloads (int): The amount of times the level has been
                 downloaded.
             likes (int): The amount of people that liked the level (can be
                 negative).
+            rate_status (LevelStatus): Int flag of the level representing the
+                special ratings of the level.
         """
 
         # Check if we are not setting an unuploaded level. We need the level 
@@ -324,32 +329,72 @@ class Level:
 
         # Custom object setting is a bit special.
         if song_id := kwargs.get("song_id"):
-            self.song = Song.from_id(song_id)
+            self.song = await Song.from_id(song_id)
             # Ensure that only one of them exists at once, with custom songs
             # taking priority.
             self.track_id = 0
         else:
+            song_id = 0
             self.track_id = kwargs.get("track_id", 0)
 
         # TODO: Cleanup. Possibly loop through all of the args and just
         # `setattr` them. That might not be too secure tho. /shrug
         self.name = kwargs.get("name", self.name)
         self.description = kwargs.get("desc", self.description)
-        self.level_version = kwargs.get("version", self.level_version)
+        self.version = kwargs.get("version", self.version)
         self.length = kwargs.get("length", self.length)
         self.ldm = kwargs.get("ldm", self.ldm)
         self.coins = kwargs.get("coins", self.coins)
         self.coins_verified = kwargs.get("verified_coins", self.coins_verified)
-        self.dual = kwargs.get("dual", self.dual)
+        self.two_player = kwargs.get("two_player", self.two_player)
         self.password = kwargs.get("password", self.password)
         self.objects = kwargs.get("objects", self.objects)
         self.working_time = kwargs.get("work_time", self.working_time)
         self.unlisted = kwargs.get("unlisted", self.unlisted)
         self.game_version = kwargs.get("game_version", self.game_version)
         self.binary_version = kwargs.get("binary_version", self.binary_version)
-        self.track_id = kwargs.get("track_id", self.track_id)
+        self.rate_status = kwargs.get("rate_status", self.rate_status)
+        self.replay = kwargs.get("replay", self.replay)
+        self.feature_id = kwargs.get("feature_id", self.feature_id)
+        self.downloads = kwargs.get("downloads", self.downloads)
+        self.likes = kwargs.get("likes", self.likes)
 
-        # Update time.
+        # Update time. I hate myself.
+        await glob.sql.execute(
+            """
+            UPDATE levels SET
+                name = %s,
+                description = %s,
+                version=%s,
+                length=%s,
+                ldm=%s,
+                coins=%s,
+                coins_verified=%s,
+                two_player=%s,
+                password=%s,
+                working_time=%s,
+                unlisted=%s,
+                game_version=%s,
+                binary_version=%s,
+                track_id=%s,
+                song_id=%s,
+                rate_status=%s,
+                replay=%s,
+                feature_id=%s,
+                downloads=%s,
+                likes=%s
+            WHERE
+                id = %s
+                LIMIT 1
+            """, (
+                self.name, self.description, self.version, self.length,
+                1 if self.ldm else 0, self.coins, 1 if self.coins_verified else 0,
+                1 if self.two_player else 0, self.password, self.working_time, 
+                1 if self.unlisted else 0, self.game_version, self.binary_version,
+                self.track_id, song_id, self.rate_status, self.replay,
+                self.feature_id, self.downloads, self.likes
+            )
+        )
 
     
     async def _fetch_comments(self):

@@ -21,7 +21,7 @@ async def get_song(req) -> str:
     debug(f"Requested song {req.post['songID']} could not be found...")
     raise GDPySHandlerException("-1")
 
-async def index(req) -> str:
+async def index(_) -> str:
     """The GDPyS index page `/`."""
 
     return (

@@ -85,7 +85,9 @@ async def main(loop: asyncio.AbstractEventLoop):
     # Schedule cron running thing.
     loop.create_task(cron_runner())
 
-    await server.start(conf.http_sock, conf.http_max_conn)
+    try:
+        await server.start(conf.http_sock, conf.http_max_conn)
+    except KeyboardInterrupt: server.kill()
 
 if __name__ == "__main__":
     # Here we are using uvloop rather than the defauly

@@ -23,7 +23,6 @@ class MySQLPool:
         """Creates the default values for the connector. Use the `conntect`
         classmethod instead."""
         self._pool: aiomysql.Pool
-        self.last_row_id: int = 0
         self._loop: asyncio.AbstractEventLoop
     
     @classmethod
@@ -143,9 +142,6 @@ class MySQLPool:
             async with pool.cursor() as cur:
                 # Execute it.
                 await cur.execute(query, args)
-
-                # Set `last_row_id`
-                self.last_row_id = cur.lastrowid
 
                 # Commit it.
                 await pool.commit()

@@ -29,6 +29,11 @@ class Privilege:
 
     def has_privilege(self, priv: Privileges) -> bool:
         """Check if members of the privilege group have the given permisison.
+
+        Note:
+            Only singular privilege checks work! Combining multiple in one
+                will result in the whole function returning true even if only
+                one of the privileges is present.
         
         Args:
             priv (Privileges): An IntFlag representing the privilege to check

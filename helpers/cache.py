@@ -53,7 +53,7 @@ class Cache:
     
     def _get_cached_ids(self) -> list:
         """Returns a list of all cache IDs currently cached."""
-        return dict_keys(self._cache)
+        return tuple(self._cache)
 
     def _get_object(self, cache_id : int) -> list:
         """Gets object using set function."""
@@ -95,3 +95,9 @@ class Cache:
         """Runs checks on the cache."""
         self._remove_expired_cache()
         self._remove_limit_cache()
+    
+    def get_all_items(self) -> list:
+        """Creates a list of all cached items in the order of when it was
+        cached."""
+
+        return [obj for _, obj in self._cache.items()]

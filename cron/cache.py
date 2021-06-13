@@ -17,3 +17,9 @@ async def cache_feature_id() -> None:
     # No levels on the gdps
     if not feaid_db: glob.feature_id = 0
     else: glob.feature_id = feaid_db[0]
+
+async def refresh_rank() -> None:
+    """Ensures rank consistency by refreshing the ranks of ALL currently
+    cached players. Kinda expensive but fits a cache up-to-dateness.
+    Given enough time sometimes ranks will appear broken for players passed
+    so this is kinda required."""

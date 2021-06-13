@@ -23,3 +23,6 @@ async def refresh_rank() -> None:
     cached players. Kinda expensive but fits a cache up-to-dateness.
     Given enough time sometimes ranks will appear broken for players passed
     so this is kinda required."""
+
+    for u in glob.user_cache.get_all_items():
+        await u.stats.calc_rank()

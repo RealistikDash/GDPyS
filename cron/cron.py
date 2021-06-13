@@ -6,11 +6,12 @@ import asyncio
 
 # Cron job imports
 from .leaderboards import refresh_leaderboards
-from .cache import cache_registered
+from .cache import cache_registered, cache_feature_id
 
 JOBS = ( # All the cron coroutine functions
     refresh_leaderboards,
-    cache_registered
+    cache_registered,
+    cache_feature_id
 )
 
 async def cron_runner(delay: int = 1800) -> None:

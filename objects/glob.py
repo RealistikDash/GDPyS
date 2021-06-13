@@ -39,6 +39,7 @@ class Glob:
         self.connections_handled: int = 0
         self.startup_time: int = get_timestamp()
         self.registered_users: int = 0 # Cached in cron
+        self.feature_id: int = 0 # Latest feature id (to be incremented).
 
 # Define glob here so we can just use it.
 glob = Glob()

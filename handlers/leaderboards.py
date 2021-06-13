@@ -4,15 +4,15 @@ from const import LeaderboardTypes
 from web.http import Request
 from objects.glob import glob
 
+# TODO: Place in a better place.
+glob.star_lb = Leaderboard(LeaderboardTypes.TOP)
+glob.cp_lb = Leaderboard(LeaderboardTypes.CP)
+
 # Local consts.
 LEADERBOARDS = {
     "top": glob.star_lb,
     "creators": glob.cp_lb
 }
-
-# TODO: Place in a better place.
-glob.star_lb = Leaderboard(LeaderboardTypes.TOP)
-glob.cp_lb = Leaderboard(LeaderboardTypes.CP)
 
 async def get_leaderboard(req: Request, user: User) -> str:
     """Handles the `getGJScores20.php` endpoint."""

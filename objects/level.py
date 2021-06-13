@@ -266,9 +266,10 @@ class Level:
             (
                 self.name, self.creator.id, self.description, self.song.id,
                 self.replay, self.game_version, self.binary_version, timestamp,
-                self.coins, self.requested_stars, int(self.ldm), self.objects,
+                self.coins, self.requested_stars, 1 if self.ldm else 0, self.objects,
                 self.password, self.working_time, self.version,
-                self.track_id, self.length, int(self.two_player), int(self.unlisted)
+                self.track_id, self.length, 1 if self.two_player else 0,
+                1 if self.unlisted else 0
             )
         )
     

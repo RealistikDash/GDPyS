@@ -100,4 +100,4 @@ class Cache:
         """Creates a list of all cached items in the order of when it was
         cached."""
 
-        return [obj for _, obj in self._cache.items()]
+        return [obj["object"] for _, obj in self._cache.items()]

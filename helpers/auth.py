@@ -52,8 +52,7 @@ class Auth:
         p = await User.from_id(account_id)
 
         # Check if they even exist
-        if not p:
-            return
+        if not p: return
         
         # Banned users are auto denied.
         if not p.has_privilege(Privileges.LOGIN): return
@@ -68,12 +67,9 @@ class Auth:
             # Fail them.
             debug(f"{p.name} failed auth using cache hit.")
             return
-        
-        # We have to do a bcrypt check. First decode gjp
-        p_pass = gjp_decode(gjp)
 
         # Now we compare the p_pass with bcrypt.
-        if p.check_pass(p_pass):
+        if p.check_pass(gjp_decode(gjp)):
             # They successfully authed. Store this bcrypt in cache for speed.
             self._correct_gjps.cache(account_id, gjp)
 

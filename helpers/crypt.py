@@ -120,5 +120,5 @@ def string_random(length: int = 8) -> str:
 
     return "".join(
         random.choice(string.ascii_lowercase + string.ascii_uppercase)
-        for i in range(length)
+        for _ in range(length)
     )

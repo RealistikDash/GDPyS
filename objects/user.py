@@ -126,8 +126,10 @@ class Stats:
         self.icon, self.ship,
         self.ufo, self.wave, self.ball,
         self.robot, self.spider,
-        self.explosion, self.glow,
+        self.explosion, glow,
         self.display_icon) = stats_sql
+
+        self.glow = glow == 1
 
         if full:
             await self.calc_rank()
@@ -210,7 +212,7 @@ class Stats:
             self.colour1, self.colour2, self.icon,
             self.ship, self.ufo, self.wave,
             self.robot, self.ball, self.spider,
-            self.explosion, self.display_icon, int(self.glow),
+            self.explosion, self.display_icon, 1 if self.glow else 0,
             self.user_id
         ))
 
@@ -690,7 +692,7 @@ class User:
                 24: self.stats.ufo,
                 25: self.stats.wave,
                 26: self.stats.robot,
-                28: int(self.stats.glow),
+                28: 1 if self.stats.glow else 0,
                 29: 1,
                 30: self.stats.rank,
                 43: self.stats.spider,

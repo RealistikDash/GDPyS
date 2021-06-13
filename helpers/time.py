@@ -1,6 +1,7 @@
 # For now this is simply taken from GDPyS v2 as this has no huge flaws with it.
-import time
 from datetime import datetime
+import time
+import math
 
 class Timer:
     """A simple timer class used to time the execution of code."""
@@ -41,7 +42,7 @@ class Timer:
 
 def get_timestamp() -> int:
     """Returns current timestamp as a full integer."""
-    return int(time.time())
+    return math.ceil(time.time())
 
 
 def time_ago(timestamp: int, is_ts: bool = True) -> str:

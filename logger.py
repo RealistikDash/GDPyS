@@ -1,4 +1,3 @@
-from time import localtime, strftime
 from colorama import Fore, Back
 from helpers.time import formatted_date
 import sys
@@ -50,4 +49,3 @@ def error(message: str):
 
 def warning(message: str):
     return log_message(message, "WARNING", Back.BLUE)
-

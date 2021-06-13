@@ -1,4 +1,3 @@
-from time import time
 from .glob import glob
 from .user import User
 from .song import Song

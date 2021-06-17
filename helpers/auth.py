@@ -2,6 +2,7 @@
 from objects.user import User
 from .cache import Cache
 from .crypt import gjp_decode
+from .user import log_login
 from typing import Union
 from logger import debug
 from const import Privileges

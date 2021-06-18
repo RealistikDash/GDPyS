@@ -67,7 +67,7 @@ def time_ago(timestamp: int, is_ts: bool = True) -> str:
 
     intervals = (
         ("second", 60), ("minute", 60), ("hour", 60), ("day", 24),
-        ("months", 30), ("years", 12), ("decade", 100)
+        ("month", 30), ("year", 12), ("decade", 100)
     )
 
     ret = ""

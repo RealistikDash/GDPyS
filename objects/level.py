@@ -264,7 +264,7 @@ class Level:
 
         # Song weirdness.
         if (song_id := req.post["songID"]) != "0":
-            self.song = Song.from_id(song_id)
+            self.song = await Song.from_id(song_id)
         else: self.track_id = int(req.post["audioTrack"])
 
         if len(passwd := req.post["password"]) > 8:
@@ -279,7 +279,13 @@ class Level:
         self.replay = req.post["levelInfo"]
         self.extra_str = req.post["extraString"]
         self.requested_stars = int(req.post["requestedStars"])
-
+        self.working_time = int(req.post["wt2"])
+        
+        return self
+    
+    def __repr__(self) -> str:
+        """Debug representation of the object."""
+        return f"<Level {self.name} ({self.id})>"
     
     async def insert(self) -> None:
         """Inserts the level data directly into the MySQL table.
@@ -301,15 +307,15 @@ class Level:
             "INSERT INTO levels (name, user_id, description, song_id, replay,"
             "game_version, binary_version, timestamp, coins, requested_stars,"
             "ldm, objects, password, working_time, level_ver, track_id, length,"
-            "two_player, unlisted) VALUES (%s,%s,%s,%s,%s,%s,%s,"
-            "UNIX_TIMESTAMP(),%s,%s,%s,%s,%s,%s,%s)",
+            "two_player, unlisted, extra_str) VALUES (%s,%s,%s,%s,%s,%s,%s,"
+            "UNIX_TIMESTAMP(),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (
                 self.name, self.creator.id, self.description, song_id,
                 self.replay, self.game_version, self.binary_version,
                 self.coins, self.requested_stars, 1 if self.ldm else 0, self.objects,
                 self.password, self.working_time, self.version,
                 self.track_id, self.length, 1 if self.two_player else 0,
-                1 if self.unlisted else 0
+                1 if self.unlisted else 0, self.extra_str
             )
         )
     

@@ -511,6 +511,10 @@ class User:
         # Return obj.
         return cls
     
+    def __repr__(self) -> str:
+        """Debug representation of the object."""
+        return f"<User {self.name} ({self.id})>"
+    
     def cache(self):
         """Commits the user object to the cache."""
 

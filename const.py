@@ -9,7 +9,7 @@ class GDPyS:
     """Metadata on GDPyS."""
 
     NAME: str = "GDPyS v3"
-    BUILD: int = 2021_06_13 # Not really build as its Python but it sounds cool.
+    BUILD: int = 2021_06_18 # Not really build as its Python but it sounds cool.
 
 class HandlerTypes(IntFlag):
     """This `IntFlag` class contains enumeration for GDPyS handler types."""
@@ -120,3 +120,19 @@ class LevelStatus:
     EPIC    = 2 << 0
     MAGIC   = 2 << 1
     AWARDED = 2 << 2
+
+class Security:
+    """Security related constants."""
+
+    # Mainly to stop impersonation.
+    BANNED_USERNAMES = ( #All lower case
+        "robtop", "viprin", "michigun"
+    )
+    # Stop poor security practises
+    BANNED_PASSWORDS = ( #All lower case
+        "123456", "12345678", "abc123", "password", "111111", "picture1",
+        "123456789", "qwerty", "password1", "iloveyou", "qwertyuiop",
+        "abcdef", "unknown", "asdfgh", "zxcvbn", "112233"
+    )
+    MAX_LEVEL_NAME_LEN = 20
+    MAX_LEVEL_DESC_LEN = 255

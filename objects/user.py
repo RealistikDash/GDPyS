@@ -2,7 +2,7 @@ from helpers.crypt import bcrypt_hash, bcrypt_check
 from helpers.time import get_timestamp
 from helpers.common import safe_username
 from dataclasses import dataclass
-from const import ReqStats, Privileges, Regexes
+from const import ReqStats, Privileges, Regexes, Security
 from logger import debug
 from .glob import glob
 from .comments import AccountComment
@@ -456,6 +456,14 @@ class User:
         un_exists = await glob.sql.fetchone("SELECT 1 FROM users WHERE username_safe = %s LIMIT 1", (
             cls.safe_name
         ))
+
+        if username.lower() in Security.BANNED_USERNAMES:
+            # They are **probably** impersonating someone. Don't let them.
+            raise GDPySHandlerException("-2")
+        
+        # Don't allow really common passwords.
+        if password.lower() in Security.BANNED_PASSWORDS:
+            raise GDPySHandlerException("-5")
 
         # User with that username already exists in the db.
         if un_exists:

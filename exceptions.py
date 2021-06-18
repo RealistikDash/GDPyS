@@ -19,4 +19,3 @@ class GDPySAPINotFound(Exception):
 class GDPySAPIBadData(Exception):
     """Exception raised when the api is sent invalid data."""
     pass
-

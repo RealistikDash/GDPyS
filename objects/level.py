@@ -260,7 +260,7 @@ class Level:
         self.name = req.post["levelName"][:Security.MAX_LEVEL_NAME_LEN]
         self.description = base64_decode(
             req.post["levelDesc"]
-        )[:Security.MAX_LEVEL_NAME_LEN]
+        )[:Security.MAX_LEVEL_DESC_LEN]
 
         # Song weirdness.
         if (song_id := req.post["songID"]) != "0":

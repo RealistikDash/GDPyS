@@ -1,3 +1,4 @@
+from exceptions import GDPySHandlerException
 from objects.song import Song
 from objects.user import User
 from web.http import Request
@@ -140,3 +141,75 @@ async def level_search(req: Request) -> str:
     security_str = sha1_hash("".join(security_strs) + SECURITY_APPEND)
 
     return "#".join((level_str, user_str, song_str, page_info, security_str))
+
+async def download_level(req: Request) -> str:
+    """Handles `downloadGJLevel22.php`"""
+
+    level_id = int(req.post["levelID"])
+
+    # Daily and weekly levels.
+    if level_id in (-1, -2):
+        ...
+    else:
+        level: Level = await Level.from_id(level_id)
+        if not level: raise GDPySHandlerException("-1")
+    
+    info(f"Serving level {level}")
+
+    level_str = await level.load()
+    # TODO: Download increment.
+    main_resp =  gd_dict_str({
+        1: level.id,
+        2: level.name,
+        3: base64_encode(level.description),
+        4: level_str,
+        5: level.version,
+        6: level.creator.id,
+        8: 10 if level.difficulty else 0,
+        9: level.difficulty,
+        10: level.downloads,
+        12: level.track_id,
+        13: level.game_version,
+        14: level.likes,
+        15: level.length,
+        17: 1 if level.stars == 10 else 0,
+        18: level.stars,
+        19: level.feature_id,
+        25: 1 if level.stars == 1 else 0,
+        26: level.replay,
+        27: level.password,
+        28: level.timestamp,
+        29: level.update_ts,
+        30: level.original,
+        31: 1 if level.original else 0,
+        35: level.song.id if level.song else 0,
+        36: level.extra_str,
+        37: level.coins,
+        38: 1 if level.coins_verified else 0,
+        39: level.requested_stars,
+        40: 1 if level.ldm else 0,
+        41: 0, # TODO: DAILY NUMBER.
+        42: 1 if level.epic else 0,
+        43: level.demon_diff,
+        45: level.objects,
+        46: level.working_time,
+        47: level.working_time
+    })
+
+    # This is taken from Cvolton's GMDPrivateServer.
+    # https://github.com/Cvolton/GMDprivateServer/blob/master/incl/lib/generateHash.php#L16-L26
+    security_str = ""
+    s_len = len(level_str) // 40
+    for i in range(40):
+        security_str += level_str[i * s_len]
+    security_str = sha1_hash(security_str + SECURITY_APPEND)
+
+    security_str2 = ",".join(
+        (str(level.creator.id), str(level.stars), "1" if level.demon else "0", str(level.id),
+        "1" if level.coins_verified else "0", str(level.feature_id), level.password, "0")
+    )
+    security_str2_h = sha1_hash(security_str2 + SECURITY_APPEND)
+
+    return "#".join(
+        (main_resp, security_str, security_str2_h, security_str2)
+    )

@@ -172,8 +172,9 @@ class Level:
             "binary_version, timestamp, downloads, likes,"
             "stars, difficulty, demon_diff, coins, coins_verified,"
             "requested_stars, featured_id, rate_status, ldm,"
-            "objects, password FROM levels, working_time, level_ver, "
-            "track_id, length, two_player, unlisted WHERE id = %s LIMIT 1",
+            "objects, password, working_time, level_ver, "
+            "track_id, length, two_player, unlisted FROM levels "
+            "WHERE id = %s LIMIT 1",
             (level_id,)
         )
 
@@ -219,6 +220,8 @@ class Level:
 
         if full:
             await self._fetch_comments()
+        
+        return self
     
     @classmethod
     async def from_id(cls, level_id: int):
@@ -235,7 +238,7 @@ class Level:
         if cache_l := glob.level_cache.get(level_id): return cache_l
 
         # We are required to utilise the sql (slow).
-        return Level.from_sql(level_id, True)
+        return await Level.from_sql(level_id, True)
     
     @classmethod
     async def from_submit(cls, u: User, req: Request):

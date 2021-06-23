@@ -201,6 +201,7 @@ class Handler:
         # Iterate through all required post args and see if
         # they are in the args list.
         for arg in self.req_postargs:
+            print(arg)
             if arg not in args: return False
         
         return True

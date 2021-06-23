@@ -266,7 +266,7 @@ class Level:
         )[:Security.MAX_LEVEL_DESC_LEN]
 
         # Song weirdness.
-        if (song_id := req.post["songID"]) != "0":
+        if (song_id := int(req.post["songID"])) not in (-1, 0):
             self.song = await Song.from_id(song_id)
         else: self.track_id = int(req.post["audioTrack"])
 
@@ -380,8 +380,9 @@ class Level:
         )
 
         # Custom object setting is a bit special.
-        if song_id := kwargs.get("song_id"):
+        if song_id := int(kwargs.get("song_id")):
             self.song = await Song.from_id(song_id)
+            song_id = self.song.id
             # Ensure that only one of them exists at once, with custom songs
             # taking priority.
             self.track_id = 0

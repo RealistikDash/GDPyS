@@ -58,7 +58,7 @@ BASE_QUERY = (
 )
 
 BASE_COUNT = "SELECT COUNT(*) FROM levels "
-PAGE_SIZE = 10
+PAGE_SIZE = 20
 SECURITY_APPEND = "xI25fpAapCQg"
 
 async def level_search(req: Request) -> str:
@@ -70,13 +70,12 @@ async def level_search(req: Request) -> str:
     # Setting and confirming values.
     search_type = int(req.post["type"])
     search_query = req.post["str"]
-    page = int(req.post["page"])
-    offset = page * PAGE_SIZE
+    offset = int(req.post["page"]) * PAGE_SIZE
 
-    info(f"Level search for '{search_query}' ({search_type}, {page})")
+    info(f"Level search for '{search_query}' ({search_type}, {offset})")
 
     #### IGNORE FOR TESTING.
-    levels_db = await glob.sql.fetchall(BASE_QUERY)
+    levels_db = await glob.sql.fetchall(BASE_QUERY + f"LIMIT {PAGE_SIZE} OFFSET {offset}")
     count_db = (await glob.sql.fetchone(BASE_COUNT))[0]
 
     level_strs = []

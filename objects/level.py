@@ -1,3 +1,4 @@
+from helpers.time import get_timestamp
 from web.http import Request
 from .glob import glob
 from .user import User
@@ -38,6 +39,8 @@ class Level:
         self.game_version: int = 22
         self.binary_version: int = 35
         self.timestamp: int = 0
+        self.update_ts: int = 0
+        self.original: int = 0 # The ID of the original level.
 
         # Some general statistics.
         self.likes: int = 0
@@ -280,6 +283,7 @@ class Level:
         self.extra_str = req.post["extraString"]
         self.requested_stars = int(req.post["requestedStars"])
         self.working_time = int(req.post["wt2"])
+        self.original = int(req.post["original"])
         
         return self
     
@@ -300,22 +304,23 @@ class Level:
             )
         
         song_id = self.song.id if self.song else 0
+        self.timestamp = self.update_ts = get_timestamp()
 
         # We are inserting into the database, and using the cur.lastrowid for
         # setting the id locally.
         self.id = await glob.sql.execute(
             "INSERT INTO levels (name, user_id, description, song_id, replay,"
-            "game_version, binary_version, timestamp, coins, requested_stars,"
+            "game_version, binary_version, timestamp, update_ts, coins, requested_stars,"
             "ldm, objects, password, working_time, level_ver, track_id, length,"
-            "two_player, unlisted, extra_str) VALUES (%s,%s,%s,%s,%s,%s,%s,"
-            "UNIX_TIMESTAMP(),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            "two_player, unlisted, extra_str, original) VALUES (%s,%s,%s,%s,%s,%s,%s,"
+            "UNIX_TIMESTAMP(),UNIX_TIMESTAMP(),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (
                 self.name, self.creator.id, self.description, song_id,
                 self.replay, self.game_version, self.binary_version,
                 self.coins, self.requested_stars, 1 if self.ldm else 0, self.objects,
                 self.password, self.working_time, self.version,
                 self.track_id, self.length, 1 if self.two_player else 0,
-                1 if self.unlisted else 0, self.extra_str
+                1 if self.unlisted else 0, self.extra_str, self.original
             )
         )
     
@@ -365,6 +370,7 @@ class Level:
                 negative).
             rate_status (LevelStatus): Int flag of the level representing the
                 special ratings of the level.
+            original (int): The level ID of the original level (0 if unique).
         """
 
         # Check if we are not setting an unuploaded level. We need the level 
@@ -404,6 +410,7 @@ class Level:
         self.feature_id = kwargs.get("feature_id", self.feature_id)
         self.downloads = kwargs.get("downloads", self.downloads)
         self.likes = kwargs.get("likes", self.likes)
+        self.update_ts = get_timestamp()
 
         # Update time. I hate myself.
         await glob.sql.execute(
@@ -428,7 +435,9 @@ class Level:
                 replay=%s,
                 feature_id=%s,
                 downloads=%s,
-                likes=%s
+                likes=%s,
+                update_ts = UNIX_TIMESTAMP(),
+                original=%s
             WHERE
                 id = %s
                 LIMIT 1
@@ -438,7 +447,8 @@ class Level:
                 1 if self.two_player else 0, self.password, self.working_time, 
                 1 if self.unlisted else 0, self.game_version, self.binary_version,
                 self.track_id, song_id, self.rate_status, self.replay,
-                self.feature_id, self.downloads, self.likes
+                self.feature_id, self.downloads, self.likes, self.original,
+                self.id
             )
         )
 

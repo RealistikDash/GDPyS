@@ -5,6 +5,7 @@ import bcrypt
 import base64
 import random
 import string
+import hashlib
 
 def base64_encode(text: str) -> str:
     """Encodes the param `text` using url safe Base64.
@@ -122,3 +123,15 @@ def string_random(length: int = 8) -> str:
         random.choice(string.ascii_lowercase + string.ascii_uppercase)
         for _ in range(length)
     )
+
+def sha1_hash(text: str) -> str:
+    """Hashes a plaintext string in the SHA1 hashing algorhythm.
+    
+    Args:
+        text (str): The text to hash.
+
+    Returns:
+        `string` hashed in SHA1.
+    """
+
+    return hashlib.sha1(text.encode()).hexdigest()

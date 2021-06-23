@@ -130,7 +130,7 @@ async def level_search(req: Request) -> str:
         # THIS SECURTIY AIDS.
         level_id = str(level[0])
         security_strs.append(
-            f"{level_id[0]}{level_id[len(level_id) - 1]}{level[11]}{level[17]}"
+            f"{level_id[0]}{level_id[-1]}{level[11]}{level[17]}"
         )
     
     # Build final resp.

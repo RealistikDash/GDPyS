@@ -4,6 +4,15 @@ from web.http import GDPySWeb
 from objects import glob
 from config import conf
 
+# This is only to initialise this files.
+from handlers import (
+    login,
+    profiles,
+    misc,
+    leaderboards,
+    levels
+)
+
 # Init cron
 from cron.cron import cron_runner
 

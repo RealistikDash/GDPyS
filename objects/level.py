@@ -1,6 +1,6 @@
 from helpers.time import get_timestamp
 from web.http import Request
-from .glob import glob
+from . import glob
 from .user import User
 from .song import Song
 from config import conf

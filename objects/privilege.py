@@ -1,4 +1,4 @@
-from .glob import glob
+from . import glob
 from .misc import RGB
 from const import Privileges
 

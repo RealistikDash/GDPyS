@@ -2,7 +2,10 @@
 from exceptions import GDPySAPIBadData, GDPySAPINotFound
 from web.http import Request
 from objects.user import User
+from const import HandlerTypes
+from objects import glob
 
+@glob.add_route("/api/user", HandlerTypes.JSON)
 async def get_user_api(req: Request) -> dict:
     """Handles `/api/user`."""
 

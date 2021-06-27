@@ -1,59 +1,24 @@
-from handlers.api import get_user_api
-from web.http import GDPySWeb
-from objects.glob import glob
-from config import conf
-from const import HandlerTypes
 import uvloop
 import asyncio
+from web.http import GDPySWeb
+from objects import glob
+from config import conf
 
-# Handler imports.
-from handlers.login import register_account, login_account
-from handlers.profiles import (
-    user_info,
-    update_stats,
-    account_comments,
-    upload_acc_comment,
-    delete_acc_comment,
-    update_social,
-    profile_search,
-    req_mod
+# This is only to initialise this files.
+from handlers import (
+    api,
+    login,
+    profiles,
+    misc,
+    leaderboards,
+    levels
 )
-from handlers.misc import get_song, index
-from handlers.leaderboards import get_leaderboard
-from handlers.levels import upload_level, level_search, download_level
 
 # Init cron
 from cron.cron import cron_runner
 
-# Local Consts
-DB_PREFIX = "/database"
-# path, handler coro, handlertype, required_postargs
-HANDLERS = (
-    ("/accounts/registerGJAccount.php", register_account, HandlerTypes.PLAIN_TEXT, ("userName", "password", "email", "secret")),
-    ("/accounts/loginGJAccount.php", login_account, HandlerTypes.PLAIN_TEXT, ("udid", "userName", "password", "secret", "sID")),
-    ("/getGJUserInfo20.php", user_info, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("gameVersion", "binaryVersion", "gdw", "accountID", "gjp", "targetAccountID", "secret")),
-    ("/updateGJUserScore22.php", update_stats, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("secret", "accGlow", "iconType", "accountID", "gjp", "userCoins", "seed2", "seed")),
-    ("/getGJAccountComments20.php", account_comments, HandlerTypes.PLAIN_TEXT, ("accountID", "total", "page", "secret", "gdw")),
-    ("/uploadGJAccComment20.php", upload_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "comment", "secret", "chk", "cType")),
-    ("/deleteGJAccComment20.php", delete_acc_comment, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "commentID")),
-    ("/updateGJAccSettings20.php", update_social, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret")),
-    ("/getGJSongInfo.php", get_song, HandlerTypes.PLAIN_TEXT, ("secret", "songID")),
-    ("/getGJUsers20.php", profile_search, HandlerTypes.PLAIN_TEXT, ("str", "page", "total")),
-    ("/requestUserAccess.php", req_mod, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "gjp", "secret", "gameVersion", "binaryVersion", "gdw")),
-    ("/getGJScores20.php", get_leaderboard, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("accountID", "secret", "gdw", "type")),
-    ("/uploadGJLevel21.php", upload_level, HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED, ("gameVersion", "auto", "seed2", "secret", "wt2", "gdw", "levelInfo", "levelID")),
-    ("/getGJLevels21.php", level_search, HandlerTypes.PLAIN_TEXT, ("type", "gdw", "gameVersion", "str", "len", "page")),
-    ("/downloadGJLevel22.php", download_level, HandlerTypes.PLAIN_TEXT, ("levelID", "secret", "gdw", "extras", "rs", "udid"))
-)
-
-API_HANDLERS = (
-    ("user", get_user_api),
-)
-
-async def main(loop: asyncio.AbstractEventLoop):
+async def main():
     """The main asyncronous function."""
-
-    server = GDPySWeb(loop)
 
     # Create mysql conn.
     await server.config_sql(
@@ -63,39 +28,23 @@ async def main(loop: asyncio.AbstractEventLoop):
         database= conf.sql_db
     )
 
-    # SET ALL THE HANDLERS
-    for handler in HANDLERS:
+    # Add all global routes.
+    for route in glob.routes.values():
         server.add_handler(
-            path= DB_PREFIX + handler[0],
-            status= handler[2],
-            handler= handler[1],
-            req_postargs= handler[3]
+            path= route['path'],
+            status= route['status'],
+            handler= route['handler'],
+            req_postargs= route['args']
         )
-    
-    # API handlers
-    for route, handler in API_HANDLERS:
-        server.add_handler(
-            f"/api/{route}",
-            HandlerTypes.JSON,
-            handler
-        )
-    
-    server.add_handler(
-        "/",
-        HandlerTypes.PLAIN_TEXT,
-        index
-    )
     
     # Schedule cron running thing.
-    loop.create_task(cron_runner())
-
-    try:
-        await server.start(conf.http_sock, conf.http_max_conn)
-    except KeyboardInterrupt: server.kill()
+    server.add_task(cron_runner)
 
 if __name__ == "__main__":
     # Here we are using uvloop rather than the defauly
     # asyncio as its faster. However, it does not support
     # Windows so a simple if statement can be added here.
     loop = uvloop.new_event_loop()
-    loop.run_until_complete(main(loop))
+    server = GDPySWeb(loop)
+    loop.run_until_complete(main())
+    server.start(conf.http_sock, conf.http_max_conn)

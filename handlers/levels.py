@@ -3,12 +3,17 @@ from objects.song import Song
 from objects.user import User
 from web.http import Request
 from objects.level import Level
-from objects.glob import glob
+from objects import glob
 from helpers.crypt import base64_decode, base64_encode, sha1_hash
 from logger import info, debug
 from utils.gdform import gd_dict_str
-from const import LevelStatus
+from const import LevelStatus, DB_PREFIX, HandlerTypes
 
+@glob.add_route(
+    path= DB_PREFIX + "/uploadGJLevel21.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("gameVersion", "auto", "seed2", "secret", "wt2", "gdw", "levelInfo", "levelID")
+)
 async def upload_level(req: Request, user: User) -> str:
     """Handles the endpoint `uploadGJLevel21.php`."""
 
@@ -62,6 +67,11 @@ BASE_COUNT = "SELECT COUNT(*) FROM levels "
 PAGE_SIZE = 20
 SECURITY_APPEND = "xI25fpAapCQg"
 
+@glob.add_route(
+    path= DB_PREFIX + "/getGJLevels21.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("type", "gdw", "gameVersion", "str", "len", "page")
+)
 async def level_search(req: Request) -> str:
     """Handles level search (`getGJLevels21.php`)."""
 
@@ -142,6 +152,11 @@ async def level_search(req: Request) -> str:
 
     return "#".join((level_str, user_str, song_str, page_info, security_str))
 
+@glob.add_route(
+    path= DB_PREFIX + "/downloadGJLevel22.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("levelID", "secret", "gdw", "extras", "rs", "udid")
+)
 async def download_level(req: Request) -> str:
     """Handles `downloadGJLevel22.php`"""
 

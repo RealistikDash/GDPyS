@@ -1,11 +1,17 @@
-from objects.user import User
+from objects import glob
 from web.http import Request
-from utils.security import verify_textbox
-from const import GenericResponse
-from exceptions import GDPySHandlerException
-from logger import info, debug
 from const import Privileges
+from objects.user import User
+from logger import info, debug
+from utils.security import verify_textbox
+from exceptions import GDPySHandlerException
+from const import GenericResponse, HandlerTypes, DB_PREFIX
 
+@glob.add_route(
+    path= DB_PREFIX + "/accounts/registerGJAccount.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("userName", "password", "email", "secret")
+)
 async def register_account(req: Request) -> str:
     """Handles the account registration endpoint."""
 
@@ -34,6 +40,11 @@ async def register_account(req: Request) -> str:
     # They have been successfully registered.
     return GenericResponse.COMMON_SUCCESS
 
+@glob.add_route(
+    path= DB_PREFIX + "/accounts/loginGJAccount.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("udid", "userName", "password", "secret", "sID")
+)
 async def login_account(req: Request) -> str:
     """Handles the action of user login.
     

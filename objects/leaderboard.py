@@ -1,6 +1,6 @@
 from const import LeaderboardTypes, Privileges
 from .user import User
-from .glob import glob
+from . import glob
 from copy import copy
 from typing import List
 from logger import debug

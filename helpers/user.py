@@ -1,6 +1,6 @@
 # Assists with user related functions. Unlike v2, this is for minor things and
 # not LITERALLY EVERYTHING USER RELATED lmfao.
-from objects.glob import glob
+from objects import glob
 from objects.user import User
 
 async def get_user_count() -> int:

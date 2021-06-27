@@ -4,10 +4,11 @@ from utils.gdform import gd_dict_str
 from helpers.common import paginate_list
 from helpers.crypt import base64_encode, base64_decode
 from helpers.time import time_ago
+from objects import glob
 from utils.security import verify_stats_seed, verify_textbox
 from exceptions import GDPySHandlerException
 from objects.comments import AccountComment
-from const import ReqStats
+from const import ReqStats, HandlerTypes, DB_PREFIX
 from logger import debug
 
 # LOCAL CONSTS
@@ -21,6 +22,11 @@ COMMENT_STATES = {
     "1": ReqStats.COMMENTS_FRIENDS_ONLY
 }
 
+@glob.add_route(
+    path= DB_PREFIX + "/getGJUserInfo20.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("gameVersion", "binaryVersion", "gdw", "accountID", "gjp", "targetAccountID", "secret")
+)
 async def user_info(req: Request, user: User):
     """Handles the `getGJUserInfo20.php` endpoint."""
 
@@ -78,6 +84,11 @@ async def user_info(req: Request, user: User):
 
     return gd_dict_str(resp_dict)
 
+@glob.add_route(
+    path= DB_PREFIX + "/updateGJUserScore22.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("secret", "accGlow", "iconType", "accountID", "gjp", "userCoins", "seed2", "seed")
+)
 async def update_stats(req: Request, user: User):
     """Handles the `updateGJUserScore22.php` endpoint."""
 
@@ -131,6 +142,11 @@ async def update_stats(req: Request, user: User):
     # We have to return the users account ID.
     return user.id
 
+@glob.add_route(
+    path= DB_PREFIX + "/getGJAccountComments20.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("accountID", "total", "page", "secret", "gdw")
+)
 async def account_comments(req: Request):
     """Handles the `getGJAccountComments20.php` endpoint."""
 
@@ -168,6 +184,11 @@ async def account_comments(req: Request):
     f_comments += f"#{len(target_user.account_comments)}:{page}:10"
     return f_comments
 
+@glob.add_route(
+    path= DB_PREFIX + "/uploadGJAccComment20.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("accountID", "gjp", "comment", "secret", "chk", "cType")
+)
 async def upload_acc_comment(req: Request, user: User) -> str:
     """Handles the `uploadGJAccComment20.php` endpoint."""
 
@@ -186,6 +207,11 @@ async def upload_acc_comment(req: Request, user: User) -> str:
     # Idk just give them a success.
     return 1
 
+@glob.add_route(
+    path= DB_PREFIX + "/deleteGJAccComment20.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("accountID", "gjp", "secret", "commentID")
+)
 async def delete_acc_comment(req: Request, user: User) -> str:
     """Handles the `deleteGJAccComment20.php` endpoint."""
 
@@ -205,6 +231,11 @@ async def delete_acc_comment(req: Request, user: User) -> str:
     # Send a success message.
     return 1
 
+@glob.add_route(
+    path= DB_PREFIX + "/updateGJAccSettings20.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("accountID", "gjp", "secret")
+)
 async def update_social(req: Request, user: User) -> str:
     """Handles the `updateGJAccSettings20.php` endpoint."""
 
@@ -240,6 +271,11 @@ async def update_social(req: Request, user: User) -> str:
     # Return a success!
     return 1
 
+@glob.add_route(
+    path= DB_PREFIX + "/getGJUsers20.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("str", "page", "total")
+)
 async def profile_search(req: Request) -> str:
     """Handles `getGJUsers20.php`."""
 
@@ -258,6 +294,11 @@ async def profile_search(req: Request) -> str:
     
     return u.resp() + "#1:0:10"
 
+@glob.add_route(
+    path= DB_PREFIX + "/requestUserAccess.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("accountID", "gjp", "secret", "gameVersion", "binaryVersion", "gdw")
+)
 async def req_mod(req: Request, user: User) -> str:
     """Handles `requestUserAccess.php` (mod check.)"""
 

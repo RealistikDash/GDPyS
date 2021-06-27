@@ -1,10 +1,15 @@
 from objects.song import Song
-from objects.glob import glob
+from objects import glob
 from exceptions import GDPySHandlerException
-from const import Secrets, GDPyS
+from const import Secrets, GDPyS, HandlerTypes, DB_PREFIX
 from helpers.time import time_ago, get_timestamp
 from logger import debug
 
+@glob.add_route(
+    path= DB_PREFIX + "/getGJSongInfo.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args= ("secret", "songID")
+)
 async def get_song(req) -> str:
     """Handles `getGJSongInfo.php` endpoint."""
 
@@ -21,6 +26,7 @@ async def get_song(req) -> str:
     debug(f"Requested song {req.post['songID']} could not be found...")
     raise GDPySHandlerException("-1")
 
+@glob.add_route("/", HandlerTypes.PLAIN_TEXT)
 async def index(_) -> str:
     """The GDPyS index page `/`."""
 

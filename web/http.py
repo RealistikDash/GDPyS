@@ -104,7 +104,7 @@ class Request:
 
 		resp_back = json.dumps(content)
 		self.add_header("Content-Type", "application/json")
-		return resp_back
+		return resp_back.encode()
 	
 	async def send(self, code: int, data: bytes) -> None:
 		"""Sends data back to the client.

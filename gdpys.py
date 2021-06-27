@@ -6,6 +6,7 @@ from config import conf
 
 # This is only to initialise this files.
 from handlers import (
+    api
     login,
     profiles,
     misc,

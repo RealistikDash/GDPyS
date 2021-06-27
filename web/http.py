@@ -489,7 +489,7 @@ class GDPySWeb:
 			pass
 	
 	# Server start
-	async def start(self, sock_name: str = "/tmp/gdpys.sock", max_conn: int = 5):
+	def start(self, sock_name: str = "/tmp/gdpys.sock", max_conn: int = 5):
 		"""Starts the GDPyS HTTP server on socket `sock`, looping forever
 		to receive connections.
 

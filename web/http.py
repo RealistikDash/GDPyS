@@ -51,7 +51,7 @@ class Request:
 
 		self.headers: Dict[str, Any] = {}
 		self.get_args: Dict[str, Any] = {}
-		self.post_args: Dict[str, Any] = {}
+		self.post: Dict[str, Any] = {}
 		self.files: Dict[str, Any] = {}
 
 		self.handle_args: list = [self]
@@ -96,7 +96,7 @@ class Request:
 
 		for args in BODY.split("&"):
 			k, v = args.split("=", 1)
-			self.post_args[unquote(k).strip()] = unquote(v).strip()
+			self.post[unquote(k).strip()] = unquote(v).strip()
 
 	def return_json(self, code: int, content: dict) -> bytes:
 		"""Returns an response but in json."""
@@ -164,7 +164,7 @@ class Request:
 
 
 			if "filename" in temp_args: self.files[temp_args['filename']] = body[:-2] # It is a file.
-			else: self.post_args[temp_args['name']] = body[:-2].decode() # It's a post arg.
+			else: self.post[temp_args['name']] = body[:-2].decode() # It's a post arg.
 
 	async def perform_parse(self) -> None:
 		"""Performs full parsing on headers and body bytes."""
@@ -403,7 +403,7 @@ class GDPySWeb:
 			# TODO: Maybe allow this to use db and statuses etc.
 			resp_str = RESP_500.format(exc= tb)
 			request.resp_code = 500
-			return await request.send(request.resp_code, resp_str)
+			return await request.send(request.resp_code, resp_str.encode())
 		
 		if handler.has_status(HandlerTypes.JSON):
 			if "status" not in resp_str: resp_str["status"] = 200

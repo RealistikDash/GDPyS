@@ -4,6 +4,7 @@ from enum import IntFlag
 
 # {404: 'Not Found', ...}
 HTTP_CODES = {c.value: c.phrase for c in http.HTTPStatus}
+DB_PREFIX = "/database"
 
 class GDPyS:
     """Metadata on GDPyS."""

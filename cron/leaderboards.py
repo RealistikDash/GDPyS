@@ -1,5 +1,5 @@
 # The GDPyS Leaderboard Refresh
-from objects.glob import glob
+from objects import glob
 
 LEADERBOARDS = (glob.star_lb, glob.cp_lb)
 

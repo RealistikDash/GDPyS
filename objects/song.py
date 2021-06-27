@@ -1,6 +1,6 @@
 # The main purpose of this file is to contain
 # the main song object.
-from .glob import glob
+from . import glob
 from web.client import post_request
 from helpers.common import is_numeric
 from utils.gdform import parse_to_dict, gd_dict_str

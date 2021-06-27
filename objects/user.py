@@ -4,7 +4,7 @@ from helpers.common import safe_username
 from dataclasses import dataclass
 from const import ReqStats, Privileges, Regexes, Security
 from logger import debug
-from .glob import glob
+from . import glob
 from .comments import AccountComment
 from .privilege import Privilege
 from exceptions import GDPySHandlerException

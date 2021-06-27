@@ -1,8 +1,8 @@
 from objects.user import User
 from objects.leaderboard import Leaderboard
-from const import LeaderboardTypes
+from const import LeaderboardTypes, HandlerTypes, DB_PREFIX
 from web.http import Request
-from objects.glob import glob
+from objects import glob
 
 # TODO: Place in a better place.
 glob.star_lb = Leaderboard(LeaderboardTypes.TOP)
@@ -14,6 +14,11 @@ LEADERBOARDS = {
     "creators": glob.cp_lb
 }
 
+@glob.add_route(
+    path= DB_PREFIX + "/getGJScores20.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args= ("accountID", "secret", "gdw", "type")
+)
 async def get_leaderboard(req: Request, user: User) -> str:
     """Handles the `getGJScores20.php` endpoint."""
 

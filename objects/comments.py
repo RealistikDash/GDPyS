@@ -1,5 +1,5 @@
 from exceptions import GDPySAlreadyExists, GDPySDoesntExist
-from .glob import glob
+from . import glob
 from helpers.time import get_timestamp
 
 class AccountComment:

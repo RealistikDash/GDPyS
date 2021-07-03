@@ -9,7 +9,7 @@ class AccountComment:
     def __init__(self):
         """Sets all default values for the object. Use classmethods instead."""
         
-        self.id: int = -1 # -1 means not in db.
+        self.id: int = 0 # 0 means not in db.
         self.account_id: int = 0 # Thought about making this an acc object but that could lead to ram issues etc.
         self.likes: int = 0
         self.content: str = "" # Plaintext content.
@@ -49,11 +49,14 @@ class AccountComment:
         
         # Create object and fill it in.
         cls = cls()
-        cls.account_id = comment_db[0]
-        cls.likes = comment_db[1]
-        cls.content = comment_db[2]
-        cls.timestamp = comment_db[3]
-        cls.id = comment_db[4]
+
+        (
+            cls.account_id,
+            cls.likes,
+            cls.content,
+            cls.timestamp,
+            cls.id
+        ) = comment_db
 
         # Return it
         return cls
@@ -113,11 +116,11 @@ class AccountComment:
         
         Note:
             The check if the comment is already in the database is done by
-                checking it the id variable is equal to its default value (-1)
+                checking it the id variable is equal to its default value (0)
         
         """
 
-        if self.id != -1:
+        if self.id:
             # It already exists we think. Idk if this is the right exception.
             raise GDPySAlreadyExists("This comment already exists in the database!")
         
@@ -144,7 +147,7 @@ class AccountComment:
                 it isn't, please use the `insert` coroutine.
         """
 
-        if self.id == -1:
+        if not self.id:
             # It doesnt exist to our knowledge. Idk if this is the right exception.
             raise GDPySDoesntExist("A comment must be inserted to the db prior to its updating.")
 
@@ -168,7 +171,7 @@ class AccountComment:
     async def delete(self):
         """Deletes the account comment from the database and cached user."""
 
-        if self.id == -1:
+        if not self.id:
             # It doesnt exist to our knowledge. Idk if this is the right exception.
             raise GDPySDoesntExist("A comment must be inserted to the db prior to its deletion.")
         
@@ -187,4 +190,4 @@ class AccountComment:
                     u.account_comments.remove(com)
                     break
 
-        self.id = -1 # Set it to -1 to signify not being in db
+        self.id = 0 # Set it to 0 to signify not being in db

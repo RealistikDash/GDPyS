@@ -19,21 +19,21 @@ async def upload_level(req: Request, user: User) -> str:
 
     # TODO: Perm checks
     # Check whether we are updating the level.
-    if l_id := int(req.post["levelID"]):
+    if (l_id := int(req.post["levelID"])) \
+    and (level := await Level.from_id(l_id)) and level.creator.id == user.id:
         # Ok so if we do not have the level on the server, we get them to 
         # upload again. If it exists, we update.
-        if level := await Level.from_id(l_id):
-            debug(f"{user} is updating the level {level}!")
-            # Some stuff we have to decode and ensure correct types.
-            desc = base64_decode(req.post["levelDesc"])
-            level.update(
-                description= desc,
-                unlisted= req.post["unlisted"] == "1",
-                ldm= req.post["ldm"] == 1,
-                # TODO: More.
-            )
-            await level.write(req.post["levelString"])
-            return level.id
+        debug(f"{user} is updating the level {level}!")
+        # Some stuff we have to decode and ensure correct types.
+        desc = base64_decode(req.post["levelDesc"])
+        level.update(
+            description= desc,
+            unlisted= req.post["unlisted"] == "1",
+            ldm= req.post["ldm"] == 1,
+            # TODO: More.
+        )
+        await level.write(req.post["levelString"])
+        return level.id
         
     else:
         # We are uploading new level.

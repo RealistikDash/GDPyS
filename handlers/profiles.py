@@ -7,7 +7,7 @@ from helpers.time import time_ago
 from objects import glob
 from utils.security import verify_stats_seed, verify_textbox
 from exceptions import GDPySHandlerException
-from objects.comments import AccountComment
+from objects.acc_comments import AccountComment
 from const import ReqStats, HandlerTypes, DB_PREFIX
 from logger import debug
 

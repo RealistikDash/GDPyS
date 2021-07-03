@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from const import ReqStats, Privileges, Regexes, Security
 from logger import debug
 from . import glob
-from .comments import AccountComment
+from .acc_comments import AccountComment
 from .privilege import Privilege
 from exceptions import GDPySHandlerException
 from typing import List

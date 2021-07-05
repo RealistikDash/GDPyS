@@ -10,7 +10,7 @@ class AccountComment:
         """Sets all default values for the object. Use classmethods instead."""
         
         self.id: int = 0 # 0 means not in db.
-        self.account_id: int = 0 # Thought about making this an acc object but that could lead to ram issues etc.
+        self.user_id: int = 0 # Thought about making this an acc object but that could lead to ram issues etc.
         self.likes: int = 0
         self.content: str = "" # Plaintext content.
         self.timestamp: int = 0 # UNIX style timestamp.
@@ -39,7 +39,7 @@ class AccountComment:
         """
 
         # Fetch directly from db.
-        comment_db = await glob.sql.fetchone("SELECT account_id, likes, content, timestamp, id FROM a_comments WHERE id = %s LIMIT 1", (
+        comment_db = await glob.sql.fetchone("SELECT user_id, likes, content, timestamp, id FROM a_comments WHERE id = %s LIMIT 1", (
             comment_id,
         ))
 
@@ -51,7 +51,7 @@ class AccountComment:
         cls = cls()
 
         (
-            cls.account_id,
+            cls.user_id,
             cls.likes,
             cls.content,
             cls.timestamp,
@@ -70,7 +70,7 @@ class AccountComment:
                 multiple queries.
         
         Args:
-            from_t (tuple): Tuple with date in the order of id, account_id,
+            from_t (tuple): Tuple with date in the order of id, user_id,
                 likes, content, timestamp.
         """
 
@@ -78,7 +78,7 @@ class AccountComment:
 
         (
             cls.id,
-            cls.account_id,
+            cls.user_id,
             cls.likes,
             cls.content,
             cls.timestamp
@@ -87,7 +87,7 @@ class AccountComment:
         return cls
     
     @classmethod
-    def from_text(cls, account_id: int, content: str):
+    def from_text(cls, user_id: int, content: str):
         """Creates a new account comment object from the `content` argument.
         
         Note:
@@ -95,7 +95,7 @@ class AccountComment:
                 is mostly tailored to that function.
 
         Args:
-            account_id (int): The account ID of the user the comment should be
+            user_id (int): The account ID of the user the comment should be
                 assigned to.
             content (str): The plaintext contents of the account comment. 
         """
@@ -103,7 +103,7 @@ class AccountComment:
         cls = cls()
 
         # Now we set the main details
-        cls.account_id = account_id
+        cls.user_id = user_id
         cls.content = content
 
         # And we also set the current timestamp.
@@ -126,16 +126,16 @@ class AccountComment:
         
         # Just insert it ig.
         row = await glob.sql.execute(
-            "INSERT INTO a_comments (account_id, likes, content, timestamp) "
+            "INSERT INTO a_comments (user_id, likes, content, timestamp) "
             "VALUES (%s,%s,%s,%s)",
-            (self.account_id, self.likes, self.content, self.timestamp)
+            (self.user_id, self.likes, self.content, self.timestamp)
         )
 
         # Now we set the id as lastrowid.
         self.id = row
 
         # If the user is already cached, append the comment to them.
-        if u := glob.user_cache.get(self.account_id):
+        if u := glob.user_cache.get(self.user_id):
             u.account_comments.insert(0, self)
     
     async def save(self):
@@ -153,15 +153,15 @@ class AccountComment:
 
         # Just run the update query.
         await glob.sql.execute(
-            "UPDATE a_comments SET account_id = %s, likes = %s, content = %s, "
+            "UPDATE a_comments SET user_id = %s, likes = %s, content = %s, "
             "timestamp = %s WHERE id = %s LIMIT 1",
-            (self.account_id, self.likes, self.content, self.timestamp, self.id)
+            (self.user_id, self.likes, self.content, self.timestamp, self.id)
         )
 
         # If the user is already cached, update their 
         # comments. This is necessary as there isnt a 
         # global acc comment cache *yet*.
-        if u := glob.user_cache.get(self.account_id):
+        if u := glob.user_cache.get(self.user_id):
             # Look for a comment with the matching id.
             for enu, com in enumerate(u.account_comments):
                 if com.id == self.id:
@@ -182,7 +182,7 @@ class AccountComment:
         )
 
         # Delete it from the user's cached objects list IF it is cached.
-        if u := glob.user_cache.get(self.account_id):
+        if u := glob.user_cache.get(self.user_id):
             # We cant do account_comments.remove as we are expecting this
             # object to be different from the one in the list.
             for com in u.account_comments:

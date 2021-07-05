@@ -326,12 +326,12 @@ class User:
         return 0
     
     @classmethod
-    async def from_sql(cls, account_id: int, full: bool = True):
+    async def from_sql(cls, user_id: int, full: bool = True):
         """Fetches the `User` object directly from the database, using the
-        `account_id` for lookup.
+        `user_id` for lookup.
         
         Args:
-            account_id (int): The account id of the user to be fetched.
+            user_id (int): The account id of the user to be fetched.
             full (bool): Decides whether the full profile will be fetched from
                 the database of only the minimums.
         
@@ -343,10 +343,10 @@ class User:
         cls = cls()
 
         # Set stats id
-        cls.stats.user_id = account_id
+        cls.stats.user_id = user_id
 
         # Set acc_id.
-        cls.id = account_id
+        cls.id = user_id
 
         # Basic fetch only fetches the stats.
         await cls.stats_db()
@@ -391,8 +391,8 @@ class User:
         return await cls.from_id(a_id[0])
     
     @classmethod
-    async def from_id(cls, account_id: int):
-        """Attempts for fetch the account with the ID of `account_id` from
+    async def from_id(cls, user_id: int):
+        """Attempts for fetch the account with the ID of `user_id` from
         multiple sources, which are ordered from fastest to slowest.
         
         Note:
@@ -400,7 +400,7 @@ class User:
                 MySQL.
         
         Args:
-            account_id (int): The account of the user you are fetching.
+            user_id (int): The account of the user you are fetching.
         
         Returns:
             If user found, instance of the `User` object is returned.
@@ -408,20 +408,20 @@ class User:
         """
 
         # First we attempt a cache hit which is the fastest by far.
-        if usr := glob.user_cache.get(account_id):
-            debug(f"User {usr.name} ({account_id}) retrieved from cache.")
+        if usr := glob.user_cache.get(user_id):
+            debug(f"User {usr.name} ({user_id}) retrieved from cache.")
             return usr
         
         # Maybe not cached... Try the database.
-        if usr := await cls.from_sql(account_id):
-            debug(f"User {usr.name} ({account_id}) retrieved from MySQL.")
+        if usr := await cls.from_sql(user_id):
+            debug(f"User {usr.name} ({user_id}) retrieved from MySQL.")
 
             # Add them to the cache for speed later on.
             usr.cache()
             return usr
         
         # They do not exist to our knowledge.
-        debug(f"Unable to find user with the ID of {account_id}")
+        debug(f"Unable to find user with the ID of {user_id}")
         return
     
     @classmethod
@@ -576,8 +576,8 @@ class User:
 
         # Firstly, we will directly fetch the user's comments from db.
         acomments_db = await glob.sql.fetchall(
-            "SELECT id, account_id, likes, content, timestamp FROM "
-            "a_comments WHERE account_id = %s ORDER BY timestamp DESC",
+            "SELECT id, user_id, likes, content, timestamp FROM "
+            "a_comments WHERE user_id = %s ORDER BY timestamp DESC",
             (self.id,)
         )
 

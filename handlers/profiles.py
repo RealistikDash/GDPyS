@@ -197,8 +197,8 @@ async def upload_acc_comment(req: Request, user: User) -> str:
 
     # Now we create the account comment object from scratch.
     com = AccountComment.from_text(
-        user_id= user.id,
-        content= content
+        user_id = user.id,
+        content = content
     )
 
     # And lastly we insert it into the db.

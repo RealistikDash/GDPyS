@@ -9,11 +9,19 @@ class AccountComment:
     def __init__(self):
         """Sets all default values for the object. Use classmethods instead."""
         
-        self.id: int = 0 # 0 means not in db.
-        self.user_id: int = 0 # Thought about making this an acc object but that could lead to ram issues etc.
+        # 0 means not in db.
+        self.id: int = 0
+
+        # Thought about making this an acc object but that could 
+        # lead to ram issues etc.
+        self.user_id: int = 0
         self.likes: int = 0
-        self.content: str = "" # Plaintext content.
-        self.timestamp: int = 0 # UNIX style timestamp.
+
+        # Plaintext content.
+        self.content: str = ""
+
+        # UNIX style timestamp.
+        self.timestamp: int = 0
     
     def api(self) -> dict:
         """Converts the object into a dict (mostly for API purposes)."""
@@ -39,7 +47,9 @@ class AccountComment:
         """
 
         # Fetch directly from db.
-        comment_db = await glob.sql.fetchone("SELECT user_id, likes, content, timestamp, id FROM a_comments WHERE id = %s LIMIT 1", (
+        comment_db = await glob.sql.fetchone(
+            "SELECT user_id, likes, content, timestamp, " + 
+            "id FROM a_comments WHERE id = %s LIMIT 1", (
             comment_id,
         ))
 

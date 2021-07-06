@@ -16,7 +16,7 @@
 
 CREATE TABLE `a_comments` (
   `id` int(11) NOT NULL,
-  `account_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `likes` int(6) NOT NULL DEFAULT '0',
   `content` varchar(256) NOT NULL,
   `timestamp` int(11) NOT NULL DEFAULT '0'

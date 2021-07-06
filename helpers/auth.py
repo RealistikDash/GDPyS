@@ -28,8 +28,8 @@ class Auth:
             cache_length= 30
         )
     
-    async def gjp_check(self, account_id: int, gjp: str) -> Union[User, None]:
-        """Checks if the combination of `account_id` and `gjp` matches the
+    async def gjp_check(self, user_id: int, gjp: str) -> Union[User, None]:
+        """Checks if the combination of `user_id` and `gjp` matches the
         credentials of the target user.
         
         Note:
@@ -37,7 +37,7 @@ class Auth:
             Cached results stored are used within this check.
         
         Args:
-            account_id (int): The ID of the user that you want to authenticate.
+            user_id (int): The ID of the user that you want to authenticate.
             gjp (str): The GJP encoded variant of the user's password.
         
         Returns:
@@ -50,7 +50,7 @@ class Auth:
         """
 
         # Fetch the user directly from any available medium.
-        p = await User.from_id(account_id)
+        p = await User.from_id(user_id)
 
         # Check if they even exist
         if not p: return
@@ -59,7 +59,7 @@ class Auth:
         if not p.has_privilege(Privileges.LOGIN): return
 
         # Now we check if perhaps we already cached their val.
-        if cached_gjp := self._correct_gjps.get(account_id):
+        if cached_gjp := self._correct_gjps.get(user_id):
             # Check if the cached gjp matches them.
             if gjp == cached_gjp:
                 debug(f"{p.name} authed successfully using cache hit.")
@@ -72,7 +72,7 @@ class Auth:
         # Now we compare the p_pass with bcrypt.
         if p.check_pass(gjp_decode(gjp)):
             # They successfully authed. Store this bcrypt in cache for speed.
-            self._correct_gjps.cache(account_id, gjp)
+            self._correct_gjps.cache(user_id, gjp)
 
             # Log our success.
             debug(f"{p.name} authed successfully using direct BCrypt check.")

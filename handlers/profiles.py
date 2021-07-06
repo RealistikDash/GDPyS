@@ -197,8 +197,8 @@ async def upload_acc_comment(req: Request, user: User) -> str:
 
     # Now we create the account comment object from scratch.
     com = AccountComment.from_text(
-        account_id= user.id,
-        content= content
+        user_id = user.id,
+        content = content
     )
 
     # And lastly we insert it into the db.
@@ -221,7 +221,7 @@ async def delete_acc_comment(req: Request, user: User) -> str:
     )
 
     # Check if the user is the same as the poser.
-    if com.account_id != user.id:
+    if com.user_id != user.id:
         # They are sending the reqs not through the client.
         raise GDPySHandlerException("-1")
 

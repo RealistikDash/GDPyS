@@ -24,6 +24,10 @@ async def upload_level(req: Request, user: User) -> str:
         # Ok so if we do not have the level on the server, we get them to 
         # upload again. If it exists, we update.
         debug(f"{user} is updating the level {level}!")
+        # Respect update lock.
+        if level.update_locked:
+            debug("Did not update level! (level is update locked)")
+            raise GDPySHandlerException("-1")
         # Some stuff we have to decode and ensure correct types.
         desc = base64_decode(req.post["levelDesc"])
         level.update(

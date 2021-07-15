@@ -57,6 +57,7 @@ class Level:
         self.objects: int = 0
         self.password: int = 0
         self.working_time: int = 0 # Time spent building the level.
+        self.update_locked: bool = False # If true, the level wont be able to be updated
 
         # Special cache for small levels.
         self._cache: str = ""
@@ -173,7 +174,7 @@ class Level:
             "stars, difficulty, demon_diff, coins, coins_verified,"
             "requested_stars, featured_id, rate_status, ldm,"
             "objects, password, working_time, level_ver, "
-            "track_id, length, two_player, unlisted FROM levels "
+            "track_id, length, two_player, unlisted, update_locked FROM levels "
             "WHERE id = %s LIMIT 1",
             (level_id,)
         )
@@ -211,7 +212,8 @@ class Level:
             self.track_id,
             self.length,
             self.two_player,
-            self.unlisted
+            self.unlisted,
+            self.update_locked
         ) = level_db
 
         # GDPyS custom objects.
@@ -374,6 +376,8 @@ class Level:
             rate_status (LevelStatus): Int flag of the level representing the
                 special ratings of the level.
             original (int): The level ID of the original level (0 if unique).
+            update_locked (bool): Whether the level should be stopped from
+                being updated in the future.
         """
 
         # Check if we are not setting an unuploaded level. We need the level 
@@ -415,6 +419,7 @@ class Level:
         self.downloads = kwargs.get("downloads", self.downloads)
         self.likes = kwargs.get("likes", self.likes)
         self.update_ts = get_timestamp()
+        self.update_locked = kwargs.get("update_locked", self.update_locked)
 
         # Update time. I hate myself.
         await glob.sql.execute(
@@ -441,7 +446,8 @@ class Level:
                 downloads=%s,
                 likes=%s,
                 update_ts = UNIX_TIMESTAMP(),
-                original=%s
+                original=%s,
+                update_locked=%s
             WHERE
                 id = %s
                 LIMIT 1
@@ -452,7 +458,7 @@ class Level:
                 1 if self.unlisted else 0, self.game_version, self.binary_version,
                 self.track_id, song_id, self.rate_status, self.replay,
                 self.feature_id, self.downloads, self.likes, self.original,
-                self.id
+                1 if self.update_locked else 0, self.id
             )
         )
 

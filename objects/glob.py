@@ -2,6 +2,7 @@
 from helpers.cache import Cache
 from helpers.time import get_timestamp
 from typing import Callable, Coroutine
+import asyncio
 
 # The global object shared between most major GDPyS systems.
 
@@ -36,7 +37,7 @@ cp_lb = None
 # Some statistics
 connections_handled: int = 0
 startup_time: int = get_timestamp()
-registered_users: int = 0 # Cached in cron
+registered_users: int = 0 # Cached in cron 
 feature_id: int = 0 # Latest feature id (to be incremented).
 
 def add_route(path: str, status: int, args: tuple = ()) -> Callable:

@@ -1,6 +1,7 @@
 # This contains the majority of the constants used within GDPyS.
-import http
 from enum import IntFlag
+import http
+import re
 
 # {404: 'Not Found', ...}
 HTTP_CODES = {c.value: c.phrase for c in http.HTTPStatus}
@@ -10,7 +11,7 @@ class GDPyS:
     """Metadata on GDPyS."""
 
     NAME: str = "GDPyS v3"
-    BUILD: int = 2021_07_15 # Not really build as its Python but it sounds cool.
+    BUILD: int = 2021_08_09 # Not really build as its Python but it sounds cool.
 
 class HandlerTypes(IntFlag):
     """This `IntFlag` class contains enumeration for GDPyS handler types."""
@@ -63,7 +64,7 @@ class GenericResponse:
 class Regexes:
     """Commonly used regexes."""
 
-    EMAIL = r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
+    EMAIL = re.compile(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$")
 
 class Secrets:
     """All of the Geometry Dash secret values."""
@@ -137,3 +138,12 @@ class Security:
     )
     MAX_LEVEL_NAME_LEN = 20
     MAX_LEVEL_DESC_LEN = 255
+
+class LogTypes:
+    """Integer enumerations for the types of logs available."""
+
+    SRV_STARTUP     = 0
+    USR_PRIV_CHANGE = 1
+    USR_DELETE      = 2
+    LVL_RATE        = 3
+    LVL_DELETE      = 4

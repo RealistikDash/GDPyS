@@ -479,7 +479,7 @@ class User:
             raise GDPySHandlerException("-3")
         
         # Regex check for the email.
-        if not re.search(Regexes.EMAIL, cls.email):
+        if not Regexes.EMAIL.match(cls.email):
             raise GDPySHandlerException("-6")
 
         # Check name length

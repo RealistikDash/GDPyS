@@ -6,6 +6,10 @@ class AccountComment:
     """An object representation of Geometry Dash
     account comments."""
 
+    __slots__ = (
+        "id", "user_id", "likes", "content", "timestamp"
+    )
+
     def __init__(self):
         """Sets all default values for the object. Use classmethods instead."""
         

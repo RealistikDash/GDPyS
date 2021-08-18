@@ -9,6 +9,10 @@ from logger import error, debug
 class Song:
     """The object representation of the GDPyS and Geometry Dash songs."""
 
+    __slots__ = (
+        "id", "title", "author_id", "author_name", "size", "author_yt", "url"
+    )
+
     def __init__(self):
         """Sets the placeholder variables. Please
         use the classmethods instead."""

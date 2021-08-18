@@ -15,6 +15,10 @@ class Leaderboard:
     """The GDPyS in-game leaderboard containter for storing user objects in
     their ranking position."""
 
+    __slots__ = (
+        "users", "_lb_type", "_size"
+    )
+
     def __init__(self, lb_type: LeaderboardTypes, size: int = 50) -> None:
         """Configures the leaderboard for usage as a specific leaderboard.
         

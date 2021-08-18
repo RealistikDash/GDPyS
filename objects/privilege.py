@@ -7,6 +7,10 @@ class Privilege:
     they are allowed to do essentially). These are used to group people as
     well as determine what they can and can't do."""
 
+    __slots__ = (
+        "id", "name", "description", "privileges", "colour"
+    )
+
     def __init__(self):
         """Sets out placeholders for the class. Use classmethods instead."""
 

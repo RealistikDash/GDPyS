@@ -221,6 +221,12 @@ class User:
     allows for the OOP way of working with users.
     """
 
+    __slots__ = (
+        "id", "name", "stats", "registered_timestamp", "privilege", "bcrypt_pass",
+        "email", "youtube_url", "twitter_url", "twitch_url", "req_states",
+        "messages", "friend_reqs", "friends", "account_comments"
+    )
+
     def __init__(self):
         """Configures all placeholders for the object. Please use classmethods
         instead."""

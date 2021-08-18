@@ -19,6 +19,8 @@ class MySQLPool:
             pool.
     """
 
+    __slots__ = ("_pool", "_loop")
+
     def __init__(self):
         """Creates the default values for the connector. Use the `conntect`
         classmethod instead."""

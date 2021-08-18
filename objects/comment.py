@@ -5,6 +5,10 @@ class Comment:
     """An object representation of the Geometry Dash comment meant for internal
     representation in GDPyS."""
 
+    __slots__ = (
+        "id", "poster", "level_id", "content", "timestamp", "progress"
+    )
+
     def __init__(self) -> None:
         """Creates an instance of the class with default values. Please use
         the provided classmethods instead."""

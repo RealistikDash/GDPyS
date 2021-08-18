@@ -18,6 +18,15 @@ class Level:
     level in code. It contains all of the functions and properties to work
     with levels."""
 
+    __slots__ = (
+        "id", "name", "creator", "comments", "description", "song", "track_id",
+        "version", "length", "two_player", "unlisted", "extra_str", "replay",
+        "game_version", "binary_version", "timestamp", "update_ts", "original",
+        "likes", "downloads", "stars", "difficulty", "demon_diff", "coins",
+        "coins_verified", "requested_stars", "feature_id", "rate_status",
+        "ldm", "objects", "password", "working_time", "update_locked"
+    )
+
     def __init__(self) -> None:
         """Sets all the placeholder attributes. Use classmethods instead
         please."""

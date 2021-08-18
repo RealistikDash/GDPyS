@@ -16,7 +16,7 @@ class Privilege:
 
         self.id: int = -1
         self.name: str = ""
-        self.descritpion: str = ""
+        self.description: str = ""
         self.privileges: Privileges = Privileges(0)
         self.colour: RGB = RGB()
 
@@ -26,7 +26,7 @@ class Privilege:
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.descritpion,
+            "description": self.description,
             "privileges": int(self.privileges),
             "colour": self.colour.api()
         }
@@ -81,7 +81,7 @@ class Privilege:
         (
             self.id,
             self.name,
-            self.descritpion,
+            self.description,
             priv,
             colour
         ) = priv_db

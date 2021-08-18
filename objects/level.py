@@ -24,7 +24,8 @@ class Level:
         "game_version", "binary_version", "timestamp", "update_ts", "original",
         "likes", "downloads", "stars", "difficulty", "demon_diff", "coins",
         "coins_verified", "requested_stars", "feature_id", "rate_status",
-        "ldm", "objects", "password", "working_time", "update_locked"
+        "ldm", "objects", "password", "working_time", "update_locked",
+        "_cache"
     )
 
     def __init__(self) -> None:

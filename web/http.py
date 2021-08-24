@@ -151,7 +151,7 @@ class Request:
 			headers, body = part.split(b"\r\n\r\n", 1)
 			
 			temp_headers = {}
-			for key, val in [p.split(":", 1) for p in [h for h in headers.decode().split("\r\n")[1:]]]:
+			for key, val in [p.split(":", 1) for p in headers.decode().split("\r\n")[1:]]:
 				temp_headers[key] = val.strip()
 
 			if not (content := temp_headers.get("Content-Disposition")):
@@ -376,7 +376,7 @@ class GDPySWeb:
 			if isinstance(resp_str, tuple): request.resp_code, resp_str = resp_str
 
 		except GDPySHandlerException as e:
-			resp_str = e.encode()
+			resp_str = str(e).encode()
 			debug(f"Handler triggered error code {resp_str}") # Temp debug as else it will be triggered a lot.
 		
 		except GDPySAPINotFound:

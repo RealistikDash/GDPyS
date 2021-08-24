@@ -5,6 +5,7 @@ from web.http import Request
 from objects.level import Level
 from objects import glob
 from helpers.crypt import base64_decode, base64_encode, sha1_hash
+from helpers.time import time_ago, get_timestamp
 from logger import info, debug
 from utils.gdform import gd_dict_str
 from const import LevelStatus, DB_PREFIX, HandlerTypes
@@ -232,3 +233,66 @@ async def download_level(req: Request) -> str:
     return "#".join(
         (main_resp, security_str, security_str2_h, security_str2)
     )
+
+LIKES_SORT_LAMBDA = lambda x: x.likes
+
+@glob.add_route(
+    DB_PREFIX + "/getGJComments21.php",
+    status= HandlerTypes.PLAIN_TEXT,
+    args = ("levelID", "page", "secret", "gdw", "mode", "total")
+)
+async def get_level_comments(req: Request):
+    """Handles the `getGJComments21.php` endpoint."""
+
+    level_id = int(req.post["levelID"])
+    page     = int(req.post["page"])
+    mode     = int(req.post["mode"])
+    amount   = int(req.post["amount"])
+
+    level = Level.from_id(level_id)
+
+    if not level:
+        logger.debug(f"Requested comment for a non existent level ({level_id})")
+        return "-1"
+    
+    if mode:
+        # We are ordering comments by most liked. We have to manually
+        # order the comments ourselves but only try to if there
+        # are actually comments.
+        if level.comments:
+            # Sorted creates a new instance of list
+            comments = sorted(level.comments, key= LIKES_SORT_LAMBDA, reverse= True)
+        else: comments = []
+    else: comments = level.comments
+
+    # Create comments slice from page + am
+    offs = amount * page
+    comment_slice = comments[offs:offs+amount]
+
+    # This is to reduce get_timestamp calls (1.3usec each)
+    ts = get_timestamp()
+
+    resp = "|".join([
+        gd_dict_str({
+            2: base64_encode(comment.content),
+            3: comment.poster.id,
+            4: comment.likes,
+            5: 0,
+            6: comment.id,
+            7: 1 if comment.likes < -10 else 0, # TODO: Proper spam def.
+            9: time_ago(ts - comment.timestamp, False),
+            10: comment.progress,
+            11: comment.poster.badge_level
+        }, "~") + ":" + gd_dict_str({
+            1: comment.poster.name,
+            7: 1,
+            9: comment.poster.icon,
+            10: comment.poster.colour1,
+            11: comment.poster.colour2,
+            14: comment.poster.display_icon,
+            15: 0,
+            16: comment.poster.id
+        }, "~") for comment in comment_slice
+    ])
+
+    return f"{resp}#{len(comments)}:{page}:{amount}"

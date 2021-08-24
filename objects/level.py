@@ -3,6 +3,7 @@ from web.http import Request
 from . import glob
 from .user import User
 from .song import Song
+from .comment import Comment
 from config import conf
 from const import Difficulty, LevelLengths, LevelStatus, Security
 from helpers.crypt import base64_decode
@@ -35,7 +36,7 @@ class Level:
         self.id: int = 0
         self.name: str = ""
         self.creator: User = User()
-        self.comments: list = [] # TODO: Correct type hints when comment object is done.
+        self.comments: list[Comment] = [] # Ordered by newest first.
         self.description: str = ""
         self.song: Song = Song()
         self.track_id: int = 0 # The in-game song IDs. Don't like how its done.
@@ -477,7 +478,13 @@ class Level:
         """Fetches level comments from the MySQL database and sets them in the
         object."""
 
-        ...
+        comments_db = await glob.sql.fetchall(
+            "SELECT id, user_id, level_id, content, timestamp, progress "
+            "FROM comments WHERE level_id = %s"
+        )
+
+        for comment_tuple in comments_db:
+            self.comments.append(Comment.from_tuple(comment_tuple))
     
     def has_status(self, status: LevelStatus) -> bool:
         """Checks if the level has the `status` rating status.

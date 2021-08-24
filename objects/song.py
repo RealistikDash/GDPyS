@@ -189,7 +189,7 @@ class Song:
         return self.full_name
     
     def resp(self) -> str:
-        """"A Geometry Dash HTTP response styled song object."""
+        """A Geometry Dash HTTP response styled song object."""
 
         return gd_dict_str(
             {

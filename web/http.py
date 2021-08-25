@@ -5,7 +5,7 @@ from .sql import MySQLPool
 from helpers.auth import Auth
 from helpers.common import dict_keys
 from const import HandlerTypes, HTTP_CODES, GDPyS
-from logger import error, info, debug, warning
+from logger import error, info, debug, warning, DEBUG
 from helpers.time import Timer
 from exceptions import GDPySAPIBadData, GDPySAPINotFound, GDPySHandlerException
 from objects import glob
@@ -236,10 +236,18 @@ class Handler:
 
 		# Iterate through all required post args and see if
 		# they are in the args list.
-		if all(arg in args for arg in self.req_postargs):
+		if not DEBUG: return all(arg in args for arg in self.req_postargs)
+		else:
+			# Using for in debug mode as it allows us to log each missing var.
+			missing_args = []
+			for arg in self.req_postargs:
+				if arg not in args:
+					missing_args.append(arg)
+			
+			if missing_args:
+				debug(f"Request is missing the post arguments {', '.join(missing_args)}")
+				return False
 			return True
-		
-		return False
 
 class GDPySWeb:
 	"""A HTTP server based on Python's low level socket package.

@@ -21,12 +21,12 @@ async def register_account(req: Request) -> str:
     username = req.post["userName"]
     password = req.post["password"] # Plaintext
 
-    # Verify post args.
-    for arg in (email, username):
-        if not verify_textbox(arg, ["@", "."]):
-            # Arg does not match.
-            debug("User sent invalid args!")
-            raise GDPySHandlerException("-1")
+    # Verify post args. # FIXME
+    #for arg in (email, username):
+    #    if not verify_textbox(arg, ["@", "."]):
+    #        # Arg does not match.
+    #        debug("User sent invalid args!")
+    #        raise GDPySHandlerException("-1")
 
     # This classmethod takes care of the majority of things such as rising GDPySHandlerException
     # that is later handled by the http server itself.

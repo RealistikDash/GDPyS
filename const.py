@@ -11,7 +11,7 @@ class GDPyS:
     """Metadata on GDPyS."""
 
     NAME: str = "GDPyS v3"
-    BUILD: int = 2021_08_25 # Not really build as its Python but it sounds cool.
+    BUILD: int = 2021_08_27 # Not really build as its Python but it sounds cool.
 
 class HandlerTypes(IntFlag):
     """This `IntFlag` class contains enumeration for GDPyS handler types."""
@@ -65,6 +65,14 @@ class Regexes:
     """Commonly used regexes."""
 
     EMAIL = re.compile(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$")
+
+    # These regexes are taken from gd.py and are used for getting song data from
+    # the NG songs page.
+    # https://github.com/nekitdev/gd.py/blob/b9d5e29c09f953f54b9b648fb677e987d9a8e103/gd/newgrounds_parser.py#L48-L51
+    NG_SONG_LINK = re.compile(r"(https:\\\/\\\/audio\.ngfiles\.com\\\/[^\"']+)")
+    NG_SONG_SIZE = re.compile(r"[\"']filesize[\"'][ ]*:[ ]*(\d+)")
+    NG_SONG_NAME = re.compile(r"<title>([^<>]+)</title>")
+    NG_SONG_AUTH = re.compile(r"[\"']artist[\"'][ ]*:[ ]*[\"']([^\"']+)[\"']")
 
 class Secrets:
     """All of the Geometry Dash secret values."""

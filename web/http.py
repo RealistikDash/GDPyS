@@ -395,11 +395,6 @@ class GDPySWeb:
 			request.resp_code = 400
 			resp_str = RESP_400_API
 
-		# This is so we don't reveal post request required fields to people scouting.
-		except KeyError as e:
-			resp_str = "Incorrect post data." # Just assume it tbh
-			debug(f"Request sent incorrect post data. {e}")
-
 		# There has been an actual exception within the handler.
 		except Exception:
 			# Get the tb as full string

@@ -489,7 +489,7 @@ class User:
             raise GDPySHandlerException("-6")
 
         # Check name length
-        if not (3 < len(username) < 10):
+        if not (3 < len(username) < 16):
             # Im not sure of the proper error code for this but their name is too long.
             raise GDPySHandlerException("-9")
         

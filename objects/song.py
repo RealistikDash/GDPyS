@@ -1,10 +1,11 @@
 # The main purpose of this file is to contain
 # the main song object.
 from . import glob
-from web.client import post_request
+from web.client import post_request, simple_get
 from helpers.common import is_numeric
 from utils.gdform import parse_to_dict, gd_dict_str
 from logger import error, debug
+from const import Regexes
 
 class Song:
     """The object representation of the GDPyS and Geometry Dash songs."""
@@ -79,8 +80,7 @@ class Song:
                 has to make a http request to another server.
         
         Args:
-            song_id (int): The Newgrounds ID of the
-                song to fetch.
+            song_id (int): The Newgrounds ID of the song to fetch.
         
         Returns:
             Instance of `Song` if found.
@@ -97,12 +97,17 @@ class Song:
                 "songID": song_id
             }
         )
+        debug(f"Boomlings Song Data Response: {boomlings_data}")
 
         # Check if the resp is valid.
         if is_numeric(boomlings_data) or not boomlings_data:
             error(f"Boomlings Private Song API sent an invalid response for the song ID of {song_id}")
-            debug("Boomlings Reply: " + boomlings_data)
             return
+        
+        # New boomlings firewall
+        if "Cloudflare to restrict access" in boomlings_data or "error code" in boomlings_data:
+            return error(f"Boomlings Private Song API request has been blocked by the "
+                          "Cloudflare firewall.")
         
         # Looks right! Parse it.
         parsed_resp = parse_to_dict(boomlings_data)
@@ -115,6 +120,50 @@ class Song:
         self.size = float(parsed_resp[5])
         self.author_yt = parsed_resp[7]
         self.url = parsed_resp[10]
+        return self
+    
+    @classmethod
+    async def from_newgrounds(cls, song_id: int):
+        """Fetches song data directly from Newgrounds (directly using the song
+        page and parsing using regex).
+
+        Note:
+            This method is even slower than `from_boomlings` as it includes a
+                heavier page load alongside a regex.
+            This is heavily influenced by:
+                https://github.com/nekitdev/gd.py/blob/b9d5e29c09f953f54b9b648fb677e987d9a8e103/gd/newgrounds_parser.py#L104-L113
+        
+        Args:
+            song_id (int): The Newgrounds ID of the song to fetch.
+        
+        Returns:
+            Instance of `Song` if found.
+            None if not found.
+        """
+
+        # We use the HTML to grab our data.
+        newgrounds_resp = await simple_get(
+            f"https://www.newgrounds.com/audio/listen/{song_id}"
+        )
+
+        #debug(newgrounds_resp)
+
+        # Check so we dont parse a 404
+        if "No Audio Project exists with ID" in newgrounds_resp: # XXX: Comments.
+            error(f"Newgrounds Request for song with ID {song_id} failed! "
+                   "Song not Found.")
+            return
+
+        size = int(Regexes.NG_SONG_SIZE.search(newgrounds_resp).group(1))
+        size /= 1024 ** 2
+        
+        self = cls()
+        self.id = song_id
+        self.title       = Regexes.NG_SONG_NAME.search(newgrounds_resp).group(1)
+        self.author_name = Regexes.NG_SONG_AUTH.search(newgrounds_resp).group(1)
+        self.url         = Regexes.NG_SONG_LINK.search(newgrounds_resp).group(1).replace("\\/", "/")
+        self.size        = round(size, 2)
+        # TODO: Author ID
         return self
     
     @classmethod
@@ -147,7 +196,7 @@ class Song:
             return s
         
         # We should try the literally longest possible way (300ms+)
-        if s := await cls.from_boomlings(song_id):
+        if s := await cls.from_newgrounds(song_id):
             # Found it in boomlings. Cache it as well as add to db.
             await s.insert()
             glob.song_cache.cache(s.id, s)

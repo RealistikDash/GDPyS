@@ -90,8 +90,10 @@ async def level_search(req: Request) -> str:
 
     info(f"Level search for '{search_query}' ({search_type}, {offset})")
 
+    order = "id DESC"
+
     #### IGNORE FOR TESTING.
-    levels_db = await glob.sql.fetchall(BASE_QUERY + f"LIMIT {PAGE_SIZE} OFFSET {offset}")
+    levels_db = await glob.sql.fetchall(BASE_QUERY + f"ORDER BY {order} LIMIT {PAGE_SIZE} OFFSET {offset}")
     count_db = (await glob.sql.fetchone(BASE_COUNT))[0]
 
     level_strs = []
@@ -160,7 +162,7 @@ async def level_search(req: Request) -> str:
 @glob.add_route(
     path= DB_PREFIX + "/downloadGJLevel22.php",
     status= HandlerTypes.PLAIN_TEXT,
-    args= ("levelID", "secret", "gdw", "extras", "rs", "udid")
+    args= ("levelID", "secret", "gdw", "extras")
 )
 async def download_level(req: Request) -> str:
     """Handles `downloadGJLevel22.php`"""
@@ -247,12 +249,12 @@ async def get_level_comments(req: Request):
     level_id = int(req.post["levelID"])
     page     = int(req.post["page"])
     mode     = int(req.post["mode"])
-    amount   = int(req.post["amount"])
+    amount   = int(req.post.get("count", 10)) # Optional arg
 
-    level = Level.from_id(level_id)
+    level = await Level.from_id(level_id)
 
     if not level:
-        logger.debug(f"Requested comment for a non existent level ({level_id})")
+        debug(f"Requested comment for a non existent level ({level_id})")
         return "-1"
     
     if mode:
@@ -286,10 +288,10 @@ async def get_level_comments(req: Request):
         }, "~") + ":" + gd_dict_str({
             1: comment.poster.name,
             7: 1,
-            9: comment.poster.icon,
-            10: comment.poster.colour1,
-            11: comment.poster.colour2,
-            14: comment.poster.display_icon,
+            9: comment.poster.stats.icon,
+            10: comment.poster.stats.colour1,
+            11: comment.poster.stats.colour2,
+            14: comment.poster.stats.display_icon,
             15: 0,
             16: comment.poster.id
         }, "~") for comment in comment_slice

@@ -6,7 +6,7 @@ class Comment:
     representation in GDPyS."""
 
     __slots__ = (
-        "id", "poster", "level_id", "content", "timestamp", "progress"
+        "id", "poster", "level_id", "content", "timestamp", "progress", "likes"
     )
 
     def __init__(self) -> None:
@@ -19,6 +19,7 @@ class Comment:
         self.content: str = ""
         self.timestamp: int = 0
         self.progress: int = 0 # GD thing, 0 = no progress included
+        self.likes: int = 0 # Can be negative to signify dislikes
     
     @property
     def progress_included(self) -> bool:
@@ -47,7 +48,8 @@ class Comment:
             comment.level_id,
             comment.content,
             comment.timestamp,
-            comment.progress
+            comment.progress,
+            comment.likes
         ) = sql_t
 
         # Set instance of user.
@@ -69,13 +71,13 @@ class Comment:
         """
 
         comment_db = await sql.fetchone(
-            "SELECT id, user_id, level_id, content, timestamp, progress "
+            "SELECT id, user_id, level_id, content, timestamp, progress, likes "
             "FROM comments WHERE id = %s LIMIT 1", (comment_id,)
         )
 
         if not comment_db: return
 
-        return Comment.from_tuple(comment_db)
+        return await Comment.from_tuple(comment_db)
 
     # Not sure if we will ever use this but ig its cool for plugins.
     async def update(self, content: str = None) -> None:
@@ -100,10 +102,10 @@ class Comment:
         """
 
         self.id = await sql.execute(
-            "INSERT INTO comments (user_id, level_id, content, timestamp, progress) "
-            "VALUES (%s,%s,%s,%s,%s)",
+            "INSERT INTO comments (user_id, level_id, content, timestamp, progress, likes) "
+            "VALUES (%s,%s,%s,%s,%s,%s)",
             (self.poster.id, self.level_id, self.content, self.timestamp,
-            self.progress)
+            self.progress, self.likes)
         )
 
         # If the level is already cached, we can just insert it into the

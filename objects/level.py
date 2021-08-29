@@ -40,7 +40,7 @@ class Level:
         self.description: str = ""
         self.song: Song = Song()
         self.track_id: int = 0 # The in-game song IDs. Don't like how its done.
-        self.version: int = 0
+        self.version: int = 1
         self.length: LevelLengths = 0
         self.two_player: bool = False
         self.unlisted: bool = False
@@ -479,12 +479,12 @@ class Level:
         object."""
 
         comments_db = await glob.sql.fetchall(
-            "SELECT id, user_id, level_id, content, timestamp, progress "
-            "FROM comments WHERE level_id = %s"
+            "SELECT id, user_id, level_id, content, timestamp, progress, likes "
+            "FROM comments WHERE level_id = %s", (self.id,)
         )
 
         for comment_tuple in comments_db:
-            self.comments.append(Comment.from_tuple(comment_tuple))
+            self.comments.append(await Comment.from_tuple(comment_tuple))
     
     def has_status(self, status: LevelStatus) -> bool:
         """Checks if the level has the `status` rating status.

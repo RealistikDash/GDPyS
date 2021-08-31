@@ -5,7 +5,13 @@ from .user import User
 from .song import Song
 from .comment import Comment
 from config import conf
-from const import Difficulty, LevelLengths, LevelStatus, Security
+from const import (
+    Difficulty, 
+    LevelLengths, 
+    LevelStatus,
+    Security, 
+    Privileges
+)
 from helpers.crypt import base64_decode
 import aiofiles
 import os
@@ -80,7 +86,7 @@ class Level:
         path = f"{conf.dir_levels}/{self.id}"
 
         # Check if the level exists locally.
-        if not os.path.exists(path): return
+        #if not os.path.exists(path): return
 
         return path
     
@@ -101,6 +107,12 @@ class Level:
         return self.stars == 1
     
     @property
+    def rated(self) -> bool:
+        """Bool corresponding to whether the level has been rated."""
+
+        return not not self.stars # Slightly faster than > 0 lmfao
+    
+    @property
     def featured(self) -> bool:
         """Returns a bool of whether the level is featured."""
 
@@ -112,6 +124,13 @@ class Level:
         """Checks if the level is rated epic."""
 
         return self.has_status(LevelStatus.EPIC)
+    
+    # Operator overloads, etc
+    def __eq__(self, o: 'User') -> bool:
+        return self.id == o.id
+    
+    def __ne__(self, o: 'User') -> bool:
+        return self.id != o.id
 
     async def load(self) -> str:
         """Loads the level data directly from storage and returns it.

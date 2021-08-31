@@ -43,7 +43,10 @@ async def upload_level(req: Request, user: User) -> str:
     else:
         # We are uploading new level.
         debug(f"{user} is uploading a new level!")
-        l: Level = await Level.from_submit(user, req)
+        try:
+            l: Level = await Level.from_submit(user, req)
+        except ValueError: # Can occur if an int value is send incorrectly
+            raise GDPySHandlerException("-1")
         await l.insert()
         await l.write(req.post["levelString"])
         info(f"Uploaded new level {l}.")

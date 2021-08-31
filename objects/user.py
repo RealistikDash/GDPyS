@@ -254,6 +254,13 @@ class User:
         self.friends: list = []
         self.account_comments: List[AccountComment] = []
     
+    # Operator overloads, etc
+    def __eq__(self, o: 'User') -> bool:
+        return self.id == o.id
+    
+    def __ne__(self, o: 'User') -> bool:
+        return self.id != o.id
+    
     def api(self) -> dict:
         """Turns the User object into a dict primarily for API related
         objectives."""

@@ -13,10 +13,10 @@ def gd_dict_str(d: Dict[int, str], separator: str = ":") -> str:
         Returns a string from the dict in the format `1:aaa:2:b`
     """
     
-    a = [str(arg[i]) for arg in d.items() for i in (0, 1)]
-    
     # Combine them all and send off.
-    return separator.join(a)
+    return separator.join(
+        [str(arg[i]) for arg in d.items() for i in (0, 1)]
+    )
 
 def parse_to_dict(data: str, separator: str = "~|~") -> dict:
     """Parses a GeometryDash style keyed split response into an easy to work
@@ -64,8 +64,7 @@ def tempban_instant(*text) -> str:
     """
 
     # Merge into single str.
-    text_str = " ".join(text)
-    return tempban(text_str, 0)
+    return tempban(" ".join(text), 0)
     
 def tempban(reason: str, duration_left: int) -> str:
     """Builds a server response in the structure of a comment ban.

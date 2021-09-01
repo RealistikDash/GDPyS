@@ -11,7 +11,7 @@ class GDPyS:
     """Metadata on GDPyS."""
 
     NAME: str = "GDPyS v3"
-    BUILD: int = 2021_08_28 # Not really build as its Python but it sounds cool.
+    BUILD: int = 2021_09_01 # Not really build as its Python but it sounds cool.
 
 class HandlerTypes(IntFlag):
     """This `IntFlag` class contains enumeration for GDPyS handler types."""
@@ -49,10 +49,11 @@ class Privileges(IntFlag):
     LOGIN       = 1 << 0
     PUBLIC      = 1 << 1
     COMMENT     = 1 << 2
-    RATE        = 1 << 3
-    MOD_BADGE   = 1 << 4
-    ELDER_BADGE = 1 << 5
-    SUPPORTER   = 1 << 6
+    LEVEL_UPL   = 1 << 3
+    RATE        = 1 << 4
+    MOD_BADGE   = 1 << 5
+    ELDER_BADGE = 1 << 6
+    SUPPORTER   = 1 << 7
 
 class GenericResponse:
     """Common Geometry Dash response codes."""

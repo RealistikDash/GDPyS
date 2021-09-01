@@ -1,3 +1,4 @@
+from objects.comment import Comment
 from exceptions import GDPySHandlerException
 from objects.song import Song
 from objects.user import User
@@ -8,7 +9,8 @@ from helpers.crypt import base64_decode, base64_encode, sha1_hash
 from helpers.time import time_ago, get_timestamp
 from logger import info, debug
 from utils.gdform import gd_dict_str
-from const import LevelStatus, DB_PREFIX, HandlerTypes
+from utils.security import remove_col_tags, verify_comment
+from const import LevelStatus, DB_PREFIX, HandlerTypes, Privileges
 
 @glob.add_route(
     path= DB_PREFIX + "/uploadGJLevel21.php",
@@ -18,7 +20,10 @@ from const import LevelStatus, DB_PREFIX, HandlerTypes
 async def upload_level(req: Request, user: User) -> str:
     """Handles the endpoint `uploadGJLevel21.php`."""
 
-    # TODO: Perm checks
+    if not user.has_privilege(Privileges.LEVEL_UPL):
+        debug(f"{user} is missing permissions to upload levels.")
+        raise GDPySHandlerException("-1")
+
     # Check whether we are updating the level.
     if (l_id := int(req.post["levelID"])) \
     and (level := await Level.from_id(l_id)) and level.creator.id == user.id:
@@ -30,7 +35,7 @@ async def upload_level(req: Request, user: User) -> str:
             debug("Did not update level! (level is update locked)")
             raise GDPySHandlerException("-1")
         # Some stuff we have to decode and ensure correct types.
-        desc = base64_decode(req.post["levelDesc"])
+        desc = remove_col_tags(base64_decode(req.post["levelDesc"]))
         level.update(
             description= desc,
             unlisted= req.post["unlisted"] == "1",
@@ -107,7 +112,7 @@ async def level_search(req: Request) -> str:
         level_strs.append(gd_dict_str({
             1: level[0],
             2: level[1],
-            3: base64_encode(level[2]),
+            3: remove_col_tags(base64_encode(level[2])),
             5: level[3],
             6: level[4],
             8: 10 if level[11] else 0,
@@ -268,7 +273,9 @@ async def get_level_comments(req: Request):
             # Sorted creates a new instance of list
             comments = sorted(level.comments, key= LIKES_SORT_LAMBDA, reverse= True)
         else: comments = []
-    else: comments = level.comments
+    else: 
+        comments = level.comments.copy()
+        comments.reverse()
 
     # Create comments slice from page + am
     offs = amount * page
@@ -301,3 +308,30 @@ async def get_level_comments(req: Request):
     ])
 
     return f"{resp}#{len(comments)}:{page}:{amount}"
+
+@glob.add_route(
+    DB_PREFIX + "/uploadGJComment21.php",
+    status= HandlerTypes.PLAIN_TEXT + HandlerTypes.AUTHED,
+    args = ("levelID", "accountID", "secret", "chk", "comment")
+)
+async def upload_comment(req: Request, u: User):
+    """Handles comment uploading."""
+    # TODO: Ratelimit, respecting the 30s/comment in-game limit
+    percent  = int(req.post.get("percent", 0))
+    content  = base64_decode(req.post["comment"])
+    level_id = int(req.post["levelID"])
+    chk     = req.post["chk"]
+
+    if not u.has_privilege(Privileges.COMMENT):
+        debug(f"{u} is missing privileges to post comments.")
+        raise GDPySHandlerException("-1")
+    # Verify comment content.
+    if not verify_comment(content):
+        debug(f"Comment upload by {u} failed: Comment content check fail (possible bot?).")
+        raise GDPySHandlerException("-1")
+    
+    # TODO: Chk check
+
+    c = Comment.from_upload(u, level_id, content, percent)
+    await c.insert()
+    return "1"

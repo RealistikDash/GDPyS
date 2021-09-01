@@ -1,5 +1,6 @@
+from helpers.time import get_timestamp
 from .user import User
-from .glob import sql, level_cache
+from . import glob
 
 class Comment:
     """An object representation of the Geometry Dash comment meant for internal
@@ -22,11 +23,35 @@ class Comment:
         self.likes: int = 0 # Can be negative to signify dislikes
     
     @property
-    def progress_included(self) -> bool:
+    def has_progress(self) -> bool:
         """Bool corresponding to whether the comment has a progress value
         attached to it."""
 
         return self.progress > 0
+    
+    @classmethod
+    def from_upload(cls, u: User, level_id: int, content: str,
+                    progress: int) -> 'Comment':
+        """Creates an instance of `Comment` using data from the 
+        `uploadGJComment.php` endpoint.
+        
+        Args:
+            u (User): The user object for the user who uploaded the comment.
+            level_id (int): The ID of the level on which the comment should be
+                present.
+            content (str): The plain-text content of the comment.
+            progress (int): The percentage integer of the progress on the level
+                (0 if not provided).
+        """
+
+        self = cls()
+        self.poster = u
+        self.level_id = level_id
+        self.content = content
+        self.progress = progress
+        self.timestamp = get_timestamp()
+
+        return self
     
     @classmethod
     async def from_tuple(cls, sql_t: tuple, provide_user = None) -> 'Comment':
@@ -70,7 +95,7 @@ class Comment:
             database. Else `None`.
         """
 
-        comment_db = await sql.fetchone(
+        comment_db = await glob.sql.fetchone(
             "SELECT id, user_id, level_id, content, timestamp, progress, likes "
             "FROM comments WHERE id = %s LIMIT 1", (comment_id,)
         )
@@ -88,7 +113,7 @@ class Comment:
         # update.
         if content: self.content = content
 
-        await sql.execute(
+        await glob.sql.execute(
             "UPDATE comments SET content = %s WHERE id = %s LIMIT 1",
             (self.content, self.id,)
         )
@@ -100,8 +125,7 @@ class Comment:
             This also sets the object's id attribute, using the cursor's
                 lastrowid sent by the connnector.
         """
-
-        self.id = await sql.execute(
+        self.id = await glob.sql.execute(
             "INSERT INTO comments (user_id, level_id, content, timestamp, progress, likes) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
             (self.poster.id, self.level_id, self.content, self.timestamp,
@@ -110,5 +134,5 @@ class Comment:
 
         # If the level is already cached, we can just insert it into the
         # comments list.
-        if lvl := level_cache.get(self.level_id):
-            lvl.comments.insert(0, self)
+        if lvl := glob.level_cache.get(self.level_id):
+            lvl.comments.append(self)

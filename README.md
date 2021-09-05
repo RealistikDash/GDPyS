@@ -28,6 +28,17 @@ If you wish to see the project progress faster, feel free to contribute through 
 
 If you wish to follow the development of GDPyS or just talk with us about development, feel free to join our [Discord Server!](https://discord.gg/Un42FEV)
 
+## Progress
+As mentioned prior, GDPyS is still not complete. Here is a list of currently working features:
+- User Registering
+- User Login + Auth
+- User Profiles + Stats Updates
+- Account Comment View + Upload
+- Top and Creator Leaderboards
+- Level Upload and Update (Partial)
+- Level Search (not all filters)
+- Level Comments View + Upload
+
 
 ## License
 GDPyS is licensed under the [GNU GPL v3](https://github.com/RealistikDash/GDPyS/blob/v3/LICENSE) license. Please consult it prior to usage.

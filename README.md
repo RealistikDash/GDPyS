@@ -1,3 +1,6 @@
+# IMPORTANT INFO
+This version of GDPyS is no longer maintained! It has been replaced by the new [GDPyS](https://github.com/GDPyS).
+
 <img width="128" align="left" style="float: left; margin: 0 10px 0 0;" alt="GDPyS" src="https://cdn.discordapp.com/icons/726830621556736141/29d38660477666e5eabb790febe7dc0c.webp">
 
 # GDPyS

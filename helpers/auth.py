@@ -1,11 +1,15 @@
 # Helper that assists with the whole process of authentication.
-from objects.user import User
+from __future__ import annotations
+
+from typing import Union
+
 from .cache import Cache
 from .crypt import gjp_decode
 from .user import log_login
-from typing import Union
-from logger import debug
 from const import Privileges
+from logger import debug
+from objects.user import User
+
 
 class Auth:
     """A helper that assists with the task of authenticating users. It helps
@@ -23,29 +27,27 @@ class Auth:
         # OVER A SECOND. This is unacceptable for a server that
         # is meant to serve many users. So I thought I could
         # cache correct bcrypt values to make it so bcrypt only
-        # has to be ran once every 30 minutes per user. 
-        self._correct_gjps: Cache = Cache(
-            cache_length= 30
-        )
-    
+        # has to be ran once every 30 minutes per user.
+        self._correct_gjps: Cache = Cache(cache_length=30)
+
     async def gjp_check(self, user_id: int, gjp: str) -> Union[User, None]:
         """Checks if the combination of `user_id` and `gjp` matches the
         credentials of the target user.
-        
+
         Note:
             Correct GJPs from this are stored within a private cache.
             Cached results stored are used within this check.
-        
+
         Args:
             user_id (int): The ID of the user that you want to authenticate.
             gjp (str): The GJP encoded variant of the user's password.
-        
+
         Returns:
-            If the user is successfully validated, an instance of the matching 
+            If the user is successfully validated, an instance of the matching
                 user's `User` object is returned.
-            
+
             If the user is not successfully validated, None is returned.
-            
+
             If the target is not found within either medium, None is returned.
         """
 
@@ -53,10 +55,12 @@ class Auth:
         p = await User.from_id(user_id)
 
         # Check if they even exist
-        if not p: return
-        
+        if not p:
+            return
+
         # Banned users are auto denied.
-        if not p.has_privilege(Privileges.LOGIN): return
+        if not p.has_privilege(Privileges.LOGIN):
+            return
 
         # Now we check if perhaps we already cached their val.
         if cached_gjp := self._correct_gjps.get(user_id):
@@ -64,7 +68,7 @@ class Auth:
             if gjp == cached_gjp:
                 debug(f"{p.name} authed successfully using cache hit.")
                 return p
-            
+
             # Fail them.
             debug(f"{p.name} failed auth using cache hit.")
             return
@@ -79,6 +83,6 @@ class Auth:
 
             # Return p obj.
             return p
-        
+
         # They failed.
         return

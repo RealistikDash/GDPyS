@@ -1,14 +1,21 @@
-from objects.song import Song
-from objects import glob
+from __future__ import annotations
+
+from const import DB_PREFIX
+from const import GDPyS
+from const import HandlerTypes
+from const import Secrets
 from exceptions import GDPySHandlerException
-from const import Secrets, GDPyS, HandlerTypes, DB_PREFIX
-from helpers.time import time_ago, get_timestamp
+from helpers.time import get_timestamp
+from helpers.time import time_ago
 from logger import debug
+from objects import glob
+from objects.song import Song
+
 
 @glob.add_route(
-    path= DB_PREFIX + "/getGJSongInfo.php",
-    status= HandlerTypes.PLAIN_TEXT,
-    args= ("secret", "songID")
+    path=DB_PREFIX + "/getGJSongInfo.php",
+    status=HandlerTypes.PLAIN_TEXT,
+    args=("secret", "songID"),
 )
 async def get_song(req) -> str:
     """Handles `getGJSongInfo.php` endpoint."""
@@ -18,13 +25,12 @@ async def get_song(req) -> str:
         raise GDPySHandlerException("-1")
 
     # Grab Song object and return its gd style resp.
-    if s := await Song.from_id(
-        int(req.post["songID"])
-    ):
+    if s := await Song.from_id(int(req.post["songID"])):
         return s.resp()
-    
+
     debug(f"Requested song {req.post['songID']} could not be found...")
     raise GDPySHandlerException("-1")
+
 
 @glob.add_route("/", HandlerTypes.PLAIN_TEXT)
 async def index(_) -> str:

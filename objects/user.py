@@ -1,16 +1,24 @@
-from helpers.crypt import bcrypt_hash, bcrypt_check
-from helpers.time import get_timestamp
-from helpers.common import safe_username
+from __future__ import annotations
+
+import re
 from dataclasses import dataclass
-from const import ReqStats, Privileges, Regexes, Security
-from logger import debug
+from typing import List
+
 from . import glob
 from .acc_comments import AccountComment
 from .privilege import Privilege
+from const import Privileges
+from const import Regexes
+from const import ReqStats
+from const import Security
 from exceptions import GDPySHandlerException
-from typing import List
+from helpers.common import safe_username
+from helpers.crypt import bcrypt_check
+from helpers.crypt import bcrypt_hash
+from helpers.time import get_timestamp
+from logger import debug
 from utils.gdform import gd_dict_str
-import re
+
 
 @dataclass
 class Stats:
@@ -62,7 +70,7 @@ class Stats:
             "spider": self.spider,
             "explosion": self.explosion,
             "glow": self.glow,
-            "display_icon": self.display_icon
+            "display_icon": self.display_icon,
         }
 
     async def calc_rank(self):
@@ -75,14 +83,14 @@ class Stats:
             # Count how many users are ahead of us that are not banned.
             stars_db = await glob.sql.fetchone(
                 "SELECT COUNT(*) FROM users WHERE stars > %s AND privileges & %s",
-                (self.stars, int(Privileges.LOGIN))
+                (self.stars, int(Privileges.LOGIN)),
             )
 
             self.rank = stars_db[0] + 1
-    
+
     async def from_sql(self, full: bool = True):
         """Sets the statistics for user directly from the MySQL database.
-        
+
         Args:
             full (bool): Whether extra details such as rank should be
                 calculated.
@@ -115,28 +123,39 @@ class Stats:
                 id = %s
             LIMIT 1
             """,
-            (self.user_id,)
+            (self.user_id,),
         )
 
         # Now we set the data.
-        (self.stars, self.diamonds,
-        self.coins, self.u_coins,
-        self.demons, self.cp,
-        self.colour1, self.colour2,
-        self.icon, self.ship,
-        self.ufo, self.wave, self.ball,
-        self.robot, self.spider,
-        self.explosion, glow,
-        self.display_icon) = stats_sql
+        (
+            self.stars,
+            self.diamonds,
+            self.coins,
+            self.u_coins,
+            self.demons,
+            self.cp,
+            self.colour1,
+            self.colour2,
+            self.icon,
+            self.ship,
+            self.ufo,
+            self.wave,
+            self.ball,
+            self.robot,
+            self.spider,
+            self.explosion,
+            glow,
+            self.display_icon,
+        ) = stats_sql
 
         self.glow = glow == 1
 
         if full:
             await self.calc_rank()
-    
+
     async def set_stats(self, **kwargs):
         """Sets the statistics for a user from kwargs provided.
-        
+
         Note:
             This affects both the local object and the data stored within the
                 MySQL database.
@@ -185,7 +204,8 @@ class Stats:
         self.glow = kwargs.get("glow", self.glow)
 
         # Set all the values within the database.
-        await glob.sql.execute("""
+        await glob.sql.execute(
+            """
             UPDATE users SET
                 stars = %s,
                 diamonds = %s,
@@ -205,16 +225,31 @@ class Stats:
                 explosion = %s,
                 display_icon = %s,
                 glow = %s
-            WHERE id = %s LIMIT 1                
-        """, (
-            self.stars, self.diamonds, self.coins,
-            self.u_coins, self.demons, self.cp,
-            self.colour1, self.colour2, self.icon,
-            self.ship, self.ufo, self.wave,
-            self.robot, self.ball, self.spider,
-            self.explosion, self.display_icon, 1 if self.glow else 0,
-            self.user_id
-        ))
+            WHERE id = %s LIMIT 1
+        """,
+            (
+                self.stars,
+                self.diamonds,
+                self.coins,
+                self.u_coins,
+                self.demons,
+                self.cp,
+                self.colour1,
+                self.colour2,
+                self.icon,
+                self.ship,
+                self.ufo,
+                self.wave,
+                self.robot,
+                self.ball,
+                self.spider,
+                self.explosion,
+                self.display_icon,
+                1 if self.glow else 0,
+                self.user_id,
+            ),
+        )
+
 
 class User:
     """The primary class for the representation of GDPyS users. This class
@@ -222,9 +257,21 @@ class User:
     """
 
     __slots__ = (
-        "id", "name", "stats", "registered_timestamp", "privilege", "bcrypt_pass",
-        "email", "youtube_url", "twitter_url", "twitch_url", "req_states",
-        "messages", "friend_reqs", "friends", "account_comments"
+        "id",
+        "name",
+        "stats",
+        "registered_timestamp",
+        "privilege",
+        "bcrypt_pass",
+        "email",
+        "youtube_url",
+        "twitter_url",
+        "twitch_url",
+        "req_states",
+        "messages",
+        "friend_reqs",
+        "friends",
+        "account_comments",
     )
 
     def __init__(self):
@@ -238,7 +285,7 @@ class User:
         self.privilege: Privilege = Privilege()
 
         # Details
-        self.bcrypt_pass: str = "" # Used for auth
+        self.bcrypt_pass: str = ""  # Used for auth
         self.email: str = ""
 
         # Socials
@@ -246,21 +293,21 @@ class User:
         self.twitter_url: str = ""
         self.twitch_url: str = ""
 
-        self.req_states: ReqStats = ReqStats(7) # All enabled
+        self.req_states: ReqStats = ReqStats(7)  # All enabled
 
         # Object lists.
         self.messages: list = []
         self.friend_reqs: list = []
         self.friends: list = []
         self.account_comments: List[AccountComment] = []
-    
+
     # Operator overloads, etc
-    def __eq__(self, o: 'User') -> bool:
+    def __eq__(self, o: User) -> bool:
         return self.id == o.id
-    
-    def __ne__(self, o: 'User') -> bool:
+
+    def __ne__(self, o: User) -> bool:
         return self.id != o.id
-    
+
     def api(self) -> dict:
         """Turns the User object into a dict primarily for API related
         objectives."""
@@ -274,13 +321,11 @@ class User:
             "socials": {
                 "youtube": self.youtube_url,
                 "twitter": self.twitch_url,
-                "twitch": self.twitch_url
+                "twitch": self.twitch_url,
             },
-            "account_comments": [
-                c.api() for c in self.account_comments
-            ]
+            "account_comments": [c.api() for c in self.account_comments],
         }
-    
+
     @property
     def safe_name(self) -> str:
         """Creates a version of `name` thats all lower case with spaces
@@ -288,42 +333,42 @@ class User:
         working."""
 
         return safe_username(self.name)
-    
+
     @property
     def messages_enabled(self) -> bool:
         """A property that returns a bool corresponding to whether they have
         public messages enabled."""
 
         return self.req_states & ReqStats.MESSAGES > 0
-    
+
     @property
     def comment_history_enabled(self) -> bool:
         """A property that returns a bool corresponding to whether the user
         has their comment history set to public."""
 
         return self.req_states & ReqStats.COMMENTS > 0
-    
+
     @property
     def friend_requests_enabled(self) -> bool:
         """A property that returns a bool corresponding to whether the user
         has enabled receiving friend requests from the general public."""
 
         return self.req_states & ReqStats.REQUESTS > 0
-    
+
     @property
     def messages_fo(self) -> bool:
         """A property that returns a bool corresponding to whether they have
         messages set to friend only."""
 
         return self.req_states & ReqStats.MESSAGES_FRIENDS_ONLY > 0
-    
+
     @property
     def comment_history_fo(self) -> bool:
         """A property that returns a bool corresponding to whether the user
         has their comment history set to be viewed by friends only."""
 
         return self.req_states & ReqStats.COMMENTS_FRIENDS_ONLY > 0
-    
+
     @property
     def badge_level(self) -> int:
         """Returns the badge level enum of the user."""
@@ -334,20 +379,20 @@ class User:
         # Regular mod badge.
         elif self.has_privilege(Privileges.MOD_BADGE):
             return 1
-        
+
         # They do not have a mod badge.
         return 0
-    
+
     @classmethod
     async def from_sql(cls, user_id: int, full: bool = True):
         """Fetches the `User` object directly from the database, using the
         `user_id` for lookup.
-        
+
         Args:
             user_id (int): The account id of the user to be fetched.
             full (bool): Decides whether the full profile will be fetched from
                 the database of only the minimums.
-        
+
         Returns:
             None if user is not found within the datbase.
             User object if user is found within the database.
@@ -371,20 +416,20 @@ class User:
             await cls.friends_db()
             await cls.accomment_db()
         return cls
-    
+
     @classmethod
     async def from_name(cls, name: str):
         """Attempts to fetch the user object from their name.
-        
+
         Note:
             Currently, this function works by looking up the name within the
                 database and then calling the `from_id` classmethod. While
                 slightly slower, it shouldn't be too much. However, please use
                 `from_id` wherever you can so less stress on the db.
-        
+
         Args:
             name (str): The username of the account we will fetch.
-        
+
         Returns:
             If user found, instance of the `User` object is returned.
             If not found, `None` is returned.
@@ -394,27 +439,30 @@ class User:
         safe_uname = safe_username(name)
 
         # Grab id from db.
-        a_id = await glob.sql.fetchone("SELECT id FROM users WHERE username_safe = %s LIMIT 1", (safe_uname,))
+        a_id = await glob.sql.fetchone(
+            "SELECT id FROM users WHERE username_safe = %s LIMIT 1",
+            (safe_uname,),
+        )
 
         # Check if they are found.
         if a_id is None:
             return
-        
+
         # Use the from_id classmethod.
         return await cls.from_id(a_id[0])
-    
+
     @classmethod
     async def from_id(cls, user_id: int):
         """Attempts for fetch the account with the ID of `user_id` from
         multiple sources, which are ordered from fastest to slowest.
-        
+
         Note:
             Currently, the only two sources included are the user cache and
                 MySQL.
-        
+
         Args:
             user_id (int): The account of the user you are fetching.
-        
+
         Returns:
             If user found, instance of the `User` object is returned.
             If not found, `None` is returned.
@@ -424,7 +472,7 @@ class User:
         if usr := glob.user_cache.get(user_id):
             debug(f"User {usr.name} ({user_id}) retrieved from cache.")
             return usr
-        
+
         # Maybe not cached... Try the database.
         if usr := await cls.from_sql(user_id):
             debug(f"User {usr.name} ({user_id}) retrieved from MySQL.")
@@ -432,28 +480,28 @@ class User:
             # Add them to the cache for speed later on.
             usr.cache()
             return usr
-        
+
         # They do not exist to our knowledge.
         debug(f"Unable to find user with the ID of {user_id}")
         return
-    
+
     @classmethod
     async def register(cls, email: str, username: str, password: str):
         """Registers the user with the given credentials, adds them to the
         database and returns an instance of their User object.
-        
+
         Note:
             Any GDPyS-related error that occurs within this function will be
                 raised as a `GDPySHandlerException` with the GD response error enum
                 corresponding to the issue.
-        
+
         Args:
-            email (str): The email under which to identify the newly 
+            email (str): The email under which to identify the newly
                 registered user.
             username (str): The name that the user will be registered under.
-            password (str): The password under which the user will be 
+            password (str): The password under which the user will be
                 authenticated. Will be hashed with BCrypt.
-        
+
         Returns:
             Instance of the newly registered user.
         """
@@ -466,14 +514,15 @@ class User:
         cls.email = email
 
         # Now we run checks. First, check if the username exists.
-        un_exists = await glob.sql.fetchone("SELECT 1 FROM users WHERE username_safe = %s LIMIT 1", (
-            cls.safe_name
-        ))
+        un_exists = await glob.sql.fetchone(
+            "SELECT 1 FROM users WHERE username_safe = %s LIMIT 1",
+            (cls.safe_name),
+        )
 
         if username.lower() in Security.BANNED_USERNAMES:
             # They are **probably** impersonating someone. Don't let them.
             raise GDPySHandlerException("-2")
-        
+
         # Don't allow really common passwords.
         if password.lower() in Security.BANNED_PASSWORDS:
             raise GDPySHandlerException("-5")
@@ -482,15 +531,16 @@ class User:
         if un_exists:
             # Raise GDPySHandlerException that will be directly reported to the client.
             raise GDPySHandlerException("-2")
-        
+
         # Check for email.
-        em_exists = await glob.sql.fetchone("SELECT 1 FROM users WHERE email = %s LIMIT 1", (
-            cls.email
-        ))
+        em_exists = await glob.sql.fetchone(
+            "SELECT 1 FROM users WHERE email = %s LIMIT 1",
+            (cls.email),
+        )
         if em_exists:
             # Im not sure of the proper error but an acc with that email already exists.
             raise GDPySHandlerException("-3")
-        
+
         # Regex check for the email.
         if not Regexes.EMAIL.match(cls.email):
             raise GDPySHandlerException("-6")
@@ -499,21 +549,31 @@ class User:
         if not (3 < len(username) < 16):
             # Im not sure of the proper error code for this but their name is too long.
             raise GDPySHandlerException("-9")
-        
+
         # Check password length
         if len(password) < 6:
             raise GDPySHandlerException("-8")
-        
+
         # Do this here as its slow as hell.
         cls.bcrypt_pass = bcrypt_hash(password)
 
         # Insert them into the db ig.
-        cls.id = await glob.sql.execute("""
+        cls.id = await glob.sql.execute(
+            """
             INSERT INTO users
                 (username, username_safe, password, timestamp, email, req_status)
             VALUES
                 (%s,%s,%s,%s,%s,%s)
-        """, (cls.name, cls.safe_name, cls.bcrypt_pass, cls.registered_timestamp, cls.email, int(cls.req_states)))
+        """,
+            (
+                cls.name,
+                cls.safe_name,
+                cls.bcrypt_pass,
+                cls.registered_timestamp,
+                cls.email,
+                int(cls.req_states),
+            ),
+        )
 
         # Log.
         debug(f"{cls.name} ({cls.id}) has registered!")
@@ -523,11 +583,11 @@ class User:
 
         # Return obj.
         return cls
-    
+
     def __repr__(self) -> str:
         """Debug representation of the object."""
         return f"<User {self.name} ({self.id})>"
-    
+
     def cache(self):
         """Commits the user object to the cache."""
 
@@ -535,13 +595,14 @@ class User:
 
     async def stats_db(self):
         """Sets the statistics for the user directly from the database.
-        
+
         Note:
             This sets everything contained within the users table.
         """
 
         # I am chosing to manually select each columns in case of db order.
-        db_user = await glob.sql.fetchone("""
+        db_user = await glob.sql.fetchone(
+            """
             SELECT
                 username,
                 privileges,
@@ -556,20 +617,28 @@ class User:
             WHERE
                 id = %s
             LIMIT 1
-        """, (self.id,))
+        """,
+            (self.id,),
+        )
 
         # Check if it is found.
         if db_user is None:
             return
-        
-        # Set all the variables.
-        priv = 0 # Idk i got an error without it
 
-        (self.name, priv,
-        self.email, self.bcrypt_pass,
-        self.registered_timestamp,
-        self.youtube_url, self.twitter_url,
-        self.twitch_url, req_status)  = db_user
+        # Set all the variables.
+        priv = 0  # Idk i got an error without it
+
+        (
+            self.name,
+            priv,
+            self.email,
+            self.bcrypt_pass,
+            self.registered_timestamp,
+            self.youtube_url,
+            self.twitter_url,
+            self.twitch_url,
+            req_status,
+        ) = db_user
 
         # Set special objects from data
         self.req_states = ReqStats(req_status)
@@ -579,7 +648,7 @@ class User:
 
         # Set statistics.
         await self.stats.from_sql()
-    
+
     async def accomment_db(self):
         """Sets and populates the account comment list with `AccountComment`
         objects of the user."""
@@ -591,81 +660,79 @@ class User:
         acomments_db = await glob.sql.fetchall(
             "SELECT id, user_id, likes, content, timestamp FROM "
             "a_comments WHERE user_id = %s ORDER BY timestamp DESC",
-            (self.id,)
+            (self.id,),
         )
 
         # These should be already ordered, just create the objects now.
         for com in acomments_db:
-            self.account_comments.append(
-                AccountComment.from_tuple(com)
-            )
-    
+            self.account_comments.append(AccountComment.from_tuple(com))
+
     async def messages_db(self):
         """Sets the user messages from the database."""
 
         # Do like all the object creation here etc.
         # TODO: do this once not tired.
         return
-    
+
     async def friend_reqs_db(self):
         """Sets all friend requests from db."""
 
         # TODO: do this once not tired.
         return
-    
+
     async def friends_db(self):
         """Set all firends from db."""
 
         # TODO: do this once not tired.
         return
-    
+
     def __str__(self) -> str:
         """Returns the username of the `User` object."""
 
         return self.name
-    
+
     def __repr__(self) -> str:
         """A string representation of the `User` object."""
 
         return f"<User {self.name} ({self.id})>"
-    
+
     def check_pass(self, password: str) -> bool:
         """Compares the passed plaintext `password` to the BCrypt hashed
         password.
-        
+
         Note:
             This does NOT use the GJP cache, meaning it is as slow as BCrypt
             is. Please consider this.
-        
+
         Args:
             password (str): The plaintext version of the password to compare
                 the BCrypt to.
-        
+
         Returns:
             Bool of whether the passwords match.
         """
 
         return bcrypt_check(password, self.bcrypt_pass)
-    
+
     def has_privilege(self, priv: Privileges) -> bool:
         """Check if the user has the permission `priv`.
-        
+
         Args:
             priv (Privileges): The privilege int flag to check for within the
                 user's priv int flag.
-        
+
         Returns:
             Bool whether int flag is present.
         """
 
         if self.privilege is None:
-            return False # They don't have a privilege group due to some error?
-        
+            return False  # They don't have a privilege group due to some error?
+
         return self.privilege.has_privilege(priv)
 
     async def update_socials(self, **kwargs):
         """Updates the social aspects of the user's profile from kwargs.
-        
+
         Kwargs:
             youtube (str): The user's new channel UUID.
             twitter (str): The user's new twitter handle.
@@ -675,20 +742,25 @@ class User:
         """
 
         # Set the kwargs to proper variables.
-        self.youtube_url   = kwargs.get("youtube", self.youtube_url)
-        self.twitter_url   = kwargs.get("twitter", self.twitter_url)
-        self.twitch_url    = kwargs.get("twitch", self.twitch_url)
-        self.req_states    = kwargs.get("req_state", self.req_states)
+        self.youtube_url = kwargs.get("youtube", self.youtube_url)
+        self.twitter_url = kwargs.get("twitter", self.twitter_url)
+        self.twitch_url = kwargs.get("twitch", self.twitch_url)
+        self.req_states = kwargs.get("req_state", self.req_states)
 
         # Set it in the database.
         await glob.sql.execute(
             "UPDATE users SET yt_url = %s, twitter_url = %s, "
             "twitch_url = %s, req_status = %s WHERE id = %s "
             "LIMIT 1",
-            (self.youtube_url, self.twitter_url, self.twitch_url,
-            int(self.req_states), self.id)
+            (
+                self.youtube_url,
+                self.twitter_url,
+                self.twitch_url,
+                int(self.req_states),
+                self.id,
+            ),
         )
-    
+
     def resp(self) -> str:
         """Builds the user data into a GD user object."""
 
@@ -706,7 +778,7 @@ class User:
                 11: self.stats.colour2,
                 13: self.stats.coins,
                 14: self.stats.icon,
-                15: 0, # "Special" value. Not sure what it does.
+                15: 0,  # "Special" value. Not sure what it does.
                 16: self.id,
                 17: self.stats.u_coins,
                 # States.
@@ -726,5 +798,5 @@ class User:
                 46: self.stats.diamonds,
                 48: self.stats.explosion,
                 49: self.badge_level,
-            }
+            },
         )

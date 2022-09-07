@@ -1,7 +1,10 @@
 # Common functions related to simple python-related things.
-from typing import Union
+from __future__ import annotations
+
 import os
 from json import dump as json_dump
+from typing import Union
+
 try:
     from orjson import loads as json_load
 except ImportError:
@@ -9,12 +12,13 @@ except ImportError:
     # orjson wont work for them so thats a backup
     from json import loads as json_load
 
+
 class JsonFile:
     """Assists within working with simple JSON files."""
 
     def __init__(self, file_name: str):
         """Loads a Json file `file_name` from disk.
-        
+
         Args:
             file_name (str): The path including the filename of the JSON file
                 you would like to load.
@@ -28,7 +32,7 @@ class JsonFile:
 
     def get_file(self) -> dict:
         """Returns the loaded JSON file as a dict.
-        
+
         Returns:
             Contents of the file.
         """
@@ -36,7 +40,7 @@ class JsonFile:
 
     def write_file(self, new_content: Union[dict, list]) -> None:
         """Writes `new_content` to the target file.
-        
+
         Args:
             new_content (dict, list): The new content that should be placed
                 within the file.
@@ -46,9 +50,10 @@ class JsonFile:
             json_dump(new_content, f, indent=4)
         self.file = new_content
 
+
 def dict_keys(d: dict) -> tuple:
     """Returns a `tuple` of all the keys present within the dictionary `d`.
-    
+
     Args:
         d (dict): A dictionary to fetch all the keys of.
     """
@@ -56,12 +61,13 @@ def dict_keys(d: dict) -> tuple:
     # I decided to use tuple as its immutable.
     return tuple(d)
 
+
 def safe_username(uname: str) -> str:
     """Generates a "safe username" from a regular username.
-    
+
     Args:
         uname (str): The username to convert to a safe variant.
-    
+
     Returns:
         The username string that is lowercase and ` ` replaced with `_`.
     """
@@ -72,7 +78,7 @@ def safe_username(uname: str) -> str:
 def paginate_list(list_to_paginate: list, page: int, elems_page: int = 10):
     """Grabs a 'page' out of the given `list_to_paginate` and returns a section
     `elems_page` large.
-    
+
     Args:
         list_to_paginate (list): The list of items you would like to get the
             page of.
@@ -80,20 +86,21 @@ def paginate_list(list_to_paginate: list, page: int, elems_page: int = 10):
             fetch.
         elems_page (int): The number of elements that should be present within
             a page.
-    
+
     Returns:
         A list of elements.
     """
     offset = page * elems_page
     return list_to_paginate[offset : offset + elems_page]
 
+
 def is_numeric(digit: str) -> bool:
     """Kind of like `str.isdigit()` but works with checking for negative numbers
     too.
-    
+
     Args:
         digit (str): A string to be checked for if it is a number.
-    
+
     Returns:
         True if it is numeric, else false.
     """

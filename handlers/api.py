@@ -1,9 +1,13 @@
 # All of the GDPyS API handlers.
-from exceptions import GDPySAPIBadData, GDPySAPINotFound
-from web.http import Request
-from objects.user import User
+from __future__ import annotations
+
 from const import HandlerTypes
+from exceptions import GDPySAPIBadData
+from exceptions import GDPySAPINotFound
 from objects import glob
+from objects.user import User
+from web.http import Request
+
 
 @glob.add_route("/api/user", HandlerTypes.JSON)
 async def get_user_api(req: Request) -> dict:
@@ -17,6 +21,7 @@ async def get_user_api(req: Request) -> dict:
 
     u = await User.from_id(int(acc_id))
 
-    if u is None: raise GDPySAPINotFound
+    if u is None:
+        raise GDPySAPINotFound
 
     return u.api()

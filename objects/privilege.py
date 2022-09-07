@@ -1,15 +1,16 @@
+from __future__ import annotations
+
 from . import glob
 from .misc import RGB
 from const import Privileges
+
 
 class Privilege:
     """A GDPyS privilege group, representing the privileges of users (what
     they are allowed to do essentially). These are used to group people as
     well as determine what they can and can't do."""
 
-    __slots__ = (
-        "id", "name", "description", "privileges", "colour"
-    )
+    __slots__ = ("id", "name", "description", "privileges", "colour")
 
     def __init__(self):
         """Sets out placeholders for the class. Use classmethods instead."""
@@ -28,7 +29,7 @@ class Privilege:
             "name": self.name,
             "description": self.description,
             "privileges": int(self.privileges),
-            "colour": self.colour.api()
+            "colour": self.colour.api(),
         }
 
     def has_privilege(self, priv: Privileges) -> bool:
@@ -38,7 +39,7 @@ class Privilege:
             Only singular privilege checks work! Combining multiple in one
                 will result in the whole function returning true even if only
                 one of the privileges is present.
-        
+
         Args:
             priv (Privileges): An IntFlag representing the privilege to check
                 for.
@@ -48,7 +49,7 @@ class Privilege:
         """
 
         return self.privileges & priv > 0
-    
+
     @classmethod
     async def from_sql(cls, sql_id: int):
         """Fetches the privilege directly from the MySQL database, seaching by
@@ -56,10 +57,10 @@ class Privilege:
 
         Note:
             This also caches the object globally.
-        
+
         Args:
             sql_id (int): The ID of the privilege within the database.
-        
+
         Returns:
             Instance of `Privilege` if found in db.
             None if not found.
@@ -70,21 +71,15 @@ class Privilege:
         priv_db = await glob.sql.fetchone(
             "SELECT id, name, description, privilege, rgb FROM "
             "privileges WHERE id = %s LIMIT 1",
-            (sql_id,)
+            (sql_id,),
         )
 
         # Check if we found it.
         if not priv_db:
             return
-        
+
         # Set privilege object.
-        (
-            self.id,
-            self.name,
-            self.description,
-            priv,
-            colour
-        ) = priv_db
+        (self.id, self.name, self.description, priv, colour) = priv_db
         self.privileges = Privileges(priv)
         self.colour = RGB.from_string(colour)
 
@@ -92,20 +87,20 @@ class Privilege:
         glob.privileges[priv] = self
 
         return self
-    
+
     @classmethod
     async def from_priv_enum(cls, enum: int):
         """Fetches the privilege directly by searching for its total privilege
         enum.
-        
-        Note: 
+
+        Note:
             This searches through two sources (where we can possibly find
                 the object), the cache (instant) and the database (slow as we
                 make 2 queries).
-        
+
         Args:
             enum (int): The privilege enum for the privilege to fetch.
-        
+
         Returns:
             Instance of `Privilege` if found in db.
             None if not found.
@@ -114,17 +109,17 @@ class Privilege:
         # Check the cache first.
         if p := glob.privileges.get(enum):
             return p
-        
+
         # Nope... We have to contact the db.
         # First we fetch the id.
         db_priv = await glob.sql.fetchone(
             "SELECT id FROM privileges WHERE privilege = %s LIMIT 1",
-            (enum,)
+            (enum,),
         )
 
         # Check if it exists in db.
         if not db_priv:
             return
-        
+
         # Rest is handled by `from_sql`
         return await cls.from_sql(db_priv[0])

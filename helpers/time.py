@@ -1,7 +1,10 @@
 # For now this is simply taken from GDPyS v2 as this has no huge flaws with it.
-from datetime import datetime
-import time
+from __future__ import annotations
+
 import math
+import time
+from datetime import datetime
+
 
 class Timer:
     """A simple timer class used to time the execution of code."""
@@ -32,7 +35,7 @@ class Timer:
     def ms_return(self) -> float:
         """Returns difference in 2dp ms."""
         return round((self.end_time - self.start_time) * 1000, 2)
-    
+
     def time_str(self) -> str:
         """Returns a nicely formatted timing result."""
 
@@ -47,27 +50,34 @@ def get_timestamp() -> int:
 
 def time_ago(timestamp: int, is_ts: bool = True) -> str:
     """Returns a string that is timeago from now (for GD responses).
-    
+
     Args:
         timestamp (int): A UNIX timestamp you want the `time_ago` string from
             if `is_ts` is not passed. Else time diff.
         is_ts (bool): Whether the timestamp passed is an actual timestamp or a
             time diff.
     """
-    
-    if is_ts: time_diff = get_timestamp() - int(timestamp)
-    else: time_diff = timestamp
+
+    if is_ts:
+        time_diff = get_timestamp() - int(timestamp)
+    else:
+        time_diff = timestamp
 
     # No difference.
     if time_diff == 0:
         return "just"
-    
+
     # Make a non-negative variant for formatting.
     pos_diff = (time_diff if time_diff > 0 else time_diff * -1) * 60
 
     intervals = (
-        ("second", 60), ("minute", 60), ("hour", 60), ("day", 24),
-        ("month", 30), ("year", 12), ("decade", 100)
+        ("second", 60),
+        ("minute", 60),
+        ("hour", 60),
+        ("day", 24),
+        ("month", 30),
+        ("year", 12),
+        ("decade", 100),
     )
 
     ret = ""
@@ -76,6 +86,7 @@ def time_ago(timestamp: int, is_ts: bool = True) -> str:
         pos_diff //= time
         if pos_diff < intervals[idx + 1][1]:
             return f"{pos_diff} {singular}" + ("s" if pos_diff > 1 else "")
+
 
 def week_ago() -> int:
     """Returns timestamp exactly week ago."""
@@ -93,7 +104,7 @@ def time_since_midnight() -> int:
     """Returns time since midnight."""
     now = datetime.now()
     return round(
-        (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+        (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds(),
     )
 
 
@@ -106,8 +117,9 @@ def time_str(timer: Timer) -> str:
         time_str = f"{round(time,2)}s"
     return time_str
 
+
 def formatted_date():
     """Returns the current fromatted date in the format
     DD/MM/YYYY HH:MM:SS"""
-    
+
     return time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())

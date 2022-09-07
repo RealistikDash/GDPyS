@@ -1,9 +1,14 @@
-from helpers.common import JsonFile, dict_keys
-from logger import info, debug
+from __future__ import annotations
+
+from helpers.common import dict_keys
+from helpers.common import JsonFile
+from logger import debug
+from logger import info
 
 __name__ = "ConfigModule"
 __author__ = "RealistikDash"
 __version__ = "v2.0.0"
+
 
 class ConfigReader:
     """A parent class meant for the easy management, updating and the creation
@@ -18,7 +23,7 @@ class ConfigReader:
 
         # An object around the configuration file.
         self.json: JsonFile = JsonFile("config.json")
-    
+
     def __init_subclass__(cls, stop_on_update: bool = False):
         """Sets and reads the config child class."""
 
@@ -40,20 +45,22 @@ class ConfigReader:
             setattr(cls, var_name, key_val)
 
         if cls.updated:
-            info("The config has just been updated! Please edit according to your preferences!")
+            info(
+                "The config has just been updated! Please edit according to your preferences!",
+            )
             debug("Keys added: " + ", ".join(cls.updated_keys))
             raise SystemExit
-    
-    def read_json(self, key: str, default = None):
+
+    def read_json(self, key: str, default=None):
         """Reads a value directly from the json file and returns
         if. If the value is not already in the JSON file, it adds
         it and sets it as `default`.
-        
+
         Args:
             key (str): The JSON key to fetch the value of.
             default (any): The value for the key to be set to if the
                 value is not set.
-                
+
         Returns:
             Value of the key.
         """
@@ -76,22 +83,24 @@ class ConfigReader:
 
             # Return default
             return default
-        
+
         # It exists, just return it.
         return self.json.file[key]
+
 
 # TODO: Notifications for config updates.
 class Config(ConfigReader):
     """The main GDPyS class for the storage of config values.
     These values are read directly from the `config.json` file."""
 
-    http_sock: str      = "/tmp/gdpys.sock"
-    http_max_conn: int  = 5
-    sql_host: str       = "localhost"
-    sql_user: str       = "root"
-    sql_db: str         = "GDPyS"
-    sql_password: str   = ""
-    dir_levels: str     = ".data/levels"
+    http_sock: str = "/tmp/gdpys.sock"
+    http_max_conn: int = 5
+    sql_host: str = "localhost"
+    sql_user: str = "root"
+    sql_db: str = "GDPyS"
+    sql_password: str = ""
+    dir_levels: str = ".data/levels"
     command_prefix: str = "/"
+
 
 conf = Config()

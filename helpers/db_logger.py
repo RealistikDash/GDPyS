@@ -5,7 +5,7 @@ from typing import Union
 
 from .time import get_timestamp
 from const import LogTypes
-from objects.glob import sql
+from objects import glob
 
 INSERT_PREFIX = "INSERT INTO logs (type, message, extra, timestamp) VALUES "
 
@@ -47,7 +47,7 @@ class DBLogger:
         elif extra_type is int:
             extra = str(extra)
 
-        async with self.log_lock.acquire():
+        async with self.log_lock:
             self.log_queue.append([l_type, message, extra, get_timestamp()])
 
     async def commit(self) -> None:
@@ -61,7 +61,7 @@ class DBLogger:
         if not self.log_queue:
             return
 
-        async with self.log_lock.acquire():
+        async with self.log_lock:
             # Start building our massive (potentially) query
             log_args = []
             log_str = "(%s, %s, %s, %s) " * len(self.log_queue)
@@ -69,7 +69,7 @@ class DBLogger:
                 log_args += args
 
             # Run database query that inserts everything.
-            await sql.execute(INSERT_PREFIX + log_str, log_args)
+            await glob.sql.execute(INSERT_PREFIX + log_str, log_args)
 
             # Clean up queue so we dont keep on adding the same old logs.
             self.log_queue.clear()

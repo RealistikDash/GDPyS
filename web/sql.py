@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
+from typing import Optional
 from typing import Tuple
 from typing import Union
 
 import aiomysql
 
 
+@dataclass
 class MySQLPool:
     """The GDPyS specific wrapper around the `aiomysql` module. It allows for
     the simple usage of the database within many circumstances while
@@ -21,23 +24,15 @@ class MySQLPool:
             pool.
     """
 
-    __slots__ = ("_pool", "_loop")
+    _pool: aiomysql.Pool
 
-    def __init__(self):
-        """Creates the default values for the connector. Use the `conntect`
-        classmethod instead."""
-        self._pool: aiomysql.Pool
-        self._loop: asyncio.AbstractEventLoop
-
-    @classmethod
+    @staticmethod
     async def connect(
-        cls,
         host: str,
         user: str,
         password: str,
         database: str,
         port: int = 3306,
-        loop: asyncio.AbstractEventLoop = None,
     ):
         """Creates the MySQL connecton pool. Handles authentication and the
         configuration of the object.
@@ -61,20 +56,18 @@ class MySQLPool:
                 one will be created.
         """
 
-        cls = cls()
-        cls._loop = asyncio.get_event_loop() if loop is None else loop
-
-        # Ok so here we create the pool.
-        cls._pool = await aiomysql.create_pool(
+        pool = await aiomysql.create_pool(
             host=host,
             port=port,
             user=user,
             password=password,
             db=database,
-            loop=cls._loop,
+            loop=asyncio.get_event_loop(),
         )
 
-        return cls
+        return MySQLPool(
+            _pool=pool,
+        )
 
     async def fetchone(self, query: str, args: tuple = ()) -> Union[tuple, None]:
         """Executes `query` in MySQL and returns the first result.

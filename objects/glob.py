@@ -7,6 +7,7 @@ from typing import Coroutine
 
 from helpers.cache import Cache
 from helpers.time import get_timestamp
+from web.sql import MySQLPool
 
 # The global object shared between most major GDPyS systems.
 
@@ -22,7 +23,7 @@ level_cache: Cache = Cache(cache_length=200, cache_limit=20)
 privileges: dict = {}
 
 # Global MySQL connection.
-sql = None
+sql: MySQLPool
 routes: dict = {}
 
 # I am SO SORRY for placing this here but circular imports suck.

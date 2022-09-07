@@ -144,7 +144,7 @@ class Level:
     def rated(self) -> bool:
         """Bool corresponding to whether the level has been rated."""
 
-        return not not self.stars  # Slightly faster than > 0 lmfao
+        return self.stars > 0
 
     @property
     def featured(self) -> bool:

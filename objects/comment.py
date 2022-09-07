@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from . import glob
 from .user import User
 from helpers.time import get_timestamp
@@ -68,7 +70,7 @@ class Comment:
         return self
 
     @classmethod
-    async def from_tuple(cls, sql_t: tuple, provide_user=None) -> "Comment":
+    async def from_tuple(cls, sql_t: tuple, provide_user=None) -> Comment:
         """Creates an instance of `Comment` from a tuple representing SQL data
         obtained directly from an SQL query (meant for bulk instance creation
         without requiring an individual sql query per comment).
@@ -99,7 +101,7 @@ class Comment:
         return comment
 
     @classmethod
-    async def from_sql(cls, comment_id: int) -> "Comment":
+    async def from_sql(cls, comment_id: int) -> Optional[Comment]:
         """Creates an instance of comment by fetching data from SQL and setting
         it for the object.
 
@@ -123,7 +125,7 @@ class Comment:
         return await Comment.from_tuple(comment_db)
 
     # Not sure if we will ever use this but ig its cool for plugins.
-    async def update(self, content: str = None) -> None:
+    async def update(self, content: Optional[str] = None) -> None:
         """Syncronises the contents of the database with the object alongside
         setting the object's new values."""
 

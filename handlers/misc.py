@@ -40,6 +40,6 @@ async def index(_) -> str:
         f"Running {GDPyS.NAME} Build {GDPyS.BUILD}\n"
         f"Connections handled: {glob.connections_handled}\n"
         f"Users registered: {glob.registered_users}\n"
-        f"Cached users: {glob.user_cache.cached_items}\n"
+        f"Cached users: {len(glob.user_cache)}\n"
         f"Server started {time_ago(get_timestamp() - glob.startup_time, False)} ago"
     )

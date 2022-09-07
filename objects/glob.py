@@ -1,36 +1,38 @@
-# Shared global class. https://cdn.discordapp.com/attachments/768893339683913728/798677938932547624/1200px-Flag_of_Poland.png
+# The global object shared between most major GDPyS systems.
 from __future__ import annotations
 
 import asyncio
 from typing import Callable
 from typing import Coroutine
+from typing import TYPE_CHECKING
 
-from helpers.cache import Cache
+from helpers.cache import LRUCache
 from helpers.time import get_timestamp
 from web.sql import MySQLPool
 
-# The global object shared between most major GDPyS systems.
+if TYPE_CHECKING:
+    from objects.user import User
+    from objects.song import Song
+    from objects.level import Level
 
-# User cache.
-user_cache: Cache = Cache(cache_length=20, cache_limit=200)
-# Song Cache
-song_cache: Cache = Cache(cache_length=20, cache_limit=200)
 
-level_cache: Cache = Cache(cache_length=200, cache_limit=20)
+user_cache: LRUCache[User] = LRUCache(
+    capacity=200,
+)  # Should be a dict or a weakref dict.
+song_cache: LRUCache[Song] = LRUCache(capacity=200)
+level_cache: LRUCache[Level] = LRUCache(capacity=200)
 
-# All of the privileges. Using a dict as we want
-# them to never expire.
 privileges: dict = {}
 
 # Global MySQL connection.
 sql: MySQLPool
 routes: dict = {}
 
-# I am SO SORRY for placing this here but circular imports suck.
+# TODO: Move.
 star_lb = None
 cp_lb = None
 
-# Some statistics
+# Statistics
 connections_handled: int = 0
 startup_time: int = get_timestamp()
 registered_users: int = 0  # Cached in cron

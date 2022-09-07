@@ -182,7 +182,7 @@ class Level:
 
         # Check if it even is locally available
         if not p:
-            return
+            raise FileNotFoundError("Level not found locally.")
 
         # Loading directly from storage.
         async with aiofiles.open(p, "r") as f:
@@ -284,8 +284,14 @@ class Level:
         ) = level_db
 
         # GDPyS custom objects.
-        self.creator = await User.from_id(user_id)
-        self.song = await Song.from_id(song_id)
+        creator = await User.from_sql(user_id)
+        song = await Song.from_sql(song_id)
+
+        assert creator is not None, "The creator of the level does not exist."
+        assert song is not None, "The song of the level does not exist."
+
+        self.creator = creator
+        self.song = song
 
         if full:
             await self._fetch_comments()
@@ -303,11 +309,9 @@ class Level:
             `None` if not found, else instance of `Level`.
         """
 
-        # Cache can save us A LOT of time. Check it in case we already have it
         if cache_l := glob.level_cache.get(level_id):
             return cache_l
 
-        # We are required to utilise the sql (slow).
         return await Level.from_sql(level_id, True)
 
     @classmethod

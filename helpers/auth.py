@@ -1,11 +1,10 @@
 # Helper that assists with the whole process of authentication.
 from __future__ import annotations
 
-from typing import Union
+from typing import Optional
 
-from .cache import Cache
+from .cache import LRUCache
 from .crypt import gjp_decode
-from .user import log_login
 from const import Privileges
 from logger import debug
 from objects.user import User
@@ -17,20 +16,9 @@ class Auth:
 
     def __init__(self):
         """Establishes the auth helper."""
+        self._correct_gjps: LRUCache[str] = LRUCache(capacity=200)
 
-        # I conciously chose to cache correct GJP values. This
-        # is because bcrypt (by design) is a slow algorhythm.
-        # While this massively increases its safety, it also
-        # means that the hashing and checking of it is
-        # computationally expensive. For example, on my
-        # raspberry pi, a simple 12 round bcrypt check takes
-        # OVER A SECOND. This is unacceptable for a server that
-        # is meant to serve many users. So I thought I could
-        # cache correct bcrypt values to make it so bcrypt only
-        # has to be ran once every 30 minutes per user.
-        self._correct_gjps: Cache = Cache(cache_length=30)
-
-    async def gjp_check(self, user_id: int, gjp: str) -> Union[User, None]:
+    async def gjp_check(self, user_id: int, gjp: str) -> Optional[User]:
         """Checks if the combination of `user_id` and `gjp` matches the
         credentials of the target user.
 
@@ -51,10 +39,8 @@ class Auth:
             If the target is not found within either medium, None is returned.
         """
 
-        # Fetch the user directly from any available medium.
         p = await User.from_id(user_id)
 
-        # Check if they even exist
         if not p:
             return
 
@@ -64,25 +50,17 @@ class Auth:
 
         # Now we check if perhaps we already cached their val.
         if cached_gjp := self._correct_gjps.get(user_id):
-            # Check if the cached gjp matches them.
             if gjp == cached_gjp:
                 debug(f"{p.name} authed successfully using cache hit.")
                 return p
 
-            # Fail them.
             debug(f"{p.name} failed auth using cache hit.")
             return
 
         # Now we compare the p_pass with bcrypt.
         if p.check_pass(gjp_decode(gjp)):
-            # They successfully authed. Store this bcrypt in cache for speed.
             self._correct_gjps.cache(user_id, gjp)
-
-            # Log our success.
             debug(f"{p.name} authed successfully using direct BCrypt check.")
-
-            # Return p obj.
             return p
 
-        # They failed.
         return

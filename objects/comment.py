@@ -94,9 +94,11 @@ class Comment:
         ) = sql_t
 
         # Set instance of user.
-        comment.poster = (
-            await User.from_id(user_id) if not provide_user else provide_user
-        )
+        poster = await User.from_id(user_id) if not provide_user else provide_user
+        assert (
+            poster is not None
+        ), "Attempted to load a comment with a non-existent user."
+        comment.poster = poster
 
         return comment
 

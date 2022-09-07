@@ -79,7 +79,7 @@ def bcrypt_check(plain_pass: str, bcrypt_pass: str) -> bool:
         return False
 
 
-def xor_cipher(text: str, key: int) -> str:
+def xor_cipher(text: str, key: str) -> str:
     """Encrypts the string `text` using the XOR cipher with the key `key`.
 
     Args:
@@ -90,7 +90,7 @@ def xor_cipher(text: str, key: int) -> str:
         An XOR encoded string of param `text` using the key `key`.
     """
 
-    return "".join(chr(ord(x) ^ ord(y)) for (x, y) in zip(str(text), cycle(str(key))))
+    return "".join(chr(ord(x) ^ ord(y)) for (x, y) in zip(text, cycle(key)))
 
 
 def gjp_decode(gjp: str) -> str:

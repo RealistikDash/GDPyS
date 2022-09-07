@@ -14,7 +14,7 @@ class GDPyS:
     """Metadata on GDPyS."""
 
     NAME: str = "GDPyS v3"
-    BUILD: int = 2021_09_03  # Not really build as its Python but it sounds cool.
+    BUILD: int = 2022_09_07  # Not really build as its Python but it sounds cool.
 
 
 class HandlerTypes(IntFlag):
@@ -33,11 +33,11 @@ class HandlerTypes(IntFlag):
 class XorKeys:
     """XOR cipher keys frequently used within Geometry Dash."""
 
-    LEVEL_PASSWORD = 26364
-    MESSAGE = 14251
-    GJP = 37526
-    QUESTS = 19847
-    CHESTS = 59182
+    LEVEL_PASSWORD = "26364"
+    MESSAGE = "14251"
+    GJP = "37526"
+    QUESTS = "19847"
+    CHESTS = "59182"
 
 
 class ReqStats(IntFlag):

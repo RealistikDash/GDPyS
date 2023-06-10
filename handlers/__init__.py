@@ -5,4 +5,4 @@ from . import leaderboards
 from . import levels
 from . import login
 from . import misc
-from . import profile
+from . import profiles
